@@ -21,7 +21,7 @@ I encourage you to experiment on test nets but running a validator can be hard. 
 Personally, I will build my own validator node! I am aware of the risks!
 
 # Validator at home or run stuff in the Cloud?
-The beauty of the decentralization, that anyone can participate, if you have the required skills and hardware. You can run a validator node at home, if you have stable internet and electricity.
+The beauty of the decentralization, that anyone can participate, if you have the required skills and hardware. You can run a validator node at home, if you have stable internet and electricity. Of course, it does matter which network we're talking about! This will be mostly about Eth, but running a Sentry config on Cosmos/Crypto.org Chain is not recommended (or possible) at home (if you have only one public/dynamic IP). Solana requires extremly high network bandwidth (300Mbit/s symmetric, commercial. 1GBit/s preferred), which most home user don't have.
 
 You can use cloud providers, VPS providers too. In this case – again – you don’t have to worry about the hardware and internet, but you must build up the system. In most cases you can spin up new nodes with a base system in about 5 minutes from base images. These are pre-built, easy to scale operating systems, but you can’t make any deep customization as they are often optimized for the infrastructure of the service provider.
 
@@ -34,9 +34,9 @@ There are pre-build systems, mini-PCs which are configured to run the beacon cha
 
 I do not want to tell anyone what to do, just thinking about possible failures. I have 32ETH and I do not want to lose it, I want to protect it! So, I must understand how the validator works, I must have backups and a disaster recovery plan, which will spare me from slashing.
 
-I chose to build my own validator at home as it supports decentralization. If most of us would use AWS, Azure, GCP or any cloud provides, there would be no decentralization, and the big providers could attack the network.
+I chose to build my own validator at home as it supports decentralization. If most of us would use AWS, Azure, GCP or any cloud provides, there would be no decentralization, and the big providers could control/attack the network.
 
-# Hardware
+# Hardware (for the ETH Beacon Chain)
 Best place to start: (https://launchpad.ethereum.org/en/checklist)
 
 This page will give you some good information about the hardware you need. The most important is, you will need SSD storage to consistently handle necessary read/write speeds, and you do not want cheap SSD!
@@ -50,22 +50,22 @@ I have a motherboard with X79 chipset, a Xeon e5-2620 processor and 32GB ECC ram
 # Operating system
 This could lead to a dark forest. If you are a Windows or MAC fan, check which client supports your system and use it. First on test net of course. I recommend checking all the clients, the install process, recovery process and even the migration from one client to another one. You may need this if a bug breaks one validator client, others are not necessarily affected.
 
-I am not a fan of Windows nor Apple when it comes to mission critical systems. Stone me…. I do not care. I use Linux servers, so I will use Linux here too. However not Ubuntu, like in 98% of the guides and tutorials. My personal system of choice is openSUSE.
+I am not a fan of Windows nor Apple when it comes to mission critical systems. Stone me…. I do not care. I use Linux servers, so I will use Linux here too. However not Ubuntu, like in 98% of the guides and tutorials. My personal system of choice is openSUSE or Red Hat/CentOS/Rocky Linux.
 
 Most of the people will use Linux too. There are other alternatives, like DappNode (https://dappnode.io/), which will handle most of the process and you can set up everything from a browser window. Check all of them, play a little, and decide! There are more then one solutions!
 
 # Software components
 As you can see on the https://eth.wiki/eth2/clients page, there are a lot of beacon chain clients.
 
-My personal choices are: Prysm, Teku and Lighthouse. They are just working.
+My personal choices at the time are: Prysm, Teku and Lighthouse. They are just working.
 
 I have tested methods for system setup using these clients and even migration steps from one to another. Check the client docs and choose wisely!
 
-As for the eth1 node, you can use Infura or some other service providers node but building on them can be a single point of failure. Better to run your own node, or with trusted friends, partners run one node and use it together. 
+As for the eth1 node, you can use Infura, Alchemy or some other service providers node but building on them can be a single point of failure. Better to run your own node, or with trusted friends, partners run one node and use it together. However I can recommend this kind of service providers as a backup Eth1 client. The free plan is a good solution if you need a new eth1 client, within 2 minutes, only for a few days, while you backup system syncs up fully.
 
 My personal choice is Geth. This is where you need the SSD! Downloading and later just syncing, processing the eth1 network transactions require a significant amount of storage and I/O speed. Simple, consumer grade hard disks cannot do the task. I would not recommend cheap SSDs, buy one with great durability, with a large number as endurance rating. On my servers I use Intel D3-S4510 Series SSDs as they have 5 yr warranty and a total of 6.5 Petabyte total write capacity.
 
-In the validator I use a Samsung 860 Pro but a P883 – it is a datacenter grade SSD – is also affordable and may worth the price ad you will run a “32ETH system” on it.
+In the validator I use a Samsung P883 – it is a datacenter grade SSD – is also affordable and may worth the price ad you will run a “32ETH system” on it.
 
 # Testing
 Before you go to mainnet, it is a wise approach to spend some time on test nets. Experiment.
