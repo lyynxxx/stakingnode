@@ -1,0 +1,243 @@
+<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+<bootloader>
+	<global>
+	  <activate config:type="boolean">true</activate>
+	  <gfxmode>auto</gfxmode>
+	  <hiddenmenu>false</hiddenmenu>
+	  <os_prober>false</os_prober>
+	  <terminal>gfxterm</terminal>
+	  <timeout config:type="integer">3</timeout>
+	  <suse_btrfs config:type="boolean">false</suse_btrfs>
+	  <append>nomodeset vga=0x317 ipv6.disable=1</append>
+	</global>
+</bootloader>
+
+<general>
+  <mode>
+   	<confirm config:type="boolean">false</confirm>
+   	<second_stage config:type="boolean">true</second_stage>
+   	<forceboot config:type="boolean">false</forceboot>
+  </mode>
+</general>
+
+<partitioning config:type="list">
+	<drive>
+	  <device>/dev/sda</device>
+      <disklabel>gpt</disklabel>
+      <enable_snapshots config:type="boolean">true</enable_snapshots>
+      <initialize config:type="boolean">true</initialize>
+      <partitions config:type="list">
+      	<partition>
+          <create config:type="boolean">true</create>
+          <format config:type="boolean">true</format>
+          <partition_id config:type="integer">263</partition_id>
+          <partition_nr config:type="integer">1</partition_nr>
+          <resize config:type="boolean">false</resize>
+          <size>8388608</size>
+        </partition>
+        <partition>
+          <create config:type="boolean">true</create>
+          <filesystem config:type="symbol">swap</filesystem>
+          <format config:type="boolean">true</format>
+          <mount>swap</mount>
+          <mountby config:type="symbol">uuid</mountby>
+          <partition_id config:type="integer">130</partition_id>
+          <partition_nr config:type="integer">2</partition_nr>
+          <resize config:type="boolean">false</resize>
+          <size>2G</size>
+        </partition>
+        <partition>
+          <create config:type="boolean">true</create>
+          <create_subvolumes config:type="boolean">true</create_subvolumes>
+          <filesystem config:type="symbol">btrfs</filesystem>
+          <format config:type="boolean">true</format>
+          <mount>/</mount>
+          <mountby config:type="symbol">uuid</mountby>
+          <partition_id config:type="integer">131</partition_id>
+          <partition_nr config:type="integer">3</partition_nr>
+          <resize config:type="boolean">false</resize>
+          <size>8G</size>
+          <subvolumes config:type="list">
+            <subvolume>
+              <copy_on_write config:type="boolean">true</copy_on_write>
+              <path>usr</path>
+            </subvolume>
+            <subvolume>
+              <copy_on_write config:type="boolean">true</copy_on_write>
+              <path>boot/grub2/x86_64-efi</path>
+            </subvolume>
+            <subvolume>
+              <copy_on_write config:type="boolean">true</copy_on_write>
+              <path>boot/grub2/i386-pc</path>
+            </subvolume>
+            <subvolume>
+              <copy_on_write config:type="boolean">false</copy_on_write>
+              <path>var</path>
+            </subvolume>
+            <subvolume>
+              <copy_on_write config:type="boolean">true</copy_on_write>
+              <path>bin</path>
+            </subvolume>
+            <subvolume>
+              <copy_on_write config:type="boolean">true</copy_on_write>
+              <path>sbin</path>
+            </subvolume>
+            <subvolume>
+              <copy_on_write config:type="boolean">true</copy_on_write>
+              <path>home</path>
+            </subvolume>
+            <subvolume>
+              <copy_on_write config:type="boolean">true</copy_on_write>
+              <path>tmp</path>
+            </subvolume>
+            <subvolume>
+              <copy_on_write config:type="boolean">true</copy_on_write>
+              <path>lib</path>
+            </subvolume>
+            <subvolume>
+              <copy_on_write config:type="boolean">true</copy_on_write>
+              <path>lib64</path>
+            </subvolume>
+          </subvolumes>
+          <subvolumes_prefix><![CDATA[@]]></subvolumes_prefix>
+        </partition>
+       </partitions>
+	</drive>
+</partitioning>
+
+<keyboard>
+	<keymap>english-us</keymap>
+</keyboard>
+
+<timezone>
+	<hwclock>UTC</hwclock>
+	<timezone>Europe/Budapest</timezone>
+</timezone>
+
+<networking>
+  <ipv6 config:type="boolean">false</ipv6>
+  <dns>
+  	<keep_install_network config:type="boolean">true</keep_install_network>
+  	<domain>validator</domain>
+  	<hostname>eth2</hostname>
+  	<nameservers config:type="list">
+  		<nameserver>192.168.10.1</nameserver>
+  		<nameserver>8.8.8.8</nameserver>
+  	</nameservers>
+  	<resolv_conf_policy>auto</resolv_conf_policy>
+  </dns>
+  <interfaces config:type="list">
+	<interface>
+		<bootproto>static</bootproto>
+		<name>eth0</name>
+		<ipaddr>192.168.10.230</ipaddr>
+		<netmask>255.255.255.0</netmask>
+		<network>192.168.10.0</network>
+		<prefixlen>24</prefixlen>
+		<startmode>auto</startmode>
+	</interface>
+  </interfaces>
+<routing>
+	<ipv4_forward config:type="boolean">false</ipv4_forward>
+	<ipv6_forward config:type="boolean">false</ipv6_forward>
+	<routes config:type="list">
+		<route>
+			<destination>default</destination>
+			<name>eth0</name>
+			<gateway>192.168.10.1</gateway>
+		</route>
+	</routes>
+</routing>
+</networking>
+
+<ntp-client>
+    <ntp_policy>auto</ntp_policy>
+    <ntp_servers config:type="list">
+      <ntp_server>
+        <!-- replace ntp server address value bellow with one from your infrastructure -->
+        <address>0.hu.pool.ntp.org</address>
+        <iburst config:type="boolean">true</iburst>
+        <offline config:type="boolean">true</offline>
+      </ntp_server>
+    </ntp_servers>
+    <ntp_sync>systemd</ntp_sync>
+</ntp-client>
+
+<software>
+  <install_recommended config:type="boolean">false</install_recommended>
+   <patterns config:type="list">
+    	<pattern>base</pattern>
+   </patterns>
+   <packages config:type="list">
+	   	<package>mc</package>
+	   	<package>git</package>
+	   	<package>curl</package>
+	   	<package>mailx</package>
+	   	<package>fail2ban</package>
+	   	<package>nftables</package>
+	   	<package>audit</package>
+	   	<package>rsyslog</package>
+	   	<package>vim</package>
+	   	<package>htop</package>
+	   	<package>ca-certificates</package>
+	   	<package>ca-certificates-cacert</package>
+	   	<package>ca-certificates-mozilla</package>
+	   	<package>dos2unix</package>
+   </packages>
+   <remove-packages config:type="list">
+   		<package>postfix</package>
+   		<package>firewalld</package>
+   		<package>SuSEfirewall2</package>
+   </remove-packages>
+</software>
+
+<services-manager>
+	<services>
+		<enable config:type="list">
+			<service>sshd</service>
+		</enable>
+	</services>
+</services-manager>
+
+<users config:type="list">
+  <user>
+  	<username>root</username>
+  	<user_password>linux</user_password>
+  	<encrypted config:type="boolean">false</encrypted>
+  </user>
+  <user>
+  	<username>lyynxxx</username>
+  	<user_password>v1rus0</user_password>
+  	<encrypted config:type="boolean">false</encrypted>
+  	<authorized_keys config:type="list">
+	  <listentry>ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAsCaKUzXes0z4WMqY8tQ9PsTEFmYVIyj7nYd4F9iZXSHZfDv6AbyCudGVXHdrdAe4VnMmoWVg6j8k546KQzFZ3bQl5UJdWrqulwCvFrH8yEyouqmA6OeSSAz7ALG85FBYiVWVKWrlzLqAIT/Gn+Ud57Pu3d4OowH00EXqksKdeux/eT+nyGuC7Je2ecvXLqETOhOJDhAicZf8SEcu5Rsbz7dEqZPnXC+4zfibqDuldzKDEkYL4Pyc4mcG+F15yxmW0OyjMLUI93kcgtmwXVKRPV2k0ceuqa7a3zlhbwae/ofgC7AwsUBZYdxxSfxmkGIXZYfoaN1PxiXj+aiMFdis5w==</listentry>
+	</authorized_keys>
+  </user>
+</users>
+<kdump>
+    <add_crash_kernel config:type="boolean">false</add_crash_kernel>
+</kdump>
+
+<scripts>
+	<post-scripts config:type="list">
+		<script>
+			<location>http://192.168.10.125/vm/01-system-setup-eth.sh</location>
+		</script>
+		<script>
+			<location>http://192.168.10.125/vm/service-geth.sh</location>
+		</script>
+		<script>
+			<location>http://192.168.10.125/vm/service-prysm.sh</location>
+		</script>
+    <script>
+      <location>http://192.168.10.125/vm/service-node_exporter.sh</location>
+    </script>
+		<script>
+			<location>http://192.168.10.125/vm/99-lockdown.sh</location>
+		</script>
+	</post-scripts>
+</scripts>
+
+</profile>

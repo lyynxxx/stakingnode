@@ -1,0 +1,256 @@
+<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+<bootloader>
+	<global>
+	  <activate config:type="boolean">true</activate>
+	  <gfxmode>auto</gfxmode>
+	  <hiddenmenu>false</hiddenmenu>
+	  <os_prober>false</os_prober>
+	  <terminal>gfxterm</terminal>
+	  <timeout config:type="integer">3</timeout>
+	  <suse_btrfs config:type="boolean">false</suse_btrfs>
+	  <append>nomodeset vga=0x317 ipv6.disable=1</append>
+	</global>
+</bootloader>
+
+<general>
+  <mode>
+   	<confirm config:type="boolean">false</confirm>
+   	<second_stage config:type="boolean">true</second_stage>
+   	<forceboot config:type="boolean">false</forceboot>
+  </mode>
+</general>
+
+<partitioning config:type="list">
+ 	<drive>
+ 		<initialize config:type="boolean">true</initialize>
+ 		<use>all</use>
+ 		<partitions config:type="list">
+ 			<partition>
+          		<mount>/boot/efi</mount>
+          		<size>256MB</size>
+          		<partition_id config:type="integer">1</partition_id>
+          		<filesystem config:type="symbol">vfat</filesystem>
+          		<fstopt>rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro</fstopt>
+        	</partition>
+ 			<partition>
+          		<mount>/boot</mount>
+          		<size>256MB</size>
+          		<filesystem config:type="symbol">xfs</filesystem>
+          		<fstopt>rw,nodev,nosuid,noexec,noatime,seclabel,attr2,inode64,noquota</fstopt>
+        	</partition>
+        	<partition>
+        		<create config:type="boolean">true</create>
+        		<partition_id config:type="integer">142</partition_id>
+        		<lvm_group>system</lvm_group>
+        		<size>max</size>        		
+        	</partition>
+ 		</partitions>
+ 	</drive>
+ 	<drive>
+ 		<device>/dev/system</device>
+ 		<initialize config:type="boolean">true</initialize>
+ 		<is_lvm_vg config:type="boolean">true</is_lvm_vg>
+ 		<type config:type="symbol">CT_LVM</type>
+ 		<pesize>4M</pesize>
+ 		<use>all</use>
+ 		<partitions config:type="list">
+ 			<partition>
+ 				<label>swap</label>
+ 				<mountby config:type="symbol">uuid</mountby>
+ 				<filesystem config:type="symbol">swap</filesystem>
+ 				<lv_name>swap</lv_name>
+ 				<mount>swap</mount>
+ 				<size>4GiB</size>
+ 			</partition>
+ 			<partition>
+ 				<label>root</label>
+ 				<mountby config:type="symbol">uuid</mountby>
+ 				<filesystem config:type="symbol">xfs</filesystem>
+ 				<fstopt>rw,nodev,nosuid,seclabel,attr2,inode64,noquota</fstopt>
+ 				<lv_name>root</lv_name>
+ 				<mount>/</mount>
+ 				<size>2GiB</size>
+ 			</partition>
+ 			<partition>
+ 				<label>usr</label>
+ 				<mountby config:type="symbol">uuid</mountby>
+ 				<filesystem config:type="symbol">xfs</filesystem>
+ 				<fstopt>rw,nodev,noatime,seclabel,attr2,inode64,noquota</fstopt>
+ 				<lv_name>usr</lv_name>
+ 				<mount>/usr</mount>
+ 				<size>3GiB</size>
+ 			</partition>
+ 			<partition>
+ 				<label>tmp</label>
+ 				<mountby config:type="symbol">uuid</mountby>
+ 				<filesystem config:type="symbol">xfs</filesystem>
+ 				<fstopt>rw,nodev,nosuid,noexec,noatime,seclabel,attr2,inode64,noquota</fstopt>
+ 				<lv_name>tmp</lv_name>
+ 				<mount>/tmp</mount>
+ 				<size>1GiB</size>
+ 			</partition>
+ 			<partition>
+ 				<label>var</label>
+ 				<mountby config:type="symbol">uuid</mountby>
+ 				<filesystem config:type="symbol">xfs</filesystem>
+ 				<fstopt>rw,nodev,nosuid,noexec,seclabel,attr2,inode64,noquota</fstopt>
+ 				<lv_name>var</lv_name>
+ 				<mount>/var</mount>
+ 				<size>2GiB</size>
+ 			</partition>
+ 			<partition>
+ 				<label>home</label>
+ 				<mountby config:type="symbol">uuid</mountby>
+ 				<filesystem config:type="symbol">xfs</filesystem>
+ 				<fstopt>rw,nodev,nosuid,noexec,noatime,seclabel,attr2,inode64,noquota</fstopt>
+ 				<lv_name>home</lv_name>
+ 				<mount>/home</mount>
+ 				<size>2G</size>
+ 			</partition>
+ 			<partition>
+ 				<label>opt</label>
+ 				<mountby config:type="symbol">uuid</mountby>
+ 				<filesystem config:type="symbol">xfs</filesystem>
+ 				<fstopt>rw,nodev,nosuid,noatime,seclabel,attr2,inode64,noquota</fstopt>
+ 				<lv_name>opt</lv_name>
+ 				<mount>/opt</mount>
+ 				<size>max</size>
+ 			</partition>
+ 		</partitions>
+ 	</drive>
+</partitioning>
+
+<keyboard>
+	<keymap>english-us</keymap>
+</keyboard>
+
+<timezone>
+	<hwclock>UTC</hwclock>
+	<timezone>Europe/Budapest</timezone>
+</timezone>
+
+<networking>
+  <ipv6 config:type="boolean">false</ipv6>
+  <dns>
+  	<keep_install_network config:type="boolean">true</keep_install_network>
+  	<domain>cro</domain>
+  	<hostname>sentinel</hostname>
+  	<nameservers config:type="list">
+  		<nameserver>192.168.0.1</nameserver>
+  		<nameserver>8.8.8.8</nameserver>
+  	</nameservers>
+  	<resolv_conf_policy>auto</resolv_conf_policy>
+  </dns>
+  <interfaces config:type="list">
+	<interface>
+		<bootproto>static</bootproto>
+		<name>eth0</name>
+		<ipaddr>192.168.0.230</ipaddr>
+		<netmask>255.255.255.0</netmask>
+		<network>192.168.0.0</network>
+		<prefixlen>24</prefixlen>
+		<startmode>auto</startmode>
+	</interface>
+  </interfaces>
+<routing>
+	<ipv4_forward config:type="boolean">false</ipv4_forward>
+	<ipv6_forward config:type="boolean">false</ipv6_forward>
+	<routes config:type="list">
+		<route>
+			<destination>default</destination>
+			<name>eth0</name>
+			<gateway>192.168.0.1</gateway>
+		</route>
+	</routes>
+</routing>
+</networking>
+
+<ntp-client>
+    <ntp_policy>auto</ntp_policy>
+    <ntp_servers config:type="list">
+      <ntp_server>
+        <!-- replace ntp server address value bellow with one from your infrastructure -->
+        <address>0.hu.pool.ntp.org</address>
+        <iburst config:type="boolean">true</iburst>
+        <offline config:type="boolean">true</offline>
+      </ntp_server>
+    </ntp_servers>
+    <ntp_sync>systemd</ntp_sync>
+</ntp-client>
+
+<software>
+  <install_recommended config:type="boolean">false</install_recommended>
+   <patterns config:type="list">
+    	<pattern>base</pattern>
+   </patterns>
+   <packages config:type="list">
+	   	<package>mc</package>
+	   	<package>git</package>
+	   	<package>curl</package>
+	   	<package>mailx</package>
+	   	<package>fail2ban</package>
+	   	<package>nftables</package>
+	   	<package>audit</package>
+	   	<package>rsyslog</package>
+	   	<package>jq</package>
+	   	<package>vim</package>
+	   	<package>htop</package>
+	   	<package>ca-certificates</package>
+	   	<package>ca-certificates-cacert</package>
+	   	<package>ca-certificates-mozilla</package>
+      <package>logwatch</package>
+   </packages>
+   <remove-packages config:type="list">
+   		<package>postfix</package>
+   		<package>firewalld</package>
+   		<package>SuSEfirewall2</package>
+   </remove-packages>
+</software>
+
+<services-manager>
+	<services>
+		<enable config:type="list">
+			<service>sshd</service>
+		</enable>
+	</services>
+</services-manager>
+
+<users config:type="list">
+  <user>
+  	<username>root</username>
+  	<user_password>linux</user_password>
+  	<encrypted config:type="boolean">false</encrypted>
+  </user>
+  <user>
+  	<username>lyynxxx</username>
+  	<user_password>v1rus0</user_password>
+  	<encrypted config:type="boolean">false</encrypted>
+  	<authorized_keys config:type="list">
+	  <listentry>ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAsCaKUzXes0z4WMqY8tQ9PsTEFmYVIyj7nYd4F9iZXSHZfDv6AbyCudGVXHdrdAe4VnMmoWVg6j8k546KQzFZ3bQl5UJdWrqulwCvFrH8yEyouqmA6OeSSAz7ALG85FBYiVWVKWrlzLqAIT/Gn+Ud57Pu3d4OowH00EXqksKdeux/eT+nyGuC7Je2ecvXLqETOhOJDhAicZf8SEcu5Rsbz7dEqZPnXC+4zfibqDuldzKDEkYL4Pyc4mcG+F15yxmW0OyjMLUI93kcgtmwXVKRPV2k0ceuqa7a3zlhbwae/ofgC7AwsUBZYdxxSfxmkGIXZYfoaN1PxiXj+aiMFdis5w==</listentry>
+	</authorized_keys>
+  </user>
+</users>
+<kdump>
+    <add_crash_kernel config:type="boolean">false</add_crash_kernel>
+</kdump>
+
+<scripts>
+	<post-scripts config:type="list">
+		<script>
+			<location>http://192.168.0.77/vm/01-system-setup-cro.sh</location>
+		</script>
+    <script>
+      <location>http://192.168.0.77/vm/service-node_exporter.sh</location>
+    </script>
+    <script>
+      <location>http://192.168.0.77/vm/service-cro.sh</location>
+    </script>
+		<script>
+			<location>http://192.168.0.77/vm/99-lockdown.sh</location>
+		</script>
+	</post-scripts>
+</scripts>
+
+</profile>

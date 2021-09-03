@@ -1,0 +1,18 @@
+[Unit]
+Description=Prysm Validator
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=120
+User=validator
+LimitNOFILE=5120
+LimitNPROC=5120
+ExecStart=/opt/validator/bin/validator --datadir=/opt/validator/data --wallet-dir=/opt/validator/.eth2validators/prysm-wallet-v2 --graffiti "Powered by Lynx's automated setup / openSuSE+Prysm :)" --wallet-password-file=/opt/validator/.wpwd --accept-terms-of-use
+InaccessibleDirectories=/home /var
+ReadOnlyDirectories=/etc /usr
+
+[Install]
+WantedBy=multi-user.target

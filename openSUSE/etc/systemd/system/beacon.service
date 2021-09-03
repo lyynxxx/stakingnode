@@ -1,0 +1,19 @@
+[Unit]
+Description=Prysm Beacon Chain
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=beacon
+LimitNOFILE=5120
+LimitNPROC=5120
+Environment="publicIP=$(curl -s v4.ident.me)"
+ExecStart=/opt/beacon-chain/bin/beacon-chain --p2p-host-ip=${publicIP} --datadir=/opt/beacon-chain/data --http-web3provider=http://127.0.0.1:8545 --accept-terms-of-use --log-format=journald
+InaccessibleDirectories=/home /var
+ReadOnlyDirectories=/etc /usr
+
+[Install]
+WantedBy=multi-user.target

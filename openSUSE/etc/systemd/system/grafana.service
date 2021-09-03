@@ -1,0 +1,22 @@
+[Unit]
+Description=Grafana instance
+Documentation=http://docs.grafana.org
+Wants=network-online.target
+After=network-online.target
+After=cronode.service
+
+[Service]
+#EnvironmentFile=/etc/sysconfig/grafana
+User=grafana
+Group=grafana
+Type=notify
+Restart=on-failure
+WorkingDirectory=/opt/grafana/public
+RuntimeDirectory=grafana
+RuntimeDirectoryMode=0750
+ExecStart=/opt/grafana/bin/grafana-server
+LimitNOFILE=10000
+TimeoutStopSec=20
+
+[Install]
+WantedBy=multi-user.target

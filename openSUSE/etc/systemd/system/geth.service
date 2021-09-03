@@ -1,0 +1,23 @@
+[Unit]
+Description=Ethereum go client
+After=network.target 
+Wants=network.target
+
+[Service]
+User=geth 
+Group=geth
+Type=simple
+Restart=always
+RestartSec=5
+LimitNOFILE=5120
+LimitNPROC=5120
+ExecStart=/opt/goethereum/bin/geth --cache=4096 --maxpeers=30 --http --datadir /opt/goethereum/data
+InaccessibleDirectories=/home /var
+ReadOnlyDirectories=/etc /usr
+PrivateTmp=yes
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=GETH
+
+[Install]
+WantedBy=default.target

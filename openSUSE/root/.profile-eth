@@ -1,0 +1,57 @@
+function syncing() {
+	
+	/opt/goethereum/bin/geth attach http://localhost:8545 << EOF
+	eth.syncing
+	EOF
+
+}
+
+function prysm-checkversion() {
+
+	echo "Checking Prysm beacon-chain..."
+	version=$(/opt/beacon-chain/bin/beacon-chain --version| grep -Po '(?<=Prysm/)[^B]+' | cut -d "/" -f1)
+	echo "Used version: $version"
+
+	echo "Checking Prysm validator..."
+	version=$(/opt/beacon-chain/bin/validator --version| grep -Po '(?<=Prysm/)[^B]+' | cut -d "/" -f1)
+	echo "Used version: $version"
+
+	git_latest=$(curl -f -s https://prysmaticlabs.com/releases/latest)
+	echo "Latest available version: $git_latest"
+
+	if [ $version != $git_latest ]; then
+	    echo "Update required..."
+	else
+	    echo "Nothing to do"
+	fi
+
+}
+
+function prysm-update() {
+	git_latest=$(curl -f -s https://prysmaticlabs.com/releases/latest)
+	cd /root/bin
+	/root/bin/prysm.sh beacon-chain --download-only
+	/root/bin/prysm.sh validator --download-only
+	read -p "Do you want to copy and overwrite the old binaries with the new ones? " -n 1 -r
+	echo    # (optional) move to a new line
+	if [[ $REPLY =~ ^[Yy]$ ]]
+	then
+		echo "Stopping services..."
+		systemctl stop beacon
+		systemctl stop validator
+		echo "Moving /root/bin/dist/beacon-chain-${git_latest}-linux-amd64 into /opt/beacon-chain/bin/beacon-chain"
+		cp /root/bin/dist/beacon-chain-${git_latest}-linux-amd64 /opt/beacon-chain/bin/beacon-chain
+		chown -R beacon:beacon /opt/beacon-chain/bin
+		echo "Testing..."
+		/opt/beacon-chain/bin/beacon-chain --version
+		sleep 2
+		echo "Moving /root/bin/dist/validator-${git_latest}-linux-amd64 into /opt/validator/bin/validator"
+		cp /root/bin/dist/validator-${git_latest}-linux-amd64 /opt/validator/bin/validator
+		chown -R validator:validator /opt/validator/bin
+		echo "Testing..."
+		/opt/validator/bin/validator --version
+		sleep 2
+		echo "Services won't start! Starting the services is a manual step, if you want to check somathing again..."
+	fi
+
+}

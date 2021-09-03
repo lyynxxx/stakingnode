@@ -1,0 +1,34 @@
+alias syncing="curl -s http://localhost:26657/status | jq .result.sync_info.catching_up"
+
+export MYKEY=cro1xh2j33996jv892eqd0cmfk8sxl8p28nxv8jpjg
+export MYVALIDATORADDRESS="crocncl1xh2j33996jv892eqd0cmfk8sxl8p28nx023gs5"
+export PUBKEY="crocnclconspub1zcjduepqte7exwuhxp27y8n2mzxjzh96ddlgdpcuggkcn03v254t0uqn8yssz2d7q8"
+export OPERATION_ADDRESS="crocnclcons1pz7wcqk8d94qtjkhtzmqk04etdcdw4z4rj4hw6"
+
+cro-balance() {
+    AMOUNT=$(su - sentry -s /bin/bash -c "/opt/cro-sentry/bin/chain-maind --home /opt/cro-sentry/.chain-maind query bank balances $MYKEY" | grep amount | cut -d " " -f3|sed "s/\"//g" )
+    CRO=$(( AMOUNT / 100000000 ))
+    echo "Balance: $CRO"
+}
+
+cro-showrewards() {
+        AMOUNT=$(su - sentry -s /bin/bash -c "/opt/cro-sentry/bin/chain-maind --home /opt/cro-sentry/.chain-maind q distribution rewards $MYKEY crocncl1xh2j33996jv892eqd0cmfk8sxl8p28nx023gs5"| grep amount | cut -d " " -f3 | sed "s/\"//g" | cut -d "." -f1 )
+        REWARD=$(( AMOUNT / 100000000 ))
+        echo "Available rewards: $REWARD"
+
+        AMOUNT=$(su - sentry -s /bin/bash -c "/opt/cro-sentry/bin/chain-maind --home /opt/cro-sentry/.chain-maind q distribution commission crocncl1xh2j33996jv892eqd0cmfk8sxl8p28nx023gs5"| grep amount | cut -d " " -f3 | sed "s/\"//g" | cut -d "." -f1 )
+        COMISSION=$(( AMOUNT / 100000000 ))
+        echo "Available comission: $COMISSION"
+}
+
+cro-showdelegations() {
+su - sentry -s /bin/bash -c "/opt/cro-sentry/bin/chain-maind --home /opt/cro-sentry/.chain-maind query staking delegations-to ${MYVALIDATORADDRESS}"
+}
+
+cro-getrewards() {
+su - sentry -s /bin/bash -c '/opt/cro-sentry/bin/chain-maind --home /opt/cro-sentry/.chain-maind tx distribution withdraw-all-rewards --from Stkr --chain-id="crypto-org-chain-mainnet-1" --gas-prices "0.1basecro" --gas 8000000 --yes' < /root/.pwd
+}
+
+cro-active () {
+	su - sentry -s /bin/bash -c "/opt/cro-sentry/bin/chain-maind --home /opt/cro-sentry/.chain-maind query tendermint-validator-set | jq '.' | grep ${OPERATION_ADDRESS}"
+}

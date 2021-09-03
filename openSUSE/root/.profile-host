@@ -1,0 +1,15 @@
+unlock-system() {
+mount -o remount,exec /var
+mount -o remount,rw /usr
+mount -o remount,rw /boot
+chattr -i /etc/passwd
+chattr -i /etc/shadow
+}
+
+lock-system() {
+mount -o remount,noexec /var
+mount -o remount,ro /usr
+mount -o remount,ro /boot
+chattr +i /etc/passwd
+chattr +i /etc/shadow
+}
