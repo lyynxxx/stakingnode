@@ -7,9 +7,9 @@ This can be tricky and maybe overkill and may do not make any sense, but as I se
 | /boot | 250M | Isolated boot partition for the kernel and the boot config files. I will make this read-only and unlock it only I need to update the system. Also apply nodev,nosuid,noexec flags. (details later)|
 | swap | 8G | It's like virtual memory. Stuff in RAM used a long time ago but not purged, can be "swapped out" to disk, to free up some memory for other applications that needs more. The system may not even use it, but if I have a bare-metal machine it can't be a problem if I have one. Virtual environments often don't have a swap partition. You have to plan your system's available memory so all the applications can fit in and you don't have to swap a lot.|
 | / | 2G | No need for a lot of space. All the other important stuff is separated and has the necessary free space. I don't have a separate user home directory, as I don't want to create many users. Only one, to log into the system. I will harden this, with noexec too also apply nodev and nosuid! |
-| /usr | 3G | Here I have all the important system binaries. This will be read-only. If an attacker gains access to the system often the first thing to alter some system binaries, to hide the tracks. In this way, it's not possible (at least it will be harder, but the auditing system can detect this kind of activity.) I apply nodev here too, but we need the other grants so can't apply noexec or nosuid.|
+| /usr | 3G | Here I have all the important system binaries. This will be read-only. If an attacker gains access to the system often the first thing to alter some system binaries, to hide the traces. In this way, it's not possible (at least it will be harder, but the auditing system can detect this kind of activity.) I apply nodev here too, but we need the other grants so can't apply noexec or nosuid.|
 | /var | 2G | For system logs and the package manager cache. No need much more, if something goes wrong and the system writes a lot of logs or some attacker forces the system to write a bunch of logs, our server won't stop as there is no more free space left, all our services can run. This may have the drawbacks that we don't log the suspicious activity, so making too small /var can be a bad practice, but in this situation, 2G will be fine. I apply nodev,nosid,noexec here.|
-| /tmp | 1G | Isolate the temp directory and disable any binary execution too is a must! We won't use this much, but scripts often use/tmp to do fishy stuff, in this way we can break them. This breaks compiling sources too, but we have a workaround for that. I apply nodev,nosuid,noexec here. |
+| /tmp | 1G | Isolate the temp directory and disable any binary execution too is a must! We won't use this much, but scripts often use /tmp to do fishy stuff, in this way we can break them. This breaks compiling sources too, but we have a workaround for that. I apply nodev,nosuid,noexec here. |
 | /opt | remaining space | This will be the location where we store the eth1 node data and prysm app and data. I apply here nodev,nosuid. |
 
 In case of UEFI boot/install a separate /boot/efi partition is also needed, in size of 200M and vfat filesystem.
@@ -24,7 +24,7 @@ I will use LVM and /opt will grow only for 90% of the available free space durin
  - ro / rw: Mount the filesystem in either read write or read only mode.
 
  Special settings for /proc:
- - hidepid=2: When looking in /proc you will discover a lot of files and directories. This includes process information from other users. This could include sensitive details that you may not want to share with other users. Setting hidepid=2 prevents users from seeing each other's processes.
+ - hidepid=2: When looking in /proc I can discover a lot of files and directories. This includes process information from other users. This could include sensitive details that you may not want to share with other users. Setting hidepid=2 prevents users from seeing each other's processes.
 
 The final /etc/fstab will look like this:
 ```
@@ -48,7 +48,7 @@ This must be executed as root or with sudo. If I reboot the machine I don't have
 
 ## Thingking about the users and system access
 
-I only need one user, who can log into the system. This non-privilegised user can then use sudo to do system administration tasks. But always using passwords! NEVER EVER user passwordless sudo!
+I only need one user, who can log into the system. This non-privilegised user can then use sudo or "su -" to do system administration tasks. But always using passwords! NEVER EVER user passwordless sudo!
 
 Also, the user can log in with ssh keys only. I don't allow any passwords. No weak nor strong passwords.
 Although passwords are sent to the server in a secure manner, they are generally not complex or long enough to be resistant to repeated, persistent attackers. Modern processing power combined with automated scripts makes brute-forcing a password-protected account very possible. 
@@ -65,7 +65,7 @@ For generating ssh keys check: https://docs.rightscale.com/faq/How_Do_I_Generate
 As this service provides the access to the system, we should prepare it for good.
 I DO NOT allow root login! I declare the only user who can log in, using the AllowUseres parameter. I will change the default port too (some SELinux config needed here, as the sshd daemon won't start if SELinux does not know about the port change, but the kickstart file contains all the steps!). Also, it's a good practice to enable StrictMode (in most distros it's on by default), disable host based authentication and password based authentication too. So if I don't have my keys, I can't log in!!!  
 
-In the kickstart script I use the 'sed' command to make changes on our freshly installed system (This is based on a CentOS Linux release 8.2.2004 (Core) fresh install... may not work for you if you only copy-paste, without knowing what you are doing).
+In the kickstart script I use the 'sed' command to make changes on our freshly installed system (This is based on a CentOS Linux release 8.2.2004 (Core)/openSUSE Leap 15.2 fresh install... may not work for you if you only copy-paste, without knowing what you are doing without checking your own config files).
 ```
 # Disable root login
 sed -i "s/^PermitRootLogin.*/PermitRootLogin no/g" /etc/ssh/sshd_config
@@ -194,19 +194,21 @@ net.ipv6.conf.default.max_addresses = 1
  
 #Enable ExecShield protection
 #Set value to 1 or 2 (recommended) 
-#kernel.exec-shield = 2
-#kernel.randomize_va_space=2
+kernel.exec-shield = 2
+kernel.randomize_va_space=2
  
 # TCP and memory optimization 
 # increase TCP max buffer size setable using setsockopt()
-#net.ipv4.tcp_rmem = 4096 87380 8388608
-#net.ipv4.tcp_wmem = 4096 87380 8388608
+net.ipv4.tcp_rmem = 4096 87380 8388608
+net.ipv4.tcp_wmem = 4096 87380 8388608
  
 # increase Linux auto tuning TCP buffer limits
-#net.core.rmem_max = 8388608
-#net.core.wmem_max = 8388608
-#net.core.netdev_max_backlog = 5000
-#net.ipv4.tcp_window_scaling = 1
+net.core.rmem_max = 8388608
+net.core.wmem_max = 8388608
+net.core.netdev_max_backlog = 10000
+net.core.netdev_budget = 600
+net.core.netdev_budget_usecs = 8000
+net.ipv4.tcp_window_scaling = 1
  
 # increase system file descriptor limit    
 fs.file-max = 100000
@@ -230,12 +232,25 @@ net.ipv4.icmp_ignore_bogus_error_responses=1
 fs.protected_hardlinks=1
 fs.protected_symlinks=1
 
+# Set console log level for kernel
+kernel.printk = 4 4 1 7
+
+# The default value of vm.swappiness is 60 and represents the percentage of the free memory before activating swap. The lower the value, the less swapping is used and the more memory pages are kept in physical memory.
+vm.swappiness = 20
+
+# https://lonesysadmin.net/2013/12/22/better-linux-disk-caching-performance-vm-dirty_ratio/
+# is the absolute maximum amount of system memory that can be filled with dirty pages before everything must get committed to disk
+vm.dirty_ratio = 80
+
+# is the percentage of system memory that can be filled with “dirty” pages — memory pages that still need to be written to disk — before the pdflush/flush/kdmflush background processes kick in to write it to disk
+vm.dirty_background_ratio = 5
+
 ```
 ## Firewall considerations (Thank you ArchWiki! https://wiki.archlinux.org/index.php/Simple_stateful_firewall)
 
 nftables is a netfilter project that aims to replace the existing {ip,ip6,arp,eb}tables framework. It provides a new packet filtering framework, a new user-space utility (nft), and a compatibility layer for {ip,ip6}tables. It uses the existing hooks, connection tracking system, user-space queueing component, and logging subsystem of netfilter.
 
-Firewalld os SuseFirewall - in contrast, because in general this can only be encountered in - is a pure frontend which comes with CentOS8/openSUSE. It's not an independent firewall by itself. It only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" and running "nftables only". Let's use nftables only!
+Firewalld os SuseFirewall2 - in contrast, because in general this can only be encountered in - is a pure frontend which comes with CentOS8/openSUSE. It's not an independent firewall by itself. It only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" and running "nftables only". Let's use nftables only!
 
 The rules are in the file /etc/sysconfig/nftables.conf, but here are the details, how it is made:
 ```
@@ -302,7 +317,7 @@ Fail2ban scans log files (e.g. /var/log/secure <- ssh preauth fail) and bans IPs
 
 To use fail2ban in this system I have to modify some settings. First I create a new config file /etc/fail2ban/jail.local. Instead of overwriting the default config, a common practice to create this file. Any parameter present in this file will override the defaults. In this way, if a package update modifies the default config file, my changes will be still present.
 
-As not all the messages show up in the systemd journal, I created a custom jail for ssh, and fail2ban reads /var/log/secure file, which contains more information (for example preauth messages and the connections drops as the user/script who tried to login don't have my ssh key. Maybe there is another, better solution for this... let me know).
+As not all the messages show up in the systemd journal, I created a custom jail for ssh, and fail2ban reads /var/log/secure file, which contains more information (for example preauth messages and the connection drops as the user/script who tried to login don't have my ssh key. Maybe there is another, better solution for this... let me know).
 
 /etc/fail2ban/jail.local
 ```
@@ -334,7 +349,7 @@ maxretry = 3
 findtime = 600
 bantime  = 86400
 ```
-Fail2Ban allows you to list IP addresses which should be ignored. This can be useful for testing purposes and can help avoid locking clients (or yourself) out unnecessarily. For example, if an attacker knows my IP, he/she or it can send spoofed packages and lock me out. The parameter 'ignoreip' can prevent this. 
+Fail2Ban allows me to list IP addresses which should be ignored. This can be useful for testing purposes and can help avoid locking clients (or myself) out unnecessarily. For example, if an attacker knows my IP, he/she or it can send spoofed packages and lock me out. The parameter 'ignoreip' can prevent this. 
 
 In /etc/fail2ban/action.d/nftables-common.local I can connect fail2ban with nftables and define which nftables tables and chains to use.
 ```
@@ -371,7 +386,7 @@ Our system comes auditd installed by default and that's a good thing for us. Aud
 It's a really handy tool and also can generate reports and send them via mail, so we can check what is happening in our system.
 
 All the configs are in /etc/audit/rules.d/audit.rules
-I "lock" the config too(-e 2 parameter), so after the service started, no one can edit/add rules without editing the lock and/or restarting the service or the machine. And that will trigger a lot of alerts... I hope I never get this kind of alert.
+I "lock" the config (-e 2 parameter), so after the service started, no one can edit/add rules without editing the lock and/or restarting the service or the machine. And that will trigger a lot of alerts... I hope I never get this kind of alert.
 
 ```
 ## First rule - delete all
@@ -469,11 +484,11 @@ To send mails, I use sendgrid and mailx. The mailx config file is /root/.mailrc 
 
 ## Logwatch
 
-LogWatch is a Perl-based log management tool that analyses a server’s log files and generates a daily report which summarises and reports on your system’s log activity. It does not provide real-time alerts but instead is most often used to send a short daily digest of server’s log activity to a system administrator. I will create reports with logwatch also in every 8 hours.
+LogWatch is a Perl-based log management tool that analyses a server’s log files and generates a daily report which summarises and reports on your system’s log activity. It does not provide real-time alerts but instead is most often used to send a short daily digest of server’s log activity to a system administrator.
 
 The default config file is /usr/share/logwatch/default.conf/logwatch.conf, but - just like fail2ban - there is a local config, as packege updates may overwrite the global config, my modifications are safe if I put them into /etc/logwatch/conf/logwatch.conf
 
-I set details level to almost max (8), and change the mailer and parameters to send the reports in email. This is a daily report I get in every 8 hours. Also I can define the services I want to include the report or just send everything (by default, but the kernel log is massive)
+I set details level to almost max (8), and change the mailer and parameters to send the reports in email. Also I can define the services I want to include the report or just send everything (by default, but the kernel log is massive).
 
 ```
 Output = mail
@@ -495,9 +510,7 @@ ReadOnlyDirectories=/var /etc
 ```
 With the ReadOnlyDirectories= and InaccessibleDirectories= options, it is possible to make the specified directories inaccessible for writing resp. both reading and writing to the service. With these two configuration lines, the whole tree below /home becomes inaccessible to the service (i.e. the directory will appear empty and with 000 access mode), and the tree below /var and /etc becomes read-only. I can define more folders, separate by spaces.
 
-For prysm I will use the official script (https://raw.githubusercontent.com/prysmaticlabs/prysm/master/prysm.sh). The kickstart file will create separate users both for the beacon chain and the validator, download the script two times, to the service users working directory. 
-
-To the eth1 node I will use geth, I just download the latest stable version from: https://geth.ethereum.org/downloads/ 
+The kickstart file will create separate users both for the beacon chain and the validator and for any other service I need to run on this system. 
 
 If you want to compile from source, you can, but personally in prod I don't like any compiler or building tool if it's not essential and the system can't work without them.
 
@@ -512,7 +525,7 @@ echo "export TEMP=/home/YOURUSER/tmp;" >> /home/YOURUSER/.bashrc
 echo "export TMPDIR=/home/YOURUSER/tmp;" >> /home/YOURUSER/.bashrc
 echo "export PATH=/home/YOURUSER/go/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin" >> /home/YOURUSER/.bashrc
 ```
-So compiling geth isn't a problem any more.
+So compiling isn't a problem any more.
 
 ### Too many open files...
 
@@ -577,7 +590,7 @@ Max realtime timeout      unlimited            unlimited            us
 
 ```
 
-Also worth calculate the limits not to exceed the system wide lmits otherwise the system will not respond.
+Also worth calculate the limits not to exceed the system wide limits otherwise the system will not respond.
 All your limints set < fs.file-max in sysctl config!
 
 ```
