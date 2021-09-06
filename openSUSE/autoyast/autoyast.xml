@@ -24,6 +24,7 @@
 
 <partitioning config:type="list">
  	<drive>
+    <!--device>/dev/disk/by-id/ata-KINGSTON_SA400S37240G_50026B7783A3C089</device-->
  		<initialize config:type="boolean">true</initialize>
  		<use>all</use>
  		<partitions config:type="list">
@@ -33,19 +34,19 @@
           		<partition_id config:type="integer">1</partition_id>
           		<filesystem config:type="symbol">vfat</filesystem>
           		<fstopt>rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro</fstopt>
-        	</partition>
+      </partition>
  			<partition>
           		<mount>/boot</mount>
           		<size>256MB</size>
           		<filesystem config:type="symbol">xfs</filesystem>
           		<fstopt>rw,nodev,nosuid,noexec,noatime,seclabel,attr2,inode64,noquota</fstopt>
-        	</partition>
-        	<partition>
+      </partition>
+      <partition>
         		<create config:type="boolean">true</create>
         		<partition_id config:type="integer">142</partition_id>
         		<lvm_group>system</lvm_group>
         		<size>max</size>        		
-        	</partition>
+      </partition>
  		</partitions>
  	</drive>
  	<drive>
@@ -100,7 +101,7 @@
  				<mount>/var</mount>
  				<size>2GiB</size>
  			</partition>
- 			<partition>
+<!-- 			<partition>
  				<label>home</label>
  				<mountby config:type="symbol">uuid</mountby>
  				<filesystem config:type="symbol">xfs</filesystem>
@@ -108,7 +109,7 @@
  				<lv_name>home</lv_name>
  				<mount>/home</mount>
  				<size>2G</size>
- 			</partition>
+ 			</partition>  remove this comment, if /home is needed -->
  			<partition>
  				<label>opt</label>
  				<mountby config:type="symbol">uuid</mountby>
@@ -223,8 +224,8 @@
   	<encrypted config:type="boolean">false</encrypted>
   </user>
   <user>
-  	<username>lyynxxx</username>
-  	<user_password>v1rus0</user_password>
+  	<username>SOMEUSER</username>
+  	<user_password>password</user_password>
   	<encrypted config:type="boolean">false</encrypted>
   	<authorized_keys config:type="list">
 	  <listentry>ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAsCaKUzXes0z4WMqY8tQ9PsTEFmYVIyj7nYd4F9iZXSHZfDv6AbyCudGVXHdrdAe4VnMmoWVg6j8k546KQzFZ3bQl5UJdWrqulwCvFrH8yEyouqmA6OeSSAz7ALG85FBYiVWVKWrlzLqAIT/Gn+Ud57Pu3d4OowH00EXqksKdeux/eT+nyGuC7Je2ecvXLqETOhOJDhAicZf8SEcu5Rsbz7dEqZPnXC+4zfibqDuldzKDEkYL4Pyc4mcG+F15yxmW0OyjMLUI93kcgtmwXVKRPV2k0ceuqa7a3zlhbwae/ofgC7AwsUBZYdxxSfxmkGIXZYfoaN1PxiXj+aiMFdis5w==</listentry>
