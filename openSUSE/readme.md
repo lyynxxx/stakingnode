@@ -15,13 +15,18 @@ Download installer: [openSUSE Leap 15.2 Network Installer](http://download.opens
 ## So... How to start???
 Assuming, you made it this far and mostly know what we will do...
 
-You need a HTTP server, from where the installer can download the AutoYaST control file. Or you can pack into the iso too. You can use your phone at home if it's on the same network as your validator machine.
+You need a HTTP server, from where the installer can download the AutoYaST control file. You can use your phone at home if it's on the same network as your validator machine. Or you can pack into the iso too.
 
 At home, I just downloaded the [latest stable nginx for windows](http://nginx.org/download/nginx-1.18.0.zip), extracted the files, and copyed my scripts and AutYaST files into the "html" folder.
 
- - If you plan to do this at home: get a PC with the neccesary hardware resources, download the openSUSE boot image I linked at the beginning, and boot (you can use Rufus to create bootable USB media or use your phone and DriveDroid). In the boot menu select the "Install" with the arrow keys (don't press enter!) and start add the boot parameters: "autoyast=http://YOURHTTPSREVER/autoyastfile.xml" and press enter. Assuming you have DHCP at home, the installer will get network and will be able to download the ks file and set up the system.
+ - If you plan to do this at home: get a PC with the neccesary hardware resources, download the openSUSE boot image I linked at the beginning, and boot (you can use Rufus to create bootable USB media or use your phone and DriveDroid). In the boot menu select the "Install" with the arrow keys (don't press enter!) and start (typing) adding boot parameters: "autoyast=http://YOURHTTPSREVER/autoyastfile.xml" and press enter. Assuming you have DHCP at home, the installer will get network and will be able to download the ks file and set up the system.
 
-  - If you want to install some hosted machine or remote virtual machine and have DHCP the steps are the same, only you need VNC or some kind of console access. (Later I will create a clound-init version too, to customize cloud images.)
+  - If you want to install some hosted machine or remote virtual machine and have DHCP the steps are the same, only you need VNC or some kind of console access. In case you have no access to DHCP, but you have an allocated, fix IP, you must set up the network in the boot kernel parameters, right after the autoyast file. The format:
+```
+ifcfg=INTERFACE="IPS_NETMASK,GATEWAYS,NAMESERVERS,DOMAINS(this one is)"
+for example (* as INTERFACE means whatewer network interface is plugged in)
+ifcfg=*="192.168.10.92/24,192.168.10.1,8.8.8.8"
+```
 
 You may want to use a PC but put the node in VirtualBox/VMware/HyperV/KVM/Xen/something, so after you set up everything you can create a full VM backup and move it to a NAS or some safe place and you don't have ot wait another two days to geth full sync if you have to restore the VM.
 In this case if you run Win10 as the host operating system, you definetly want to disable auto updates and auto restarts...
