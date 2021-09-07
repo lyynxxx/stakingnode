@@ -14,6 +14,9 @@
 ## Enable auditd and lock the config, preventing any modifications
 -e 2
 
+## This rule suppresses the time-change event when chrony does time updates
+-a never,exit -F arch=b64 -S adjtimex -F auid=unset -F uid=chrony -F subj_type=chronyd_t
+-a never,exit -F arch=b32 -S adjtimex -F auid=unset -F uid=chrony -F subj_type=chronyd_t
 
 # Record Events That Modify Date and Time Information
 -a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change

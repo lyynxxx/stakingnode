@@ -313,18 +313,18 @@ systemctl enable nftables
 ```
 ## Fail2ban - ssh protection
 
-Fail2ban scans log files (e.g. /var/log/secure <- ssh preauth fail) and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc. Generally, Fail2Ban is then used to update firewall rules to reject the IP addresses for a specified amount of time, although any arbitrary other action (e.g. sending an email) could also be configured. Out of the box, Fail2Ban comes with filters for various services (apache, courier, ssh, etc).
+Fail2ban scans log files (e.g. /var/log/secure or journald logs) and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc. Generally, Fail2Ban is then used to update firewall rules to reject the IP addresses for a specified amount of time, although any arbitrary other action (e.g. sending an email) could also be configured. Out of the box, Fail2Ban comes with filters for various services (apache, courier, ssh, etc).
 
-To use fail2ban in this system I have to modify some settings. First I create a new config file /etc/fail2ban/jail.local. Instead of overwriting the default config, a common practice to create this file. Any parameter present in this file will override the defaults. In this way, if a package update modifies the default config file, my changes will be still present.
+Some distros may have an outdated version in the distro's repository. OpenSUSE must use an additiona repository to get the latest version, it's in the autoyast file.
 
-As not all the messages show up in the systemd journal, I created a custom jail for ssh, and fail2ban reads /var/log/secure file, which contains more information (for example preauth messages and the connection drops as the user/script who tried to login don't have my ssh key. Maybe there is another, better solution for this... let me know).
+To override the defaults, I don't change the main configs, as a version update may replace the config/filter files. Fail2ban checks if there is a .local file with the same name. So to modify some settings, I just create a jail.local file, which can contain the same settings as jail.conf, but this will override the defaults. In this file I can define the default backend (systemd), the default ban action to use nftables and some filters, like the sshd filter.
 
 /etc/fail2ban/jail.local
 ```
 [DEFAULT]
 # Ban IP/hosts for 24 hour ( 24h*3600s = 86400s):
 bantime = 86400
-backend = auto
+backend = systemd
 
 # An ip address/host is banned if it has generated "maxretry" during the last "findtime" seconds.
 findtime = 600
@@ -334,24 +334,26 @@ maxretry = 3
 # will not ban a host which matches an address in this list. Several addresses
 # can be defined using space (and/or comma) separator. For example, add your
 # static IP address that you always use for login such as 103.1.2.3
-ignoreip = 192.168.0.100
+ignoreip = 92.191.183.41
 
-banaction = nftables
-banaction_allports = nftables[type=allports]
+# configure nftables
+banaction = nftables-multiport
+chain     = input
+
 
 # Enable custom sshd protection (failed preauth messages are not present in journal...)
 [fail2ban-sshd]
 enabled  = true
 port     = 2992
-filter   = sshd
-logpath  = /var/log/secure
+filter   = sshd[mode=aggressive]
 maxretry = 3
 findtime = 600
 bantime  = 86400
+
 ```
 Fail2Ban allows me to list IP addresses which should be ignored. This can be useful for testing purposes and can help avoid locking clients (or myself) out unnecessarily. For example, if an attacker knows my IP, he/she or it can send spoofed packages and lock me out. The parameter 'ignoreip' can prevent this. 
 
-In /etc/fail2ban/action.d/nftables-common.local I can connect fail2ban with nftables and define which nftables tables and chains to use.
+In /etc/fail2ban/action.d/nftables-common.local I can connect fail2ban with nftables and define which nftables tables and chains to use. (family and tables names are alligned to my nftables config)
 ```
 [Init]
 # Definition of the table used
@@ -376,8 +378,7 @@ table ip fail2ban {
         }
 }
 ```
-I could set up mail sending action, but I will get the reports in every 8 hours, and don't want to get notified after every banned IP.
-As I also set rate limit on the ssh port, I hope it's enough.
+I could set up mail sending action, but I don't want to get notified after every banned IP. Daily reports will be enough from LogWatch.
 
 ## Auditing the system
 
@@ -405,6 +406,9 @@ I "lock" the config (-e 2 parameter), so after the service started, no one can e
 ## Enable auditd and lock the config, preventing any modifications
 -e 2
 
+## This rule suppresses the time-change event when chrony does time updates
+-a never,exit -F arch=b64 -S adjtimex -F auid=unset -F uid=chrony -F subj_type=chronyd_t
+-a never,exit -F arch=b32 -S adjtimex -F auid=unset -F uid=chrony -F subj_type=chronyd_t
 
 # Record Events That Modify Date and Time Information
 -a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change
