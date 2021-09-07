@@ -27,7 +27,8 @@ ifcfg=INTERFACE="IPS_NETMASK,GATEWAYS,NAMESERVERS,DOMAINS(this one is)"
 for example (* as INTERFACE means whatewer network interface is plugged in)
 ifcfg=*="192.168.10.92/24,192.168.10.1,8.8.8.8"
 ```
-![]( https://gitlab.com/lyynxxx/stakingnode/-/blob/master/openSUSE/autoyast/img/autoyast01.PNG )
+[Check the screenshots of an installation here...](https://gitlab.com/lyynxxx/stakingnode/-/blob/master/openSUSE/autoyast/img/)
+
 You may want to use a PC and put the node in VirtualBox/VMware/HyperV/KVM/Xen/something, so after you set up everything you can create a full VM backup and move it to a NAS or some safe place and you don't have ot wait another two days to geth full sync if you have to restore the VM.
 In this case if you run Win10 as the host operating system, you definetly want to disable auto updates and auto restarts...
 
