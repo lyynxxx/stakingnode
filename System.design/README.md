@@ -407,8 +407,8 @@ I "lock" the config (-e 2 parameter), so after the service started, no one can e
 -e 2
 
 ## This rule suppresses the time-change event when chrony does time updates
--a never,exit -F arch=b64 -S adjtimex -F auid=unset -F uid=chrony -F subj_type=chronyd_t
--a never,exit -F arch=b32 -S adjtimex -F auid=unset -F uid=chrony -F subj_type=chronyd_t
+-a never,exit -F arch=b64 -S adjtimex -F uid=chrony -F subj_type=chronyd_t
+-a never,exit -F arch=b32 -S adjtimex -F uid=chrony -F subj_type=chronyd_t
 
 # Record Events That Modify Date and Time Information
 -a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change
@@ -459,6 +459,15 @@ I "lock" the config (-e 2 parameter), so after the service started, no one can e
 # Collect Unsuccessful File System Mounts
 -a always,exit -F arch=b64 -S mount -F auid>=500 -F auid!=4294967295 -k mounts
 -a always,exit -F arch=b32 -S mount -F auid>=500 -F auid!=4294967295 -k mounts
+
+# This rule suppresses events that originate on the below file systems.
+# Typically you would use this in conjunction with rules to monitor
+# kernel modules. The filesystem listed are known to cause hundreds of
+# path records during kernel module load. As an aside, if you do see the
+# tracefs or debugfs module load and this is a production system, you really
+# should look into why its getting loaded and prevent it if possible.
+-a never,filesystem -F fstype=tracefs
+-a never,filesystem -F fstype=debugfs
 
 # Collect File Deletion Events by User
 -a always,exit -F arch=b64 -S unlink -S unlinkat -S rename -S renameat -F auid>=500 -F auid!=4294967295 -k delete
