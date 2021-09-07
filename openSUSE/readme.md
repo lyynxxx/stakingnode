@@ -47,7 +47,29 @@ You need to change a few things, before you can use the control file:
  - add your own scripts
 
 About the secondary scripts:
- - 01.hardening.sh: This script contains post-installation settings. It changes the default configs and copy new ones from this git repo into the system, like firewall rules, sysctl tunes, audit rules, cron jobs, fine tune fstab settings, etc. The script contains comments, so you can see what the commands are doing. As a validator you should have some trust issues!!!! As IvanOnTech says, don't trust, validate! Don't copy-paste or use the files as is!
- - 02.adduseres.sh: This script contains the Validator user creation, binary download, config and validator init steps. Also creates a script into the "root" user home, to update the external address for p2p connections if the home users router restarts and get a new IP.
- - 011.hardening.sh: locks down /etc/passwd and /etc/shadow with immutable flags :) Noone can create new users or change passwords!!!
- 
+ - 01-system-setup.sh: This script contains post-installation settings. It changes the default configs, download and copy new ones from this git repo into the system, like firewall rules, sysctl tunes, audit rules, cron jobs, fine tune fstab settings, etc. The script contains comments, so you can see what the commands are doing. As a validator you should have some trust issues!!!! Don't copy-pasta or use the files as is!
+ - 99-lockdown.sh: locks down /etc/passwd and /etc/shadow with immutable flags :) Noone can create new users or change passwords!!!
+
+Modules:
+I try to speparate the base OS and all the things it will running. The autoyast control file containt the bare minimum for the system to run. The "system setup" script only downloads the general system configuration which are needed on every system, like system tunables, firewall rules, audit rules. All the other services like the Prysm Beacon chain, Prometheus, Netdata, etc. has their own bash shall file, which creates the service users, downloads binaries and settings...
+
+You can add them one by on to the end of the autoyast control file. In this way I have a modular auto installer. Like lego bricks, I can create different systems. The shell scrits can be run after the system setup if you may forgot something. The are standard bash/linux cli commands, nothing fancy.
+
+For example I need to create a new OS, but only for grafana, then I have to modify the autoyast control file like this:
+```
+<scripts>
+	<post-scripts config:type="list">
+		<script>
+			<location>http://192.168.10.125/vm/01-system-setup.sh</location>
+		</script>
+		<script>
+			<location>http://192.168.10.125/vm/service-grafana.sh</location>
+		</script>
+		<script>
+			<location>http://192.168.10.125/vm/99-lockdown.sh</location>
+		</script>
+	</post-scripts>
+</scripts>
+```
+
+After stage2 openSUSE starts most of the services, but as fstab options changes and some other settings requires reboot, right after the setup is finished it is recommended to restart the machine.
