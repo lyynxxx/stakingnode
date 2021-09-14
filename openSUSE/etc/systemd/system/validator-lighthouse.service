@@ -1,0 +1,18 @@
+[Unit]
+Description=Prysm Validator
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=120
+User=lightvc
+LimitNOFILE=5120
+LimitNPROC=5120
+ExecStart=/opt/lighthouse-bc/bin/lighthouse vc --network mainnet --datadir /opt/lighthouse-bc/data --graffiti "Powered by Lynx's automated setup / openSuSE+Lighthouse :)"
+InaccessibleDirectories=/home /var
+ReadOnlyDirectories=/etc /usr
+
+[Install]
+WantedBy=multi-user.target

@@ -17,11 +17,11 @@ chown -R prometheus:prometheus /etc/prometheus
 chown -R prometheus:prometheus /opt/prometheus
 rm -rf /opt/prometheus-2.23.0.linux-amd64*
 
-mv /tmp/kickstart/eth2nodes/opensuse/etc/prometheus/prometheus.yml /etc/prometheus/prometheus.yml
+mv /tmp/kickstart/stakingnode/openSUSE/etc/prometheus/prometheus.yml /etc/prometheus/prometheus.yml
 chown prometheus:prometheus /etc/prometheus/prometheus.yml
 chmod 600 /etc/prometheus/prometheus.yml
 
-mv /tmp/kickstart/eth2nodes/opensuse/etc/systemd/system/prometheus.service /etc/systemd/system/
+mv /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/prometheus.service /etc/systemd/system/
 chown root:root /etc/systemd/system/prometheus.service
 chmod 644 /etc/systemd/system/prometheus.service
 

@@ -15,9 +15,6 @@ ExecStart=/opt/goethereum/bin/geth --cache=4096 --maxpeers=30 --http --datadir /
 InaccessibleDirectories=/home /var
 ReadOnlyDirectories=/etc /usr
 PrivateTmp=yes
-StandardOutput=syslog
-StandardError=syslog
-SyslogIdentifier=GETH
 
 [Install]
 WantedBy=default.target
