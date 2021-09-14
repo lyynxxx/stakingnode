@@ -1,0 +1,566 @@
+<?xml version="1.0"?>
+<!DOCTYPE profile>
+<profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
+  <add-on t="map">
+    <add_on_others t="list">
+      <listentry t="map">
+        <alias>repo-backports-update</alias>
+        <media_url>http://download.opensuse.org/update/leap/15.3/backports/</media_url>
+        <name>Update repository of openSUSE Backports</name>
+        <priority t="integer">99</priority>
+        <product_dir>/</product_dir>
+      </listentry>
+      <listentry t="map">
+        <alias>repo-non-oss</alias>
+        <media_url>http://download.opensuse.org/distribution/leap/15.3/repo/non-oss/</media_url>
+        <name>Non-OSS Repository</name>
+        <priority t="integer">99</priority>
+        <product_dir>/</product_dir>
+      </listentry>
+      <listentry t="map">
+        <alias>repo-sle-update</alias>
+        <media_url>http://download.opensuse.org/update/leap/15.3/sle/</media_url>
+        <name>Update repository with updates from SUSE Linux Enterprise 15</name>
+        <priority t="integer">99</priority>
+        <product_dir>/</product_dir>
+      </listentry>
+      <listentry t="map">
+        <alias>repo-update-non-oss</alias>
+        <media_url>http://download.opensuse.org/update/leap/15.3/non-oss/</media_url>
+        <name>Update Repository (Non-Oss)</name>
+        <priority t="integer">99</priority>
+        <product_dir>/</product_dir>
+      </listentry>
+    </add_on_others>
+  </add-on>
+  <bootloader t="map">
+    <global t="map">
+      <append>splash=silent mitigations=auto quiet</append>
+      <cpu_mitigations>auto</cpu_mitigations>
+      <gfxmode>auto</gfxmode>
+      <hiddenmenu>false</hiddenmenu>
+      <os_prober>true</os_prober>
+      <secure_boot>true</secure_boot>
+      <terminal>gfxterm</terminal>
+      <timeout t="integer">8</timeout>
+      <trusted_grub>false</trusted_grub>
+      <update_nvram>true</update_nvram>
+      <xen_kernel_append>vga=gfx-1024x768x16</xen_kernel_append>
+    </global>
+    <loader_type>grub2</loader_type>
+  </bootloader>
+  
+  <general t="map">
+    <mode t="map">
+      <confirm t="boolean">false</confirm>
+    </mode>
+  </general>
+
+  
+  <networking t="map">
+    <dhcp_options t="map">
+      <dhclient_client_id/>
+      <dhclient_hostname_option>AUTO</dhclient_hostname_option>
+    </dhcp_options>
+    <dns t="map">
+      <dhcp_hostname t="boolean">true</dhcp_hostname>
+      <hostname>localhost</hostname>
+      <resolv_conf_policy>auto</resolv_conf_policy>
+    </dns>
+    <interfaces t="list">
+      <interface t="map">
+        <bootproto>dhcp</bootproto>
+        <name>eth0</name>
+        <startmode>auto</startmode>
+      </interface>
+    </interfaces>
+    <ipv6 t="boolean">false</ipv6>
+    <keep_install_network t="boolean">true</keep_install_network>
+    <managed t="boolean">false</managed>
+
+    <routing t="map">
+      <ipv4_forward t="boolean">false</ipv4_forward>
+      <ipv6_forward t="boolean">false</ipv6_forward>
+    </routing>
+  </networking>
+  <ntp-client t="map">
+    <ntp_policy>auto</ntp_policy>
+    <ntp_servers t="list">
+      <ntp_server t="map">
+        <address>0.suse.pool.ntp.org</address>
+        <iburst t="boolean">true</iburst>
+        <offline t="boolean">false</offline>
+      </ntp_server>
+      <ntp_server t="map">
+        <address>1.suse.pool.ntp.org</address>
+        <iburst t="boolean">true</iburst>
+        <offline t="boolean">false</offline>
+      </ntp_server>
+      <ntp_server t="map">
+        <address>2.suse.pool.ntp.org</address>
+        <iburst t="boolean">true</iburst>
+        <offline t="boolean">false</offline>
+      </ntp_server>
+      <ntp_server t="map">
+        <address>3.suse.pool.ntp.org</address>
+        <iburst t="boolean">true</iburst>
+        <offline t="boolean">false</offline>
+      </ntp_server>
+    </ntp_servers>
+    <ntp_sync>systemd</ntp_sync>
+  </ntp-client>
+  <partitioning t="list">
+    <drive t="map">
+      <device>/dev/system</device>
+      <enable_snapshots t="boolean">false</enable_snapshots>
+      <partitions t="list">
+        <partition t="map">
+          <create t="boolean">true</create>
+          <filesystem t="symbol">xfs</filesystem>
+          <format t="boolean">false</format>
+          <label>home</label>
+          <lv_name>home</lv_name>
+          <mount>/home</mount>
+          <mountby t="symbol">device</mountby>
+          <pool t="boolean">false</pool>
+          <resize t="boolean">false</resize>
+          <size>2147483648</size>
+          <stripes t="integer">1</stripes>
+          <stripesize t="integer">0</stripesize>
+        </partition>
+        <partition t="map">
+          <create t="boolean">true</create>
+          <filesystem t="symbol">xfs</filesystem>
+          <format t="boolean">false</format>
+          <label>opt</label>
+          <lv_name>opt</lv_name>
+          <mount>/opt</mount>
+          <mountby t="symbol">device</mountby>
+          <pool t="boolean">false</pool>
+          <resize t="boolean">false</resize>
+          <size>25220349952</size>
+          <stripes t="integer">1</stripes>
+          <stripesize t="integer">0</stripesize>
+        </partition>
+        <partition t="map">
+          <create t="boolean">true</create>
+          <filesystem t="symbol">xfs</filesystem>
+          <format t="boolean">false</format>
+          <label>root</label>
+          <lv_name>root</lv_name>
+          <mount>/</mount>
+          <mountby t="symbol">device</mountby>
+          <pool t="boolean">false</pool>
+          <resize t="boolean">false</resize>
+          <size>2147483648</size>
+          <stripes t="integer">1</stripes>
+          <stripesize t="integer">0</stripesize>
+        </partition>
+        <partition t="map">
+          <create t="boolean">true</create>
+          <filesystem t="symbol">swap</filesystem>
+          <format t="boolean">false</format>
+          <label>swap</label>
+          <lv_name>swap</lv_name>
+          <mount>swap</mount>
+          <mountby t="symbol">device</mountby>
+          <pool t="boolean">false</pool>
+          <resize t="boolean">false</resize>
+          <size>4294967296</size>
+          <stripes t="integer">1</stripes>
+          <stripesize t="integer">0</stripesize>
+        </partition>
+        <partition t="map">
+          <create t="boolean">true</create>
+          <filesystem t="symbol">xfs</filesystem>
+          <format t="boolean">false</format>
+          <label>tmp</label>
+          <lv_name>tmp</lv_name>
+          <mount>/tmp</mount>
+          <mountby t="symbol">device</mountby>
+          <pool t="boolean">false</pool>
+          <resize t="boolean">false</resize>
+          <size>1073741824</size>
+          <stripes t="integer">1</stripes>
+          <stripesize t="integer">0</stripesize>
+        </partition>
+        <partition t="map">
+          <create t="boolean">true</create>
+          <filesystem t="symbol">xfs</filesystem>
+          <format t="boolean">false</format>
+          <label>usr</label>
+          <lv_name>usr</lv_name>
+          <mount>/usr</mount>
+          <mountby t="symbol">device</mountby>
+          <pool t="boolean">false</pool>
+          <resize t="boolean">false</resize>
+          <size>3221225472</size>
+          <stripes t="integer">1</stripes>
+          <stripesize t="integer">0</stripesize>
+        </partition>
+        <partition t="map">
+          <create t="boolean">true</create>
+          <filesystem t="symbol">xfs</filesystem>
+          <format t="boolean">false</format>
+          <label>var</label>
+          <lv_name>var</lv_name>
+          <mount>/var</mount>
+          <mountby t="symbol">device</mountby>
+          <pool t="boolean">false</pool>
+          <resize t="boolean">false</resize>
+          <size>2147483648</size>
+          <stripes t="integer">1</stripes>
+          <stripesize t="integer">0</stripesize>
+        </partition>
+      </partitions>
+      <pesize>4194304</pesize>
+      <type t="symbol">CT_LVM</type>
+    </drive>
+    <drive t="map">
+      <device>/dev/sda</device>
+      <disklabel>gpt</disklabel>
+      <partitions t="list">
+        <partition t="map">
+          <create t="boolean">false</create>
+          <format t="boolean">false</format>
+          <partition_id t="integer">263</partition_id>
+          <partition_nr t="integer">1</partition_nr>
+          <resize t="boolean">false</resize>
+          <size>8388608</size>
+        </partition>
+        <partition t="map">
+          <create t="boolean">false</create>
+          <filesystem t="symbol">xfs</filesystem>
+          <format t="boolean">true</format>
+          <mount>/boot</mount>
+          <mountby t="symbol">uuid</mountby>
+          <partition_id t="integer">131</partition_id>
+          <partition_nr t="integer">3</partition_nr>
+          <resize t="boolean">false</resize>
+          <size>268435456</size>
+        </partition>
+        <partition t="map">
+          <create t="boolean">false</create>
+          <format t="boolean">false</format>
+          <lvm_group>system</lvm_group>
+          <partition_id t="integer">142</partition_id>
+          <partition_nr t="integer">4</partition_nr>
+          <resize t="boolean">false</resize>
+          <size>40255864320</size>
+        </partition>
+      </partitions>
+      <type t="symbol">CT_DISK</type>
+      <use>1,3,4</use>
+    </drive>
+  </partitioning>
+  <proxy t="map">
+    <enabled t="boolean">false</enabled>
+  </proxy>
+  <services-manager t="map">
+    <default_target>multi-user</default_target>
+    <services t="map">
+      <enable t="list">
+        <service>YaST2-Firstboot</service>
+        <service>YaST2-Second-Stage</service>
+        <service>auditd</service>
+        <service>chronyd</service>
+        <service>firewalld</service>
+        <service>wickedd-auto4</service>
+        <service>wickedd-dhcp4</service>
+        <service>wickedd-dhcp6</service>
+        <service>wickedd-nanny</service>
+        <service>haveged</service>
+        <service>irqbalance</service>
+        <service>issue-generator</service>
+        <service>kbdsettings</service>
+        <service>lvm2-monitor</service>
+        <service>wicked</service>
+        <service>purge-kernels</service>
+        <service>sshd</service>
+        <service>systemd-remount-fs</service>
+        <service>vgauthd</service>
+        <service>vmtoolsd</service>
+      </enable>
+    </services>
+  </services-manager>
+  <software t="map">
+    <install_recommended t="boolean">true</install_recommended>
+    <instsource/>
+    <packages t="list">
+      <package>xfsprogs</package>
+      <package>wicked</package>
+      <package>openssh</package>
+      <package>openSUSE-release</package>
+      <package>numactl</package>
+      <package>mc</package>
+      <package>lvm2</package>
+      <package>kexec-tools</package>
+      <package>irqbalance</package>
+      <package>grub2</package>
+      <package>glibc</package>
+      <package>firewalld</package>
+      <package>dosfstools</package>
+      <package>chrony</package>
+      <package>aytests-tests</package>
+      <package>autoyast2</package>
+    </packages>
+    <patterns t="list">
+      <pattern>base</pattern>
+      <pattern>minimal_base</pattern>
+      <pattern>yast2_basis</pattern>
+    </patterns>
+    <products t="list">
+      <product>Leap</product>
+    </products>
+  </software>
+  <ssh_import t="map">
+    <copy_config t="boolean">false</copy_config>
+    <import t="boolean">false</import>
+  </ssh_import>
+  <timezone t="map">
+    <timezone>Europe/Budapest</timezone>
+  </timezone>
+  <user_defaults t="map">
+    <expire/>
+    <group>100</group>
+    <groups/>
+    <home>/home</home>
+    <inactive>-1</inactive>
+    <no_groups t="boolean">true</no_groups>
+    <shell>/bin/bash</shell>
+    <skel>/etc/skel</skel>
+    <umask>022</umask>
+  </user_defaults>
+  <users t="list">
+    <user t="map">
+      <authorized_keys t="list"/>
+      <encrypted t="boolean">true</encrypted>
+      <fullname>lyynxxx</fullname>
+      <gid>100</gid>
+      <home>/home/lyynxxx</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max>99999</max>
+        <min>0</min>
+        <warn>7</warn>
+      </password_settings>
+      <shell>/bin/bash</shell>
+      <uid>1000</uid>
+      <user_password>$6$QDGpXOzgjklbon8l$n6rz2Wq9N7DhRPej/NYwG/2.H4BfK/sLAmpVWGpU6t0zduhK9pT1YYK0j.NCio2CG6dg6n0adbtccigofU8xe0</user_password>
+      <username>lyynxxx</username>
+    </user>
+    <user t="map">
+      <encrypted t="boolean">true</encrypted>
+      <fullname>systemd Resolver</fullname>
+      <gid>481</gid>
+      <home>/</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max/>
+        <min/>
+        <warn/>
+      </password_settings>
+      <shell>/usr/sbin/nologin</shell>
+      <uid>481</uid>
+      <user_password>!*</user_password>
+      <username>systemd-resolve</username>
+    </user>
+    <user t="map">
+      <encrypted t="boolean">true</encrypted>
+      <fullname>bin</fullname>
+      <gid>1</gid>
+      <home>/bin</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max/>
+        <min/>
+        <warn/>
+      </password_settings>
+      <shell>/sbin/nologin</shell>
+      <uid>1</uid>
+      <user_password>!</user_password>
+      <username>bin</username>
+    </user>
+    <user t="map">
+      <encrypted t="boolean">true</encrypted>
+      <fullname>nobody</fullname>
+      <gid>65534</gid>
+      <home>/var/lib/nobody</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max/>
+        <min/>
+        <warn/>
+      </password_settings>
+      <shell>/bin/bash</shell>
+      <uid>65534</uid>
+      <user_password>!</user_password>
+      <username>nobody</username>
+    </user>
+    <user t="map">
+      <encrypted t="boolean">true</encrypted>
+      <fullname>systemd Time Synchronization</fullname>
+      <gid>480</gid>
+      <home>/</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max/>
+        <min/>
+        <warn/>
+      </password_settings>
+      <shell>/usr/sbin/nologin</shell>
+      <uid>480</uid>
+      <user_password>!*</user_password>
+      <username>systemd-timesync</username>
+    </user>
+    <user t="map">
+      <encrypted t="boolean">true</encrypted>
+      <fullname>systemd Core Dumper</fullname>
+      <gid>479</gid>
+      <home>/</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max/>
+        <min/>
+        <warn/>
+      </password_settings>
+      <shell>/usr/sbin/nologin</shell>
+      <uid>479</uid>
+      <user_password>!*</user_password>
+      <username>systemd-coredump</username>
+    </user>
+    <user t="map">
+      <encrypted t="boolean">true</encrypted>
+      <fullname>SSH daemon</fullname>
+      <gid>484</gid>
+      <home>/var/lib/sshd</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max/>
+        <min/>
+        <warn/>
+      </password_settings>
+      <shell>/sbin/nologin</shell>
+      <uid>498</uid>
+      <user_password>!</user_password>
+      <username>sshd</username>
+    </user>
+    <user t="map">
+      <authorized_keys t="list"/>
+      <encrypted t="boolean">true</encrypted>
+      <fullname>root</fullname>
+      <gid>0</gid>
+      <home>/root</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max/>
+        <min/>
+        <warn/>
+      </password_settings>
+      <shell>/bin/bash</shell>
+      <uid>0</uid>
+      <user_password>$6$.XIfFWrjfoBHAXMX$xAlXIo2Mc8DaMaopX3yuJYvvTdd3KRN0aVZYQEKLZJ1788/Pu7jTvtAj9l95rt2fdsgbcZ817Q54Gs8L5D.211</user_password>
+      <username>root</username>
+    </user>
+    <user t="map">
+      <encrypted t="boolean">true</encrypted>
+      <fullname>User for D-Bus</fullname>
+      <gid>485</gid>
+      <home>/run/dbus</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max/>
+        <min/>
+        <warn/>
+      </password_settings>
+      <shell>/usr/bin/false</shell>
+      <uid>499</uid>
+      <user_password>!</user_password>
+      <username>messagebus</username>
+    </user>
+    <user t="map">
+      <encrypted t="boolean">true</encrypted>
+      <fullname>systemd Network Management</fullname>
+      <gid>482</gid>
+      <home>/</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max/>
+        <min/>
+        <warn/>
+      </password_settings>
+      <shell>/usr/sbin/nologin</shell>
+      <uid>482</uid>
+      <user_password>!*</user_password>
+      <username>systemd-network</username>
+    </user>
+    <user t="map">
+      <encrypted t="boolean">true</encrypted>
+      <fullname>Daemon</fullname>
+      <gid>2</gid>
+      <home>/sbin</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max/>
+        <min/>
+        <warn/>
+      </password_settings>
+      <shell>/sbin/nologin</shell>
+      <uid>2</uid>
+      <user_password>!</user_password>
+      <username>daemon</username>
+    </user>
+    <user t="map">
+      <encrypted t="boolean">true</encrypted>
+      <fullname>Chrony Daemon</fullname>
+      <gid>478</gid>
+      <home>/var/lib/chrony</home>
+      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
+      <password_settings t="map">
+        <expire/>
+        <flag/>
+        <inact/>
+        <max/>
+        <min/>
+        <warn/>
+      </password_settings>
+      <shell>/bin/false</shell>
+      <uid>478</uid>
+      <user_password>!</user_password>
+      <username>chrony</username>
+    </user>
+  </users>
+</profile>

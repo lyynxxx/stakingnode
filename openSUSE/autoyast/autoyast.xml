@@ -144,27 +144,27 @@
   	<resolv_conf_policy>auto</resolv_conf_policy>
   </dns>
   <interfaces config:type="list">
-	<interface>
-		<bootproto>static</bootproto>
-		<name>eth0</name>
-		<ipaddr>192.168.10.92</ipaddr>
-		<netmask>255.255.255.0</netmask>
-		<network>192.168.10.0</network>
-		<prefixlen>24</prefixlen>
-		<startmode>auto</startmode>
-	</interface>
+  	<interface>
+  		<bootproto>static</bootproto>
+  		<name>eth0</name>
+  		<ipaddr>192.168.10.93</ipaddr>
+  		<netmask>255.255.255.0</netmask>
+  		<network>192.168.10.0</network>
+  		<prefixlen>24</prefixlen>
+  		<startmode>auto</startmode>
+  	</interface>
   </interfaces>
-<routing>
-	<ipv4_forward config:type="boolean">false</ipv4_forward>
-	<ipv6_forward config:type="boolean">false</ipv6_forward>
-	<routes config:type="list">
-		<route>
-			<destination>default</destination>
-			<name>eth0</name>
-			<gateway>192.168.10.1</gateway>
-		</route>
-	</routes>
-</routing>
+  <routing>
+  	<ipv4_forward config:type="boolean">false</ipv4_forward>
+  	<ipv6_forward config:type="boolean">false</ipv6_forward>
+  	<routes config:type="list">
+  		<route>
+  			<destination>default</destination>
+  			<name>eth0</name>
+  			<gateway>192.168.10.1</gateway>
+  		</route>
+  	</routes>
+  </routing>
 </networking>
 
 <ntp-client>
@@ -183,6 +183,11 @@
 <add-on>
  <add_on_products config:type="list">
     <listentry>
+      <signature-handling>
+        <import_gpg_key> <all config:type="boolean">true</all> </import_gpg_key>
+        <accept_non_trusted_gpg_key> <all config:type="boolean">true</all> </accept_non_trusted_gpg_key>
+        <accept_unknown_gpg_key> <all config:type="boolean">true</all> </accept_unknown_gpg_key>
+      </signature-handling>
       <media_url>https://download.opensuse.org/repositories/security/openSUSE_Leap_15.2/</media_url>
       <product>Security related packages</product>
       <alias>Security</alias>
@@ -251,7 +256,6 @@
 		<script>
 			<location>http://192.168.10.125/vm/01-system-setup.sh</location>
 		</script>
-
 		<script>
 			<location>http://192.168.10.125/vm/99-lockdown.sh</location>
 		</script>
