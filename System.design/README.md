@@ -1,5 +1,7 @@
+As I see there isn't such thing as a security "silver bullet", what solves everything. I must assume, my system is not unbreakable, therefore I need to create a few security layer. None of the layers itself are enough, but together they can mitigate a lot of the attack vectors.
+
 # Planing the partitions
-This can be tricky and maybe overkill and may do not make any sense, but as I see there isn't such a thing as a security "silver bullet", what solves everything. I must assume, my system is not unbreakable, and need to prepare the system, to make things harder even if someone got access to a shell. Planning and hardening the filesystems can mitigate a lot of the attacks and script kiddies even if they got lucky somehow.
+Security begins even before I start the installation. During the installation process, I have an option to define the different partitions, filesystem types and sizes. I can apply different restrictions or fine tune the behavior of the filesystem. Separating the major system folders can help more then most people thinks.
 
 
 | Partition | Size | What for |
@@ -10,21 +12,21 @@ This can be tricky and maybe overkill and may do not make any sense, but as I se
 | /usr | 3G | Here I have all the important system binaries. This will be read-only. If an attacker gains access to the system often the first thing to alter some system binaries, to hide the traces. In this way, it's not possible (at least it will be harder, but the auditing system can detect this kind of activity.) I apply nodev here too, but we need the other grants so can't apply noexec or nosuid.|
 | /var | 2G | For system logs and the package manager cache. No need much more, if something goes wrong and the system writes a lot of logs or some attacker forces the system to write a bunch of logs, our server won't stop as there is no more free space left, all our services can run. This may have the drawbacks that we don't log the suspicious activity, so making too small /var can be a bad practice, but in this situation, 2G will be fine. I apply nodev,nosid,noexec here.|
 | /tmp | 1G | Isolate the temp directory and disable any binary execution too is a must! We won't use this much, but scripts often use /tmp to do fishy stuff, in this way we can break them. This breaks compiling sources too, but we have a workaround for that. I apply nodev,nosuid,noexec here. |
-| /opt | remaining space | This will be the location where we store the eth1 node data and prysm app and data. I apply here nodev,nosuid. |
+| /opt | remaining space | This will be the location where we store the application data. I apply here nodev,nosuid. |
 
 In case of UEFI boot/install a separate /boot/efi partition is also needed, in size of 200M and vfat filesystem.
 
 I will use LVM and /opt will grow only for 90% of the available free space during the install process, so if any other logvol needs some love and extra space, I can allocate more with ease.
 
 ## fstab options for security
- - noexec: With this option set, binaries can’t be directly executed. Unfortunately, these settings can easily be circumvented by executing a non-direct path. However, mounting the /tmp directory with noexec will stop the majority of exploits designed to be executed directly from temporary file systems. (non-direct call for example if we pass the script to an interpreter. noexec prevents /tmp/script.py from running but if we use 'python /tmp/script.py' it will run, as not the script is what is executed, then python. As I said there is no such thing as a security silver bullet, but we can harden things. Maybe this is why it's only called hardening and not totally locking out attackers and all attack vectors?:) )
+ - noexec: With this option set, binaries can’t be directly executed. Unfortunately, these settings can easily be circumvented by executing a non-direct path. However, mounting the /tmp directory with noexec will stop the majority of exploits designed to be executed directly from temporary file systems. (non-direct call for example if we pass the script to an interpreter. noexec prevents /tmp/script.py from running but if we use 'python /tmp/script.py' it will run, as not the script is what is executed, then python. As I said there is no such thing as a security silver bullet, but we can harden things. Maybe this is why it's called hardening... )
  - nodev: This option describes that device files are not allowed, like block or character devices. Normally these are only found under /dev and not seen on other mount points. Most mount points will work correctly when these are disabled. Even root, as /dev is in memory now as a devtmpfs.
- - nosuid: Do not use set-user-identifier (SETUID) or set-group-identifier (SETGID) bits to take effect. These bits are set with chmod (u+s, g+s) or unset (u-s, g-s) to allow a binary running under a specific user, which is not the active user itself. For example, to allow a normal user to run the ping command with root privileges.
+ - nosuid: Do not use set-user-identifier (SETUID) or set-group-identifier (SETGID) bits to take effect. These bits are set with chmod (u+s, g+s) or unset (u-s, g-s) to allow a binary running under a specific user, which is not the active user itself. For example, SETUID allows a non-privileges user to use the sudo command.
  - noatime: A file has three timestamp. When the file was last modified (mtime), when the file was last changed (ctime), when the file was last accessed (atime). noatime disables the indode updates when the file was last accessed so I can gain some performance.
  - ro / rw: Mount the filesystem in either read write or read only mode.
 
  Special settings for /proc:
- - hidepid=2: When looking in /proc I can discover a lot of files and directories. This includes process information from other users. This could include sensitive details that you may not want to share with other users. Setting hidepid=2 prevents users from seeing each other's processes.
+ - hidepid=2: When looking in /proc I can discover a lot of files and directories. This includes process information from other users, even sensitive details. It is better not to expose this information to everyone. Setting hidepid=2 prevents users from seeing each other's processes.
 
 The final /etc/fstab will look like this:
 ```
@@ -48,7 +50,7 @@ This must be executed as root or with sudo. If I reboot the machine I don't have
 
 ## Thingking about the users and system access
 
-I only need one user, who can log into the system. This non-privilegised user can then use sudo or "su -" to do system administration tasks. But always using passwords! NEVER EVER user passwordless sudo!
+I only need one user, who can log into the system. This non-privilegised user can then use sudo or "su -" to do system administration tasks. But always using passwords! NEVER EVER use passwordless sudo!
 
 Also, the user can log in with ssh keys only. I don't allow any passwords. No weak nor strong passwords.
 Although passwords are sent to the server in a secure manner, they are generally not complex or long enough to be resistant to repeated, persistent attackers. Modern processing power combined with automated scripts makes brute-forcing a password-protected account very possible. 
@@ -57,13 +59,15 @@ SSH key pairs are two cryptographically secure keys that can be used to authenti
 
 The private key is retained by the client and should be kept absolutely secret. Any compromise of the private key will allow the attacker to log into servers that are configured with the associated public key without additional authentication. As an additional precaution, the key can be encrypted on disk with a passphrase, it's highly recommended.
 
-The associated public key can be shared freely without any negative consequences. The public key can be used to encrypt messages that only the private key can decrypt. This property is employed as a way of authenticating using the key pair. The public key is part of the kickstart script, the newly installed system will contain it and password authentication will be disabled during the installation before anyone could try to brute force it.
+The associated public key can be shared freely without any negative consequences. The public key can be used to encrypt messages that only the private key can decrypt. This property is employed as a way of authenticating using the key pair. My public key is part of the kickstart script, the newly installed system will contain it and password authentication will be disabled during the installation before anyone could try to brute force it.
 
 For generating ssh keys check: https://docs.rightscale.com/faq/How_Do_I_Generate_My_Own_SSH_Key_Pair.html
 
+Keep your keys safe!!! Never ever share your keys!!!
+
 ## SSH 
 As this service provides the access to the system, we should prepare it for good.
-I DO NOT allow root login! I declare the only user who can log in, using the AllowUseres parameter. I will change the default port too (some SELinux config needed here, as the sshd daemon won't start if SELinux does not know about the port change, but the kickstart file contains all the steps!). Also, it's a good practice to enable StrictMode (in most distros it's on by default), disable host based authentication and password based authentication too. So if I don't have my keys, I can't log in!!!  
+I DO NOT allow root login! I declare the only user who can log in, using the AllowUseres parameter. I will change the default port too (for RHEL some SELinux config is needed here, as the sshd daemon won't start if SELinux does not know about the port change). Also, it's a good practice to enable StrictMode (in most distros it's on by default), disable host based authentication and password based authentication too. So if I don't have my keys, I can't log in!!!  
 
 In the kickstart script I use the 'sed' command to make changes on our freshly installed system (This is based on a CentOS Linux release 8.2.2004 (Core)/openSUSE Leap 15.2 fresh install... may not work for you if you only copy-paste, without knowing what you are doing without checking your own config files).
 ```
@@ -250,7 +254,7 @@ vm.dirty_background_ratio = 5
 
 nftables is a netfilter project that aims to replace the existing {ip,ip6,arp,eb}tables framework. It provides a new packet filtering framework, a new user-space utility (nft), and a compatibility layer for {ip,ip6}tables. It uses the existing hooks, connection tracking system, user-space queueing component, and logging subsystem of netfilter.
 
-Firewalld os SuseFirewall2 - in contrast, because in general this can only be encountered in - is a pure frontend which comes with CentOS8/openSUSE. It's not an independent firewall by itself. It only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" and running "nftables only". Let's use nftables only!
+Firewalld or SuseFirewall2 - in contrast, because in general this can only be encountered in - is a pure frontend which comes with CentOS8/openSUSE. It's not an independent firewall by itself. It only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" and running "nftables only". Let's use nftables only!
 
 The rules are in the file /etc/sysconfig/nftables.conf, but here are the details, how it is made:
 ```
@@ -305,23 +309,24 @@ nft add rule inet my_table my_tcp_chain tcp dport 13000 counter accept
 nft add rule inet my_table my_udp_chain udp dport 30303 counter accept
 nft add rule inet my_table my_udp_chain udp dport 12000 counter accept
 ```
-To use native nftables I disable and mask the firewalld service, and enable the nftables service.
+To use native nftables I disable and mask the firewalld service, and enable the nftables service int the kickstart file for RHEL.
 ```
 systemctl disable firewalld
 systemctl mask --now firewalld
 systemctl enable nftables
 ```
+For openSUSE it is in the AutoYast config file, in the disabled services section.
+
 ## Fail2ban - ssh protection
 
 Fail2ban scans log files (e.g. /var/log/secure or journald logs) and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc. Generally, Fail2Ban is then used to update firewall rules to reject the IP addresses for a specified amount of time, although any arbitrary other action (e.g. sending an email) could also be configured. Out of the box, Fail2Ban comes with filters for various services (apache, courier, ssh, etc).
 
-Some distros may have an outdated version in the distro's repository. OpenSUSE must use an additiona repository to get the latest version, it's in the autoyast file.
+Some distros may have an outdated version in the distro's repository. OpenSUSE must use an additional repository to get the latest version, it's in the AutoYast file.
 
-To override the defaults, I don't change the main configs, as a version update may replace the config/filter files. Fail2ban checks if there is a .local file with the same name. So to modify some settings, I just create a jail.local file, which can contain the same settings as jail.conf, but this will override the defaults. In this file I can define the default backend (systemd), the default ban action to use nftables and some filters, like the sshd filter.
+To override the defaults, I don't change the main configs, as a version update may replace the config/filter files. Fail2ban checks if there is a .local file with the same name. So to modify some settings, I just create a jail.local file, which can contain the same settings as jail.conf, but this will override the defaults. In this file I can define the default backend, the default ban action to use nftables and some filters, like the sshd filter.
 
 /etc/fail2ban/jail.local
 ```
-[DEFAULT]
 # Ban IP/hosts for 24 hour ( 24h*3600s = 86400s):
 bantime = 86400
 backend = systemd
@@ -334,7 +339,7 @@ maxretry = 3
 # will not ban a host which matches an address in this list. Several addresses
 # can be defined using space (and/or comma) separator. For example, add your
 # static IP address that you always use for login such as 103.1.2.3
-ignoreip = 92.191.183.41
+ignoreip = 9.10.11.12
 
 # configure nftables
 banaction = nftables-multiport
@@ -483,7 +488,7 @@ I "lock" the config (-e 2 parameter), so after the service started, no one can e
 
 ```
 
-Creating reports of the events I use aureport.
+Creating reports of the events I can use the aureport utility.
 ```
 aureport -ts today -te now --summary -i
 ```
@@ -511,7 +516,7 @@ Range = Today
 
 ## Services users
 
-Every service (geth, prysm-beaconchain and prysm-validator) will run under their own service user. Service users don't have a home directory or grant to login/use shell. Their only purpose is to run one application and nothing more, as limited as possible. I create systemd services to keep them running and start them at boot time.
+Every service (geth, the beacon chanin client and the validator client) will run under their own service user. Service users don't have a home directory or grant to login/use shell. Their only purpose is to run one application and nothing more, as limited as possible. I create systemd services to keep them running and start them at boot time.
 
 Using systemd I can apply some extra security settings and try to prevent the applications to sniff around (if compromised) in directories where they should not do anything.
 ```
@@ -606,6 +611,8 @@ Max realtime timeout      unlimited            unlimited            us
 Also worth calculate the limits not to exceed the system wide limits otherwise the system will not respond.
 All your limints set < fs.file-max in sysctl config!
 
+If you are not careful, you can run into this issue:
+
 ```
 Nov 29 10:22:30 eth2.vm prysm.sh[14483]: time="2020-11-29 10:22:30" level=info msg="Node started p2p server" multiAddr="/ip4/192.168.0.92/tcp/13000/p2p/16Uiu2HAmRKWHdtxuQpMezkogXgjoT3xsggX2dSeWtvmdNYRFci8P" prefix=p2p
 Nov 29 10:22:38 eth2.vm prysm.sh[14483]: time="2020-11-29 10:22:38" level=error msg="Unable to process past logs Could not process deposit log: could not get correct merkle index: latest index observed is not accurate, wanted 25885, but received  22153" prefix=powchain
@@ -630,3 +637,5 @@ Nov 29 10:22:59 eth2.vm prysm.sh[14483]: 2020-11-29T10:22:59.171+0100        ERR
 -bash: /usr/bin/w: Too many open files in system
 
 ```
+
+Only hard reset can help you to gain back control over the machine...

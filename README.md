@@ -97,3 +97,4 @@ Let us dive into the process and plan the base system.
 
 
  DISCLAIMER: I'm not an expert! Feel free to correct me (mailto: lyynxxx@gmail.com), as I don't want to mislead people, I just documenting my journey here.
+ If you find this useful, my coffee fund: ETH --  0xa29C271FF54667691A00359D23815353AC834B8f
