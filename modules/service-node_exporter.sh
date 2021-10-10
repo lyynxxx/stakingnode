@@ -10,7 +10,7 @@ mkdir -p /opt/node_exporter/textfile_collector/
 chown node_exporter:node_exporter /opt/node_exporter/textfile_collector/
 rm -rf node_exporter-1.0.1.linux-amd64.tar.gz
 
-mv /tmp/kickstart/eth2nodes/opensuse/etc/systemd/system/node_exporter.service /etc/systemd/system/node_exporter.service
+mv /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/node_exporter.service /etc/systemd/system/node_exporter.service
 chown root:root /etc/systemd/system/node_exporter.service
 chmod 644 /etc/systemd/system/node_exporter.service
 

@@ -12,7 +12,7 @@ mv grafana-7.3.6/* .
 rm -rf grafana-7.3.6
 chown -R grafana:grafana /opt/grafana
 
-mv /tmp/kickstart/eth2nodes/opensuse/etc/systemd/system/grafana.service /etc/systemd/system/
+mv /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/grafana.service /etc/systemd/system/
 chown root:root /etc/systemd/system/grafana.service
 chmod 644 /etc/systemd/system/grafana.service
 
