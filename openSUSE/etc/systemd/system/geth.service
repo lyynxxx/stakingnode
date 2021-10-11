@@ -15,6 +15,13 @@ ExecStart=/opt/goethereum/bin/geth --cache=4096 --maxpeers=30 --http --datadir /
 InaccessibleDirectories=/home /var
 ReadOnlyDirectories=/etc /usr
 PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+RestrictSUIDSGID=true
 
 [Install]
 WantedBy=default.target

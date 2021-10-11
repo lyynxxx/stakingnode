@@ -14,6 +14,14 @@ Environment="publicIP=$(curl -s v4.ident.me)"
 ExecStart=/opt/beacon-chain/bin/beacon-chain --p2p-host-ip=${publicIP} --datadir=/opt/beacon-chain/data --http-web3provider=http://127.0.0.1:8545 --accept-terms-of-use --log-format=journald
 InaccessibleDirectories=/home /var
 ReadOnlyDirectories=/etc /usr
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+RestrictSUIDSGID=true
 
 [Install]
 WantedBy=multi-user.target

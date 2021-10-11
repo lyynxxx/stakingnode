@@ -13,6 +13,14 @@ LimitNPROC=5120
 ExecStart=/opt/validator/bin/validator --datadir=/opt/validator/data --wallet-dir=/opt/validator/.eth2validators/prysm-wallet-v2 --graffiti "Powered by Lynx's automated setup / openSuSE+Prysm :)" --wallet-password-file=/opt/validator/.wpwd --accept-terms-of-use
 InaccessibleDirectories=/home /var
 ReadOnlyDirectories=/etc /usr
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+RestrictSUIDSGID=true
 
 [Install]
 WantedBy=multi-user.target
