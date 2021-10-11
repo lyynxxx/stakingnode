@@ -44,7 +44,7 @@ line 242: your username
 line 243: your users password
 line 246: include your ssh public key! ONYL KEY BASED LOGIN IS ALLOWED!!!! 
 
-line 254 and more: the post install scripts. By default onyl two are included. Include as many new <script> block as many you want, like service-geth.sh, service-prysm.sh and service-netdata.sh.
+line 254 and more: the post install scripts. By default onyl two are included. Include as many new "script" block as many you want, like service-geth.sh, service-prysm.sh and service-netdata.sh.
 
 Check the line endings!
 Copy the file into the "html" folder.
