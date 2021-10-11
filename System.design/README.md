@@ -545,6 +545,12 @@ echo "export PATH=/home/YOURUSER/go/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:
 ```
 So compiling isn't a problem any more.
 
+The eth2deposit-cli tool also breaks with noexec on /tmp!
+```
+lyynxxx@tEth2:/opt/tmp/eth2deposit-cli-256ea21-linux-amd64> ./deposit
+./deposit: error while loading shared libraries: libz.so.1: failed to map segment from shared object
+```
+
 ### Too many open files...
 
 systemd completely ignores /etc/security/limits*.
