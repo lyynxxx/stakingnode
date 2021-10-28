@@ -55,54 +55,63 @@
       <confirm t="boolean">false</confirm>
     </mode>
   </general>
-
-  
   <networking t="map">
-    <dhcp_options t="map">
-      <dhclient_client_id/>
-      <dhclient_hostname_option>AUTO</dhclient_hostname_option>
-    </dhcp_options>
     <dns t="map">
       <dhcp_hostname t="boolean">true</dhcp_hostname>
-      <hostname>localhost</hostname>
-      <resolv_conf_policy>auto</resolv_conf_policy>
+      <hostname>vobx-geth</hostname>
+      <domain>vm</domain>
+    	<nameservers t="list">
+    	  <nameserver>192.168.10.1</nameserver>
+  	  	  <nameserver>8.8.8.8</nameserver>
+  	    </nameservers>
+  	  <resolv_conf_policy>auto</resolv_conf_policy>
     </dns>
     <interfaces t="list">
       <interface t="map">
-        <bootproto>dhcp</bootproto>
+        <bootproto>static</bootproto>
         <name>eth0</name>
         <startmode>auto</startmode>
+  		<ipaddr>192.168.10.235</ipaddr>
+  		<netmask>255.255.255.0</netmask>
+  		<network>192.168.10.0</network>
+  		<prefixlen>24</prefixlen>
       </interface>
     </interfaces>
     <ipv6 t="boolean">false</ipv6>
     <keep_install_network t="boolean">true</keep_install_network>
     <managed t="boolean">false</managed>
-
     <routing t="map">
       <ipv4_forward t="boolean">false</ipv4_forward>
       <ipv6_forward t="boolean">false</ipv6_forward>
+      <routes t="list">
+	    <route>
+	      <destination>default</destination>
+	      <device>eth0</device>
+	      <gateway>192.168.10.1</gateway>
+	    </route>
+      </routes>
     </routing>
   </networking>
   <ntp-client t="map">
     <ntp_policy>auto</ntp_policy>
     <ntp_servers t="list">
       <ntp_server t="map">
-        <address>0.suse.pool.ntp.org</address>
+        <address>0.hu.pool.ntp.org</address>
         <iburst t="boolean">true</iburst>
         <offline t="boolean">false</offline>
       </ntp_server>
       <ntp_server t="map">
-        <address>1.suse.pool.ntp.org</address>
+        <address>1.hu.pool.ntp.org</address>
         <iburst t="boolean">true</iburst>
         <offline t="boolean">false</offline>
       </ntp_server>
       <ntp_server t="map">
-        <address>2.suse.pool.ntp.org</address>
+        <address>2.hu.pool.ntp.org</address>
         <iburst t="boolean">true</iburst>
         <offline t="boolean">false</offline>
       </ntp_server>
       <ntp_server t="map">
-        <address>3.suse.pool.ntp.org</address>
+        <address>3.hu.pool.ntp.org</address>
         <iburst t="boolean">true</iburst>
         <offline t="boolean">false</offline>
       </ntp_server>
@@ -117,34 +126,7 @@
         <partition t="map">
           <create t="boolean">true</create>
           <filesystem t="symbol">xfs</filesystem>
-          <format t="boolean">false</format>
-          <label>home</label>
-          <lv_name>home</lv_name>
-          <mount>/home</mount>
-          <mountby t="symbol">device</mountby>
-          <pool t="boolean">false</pool>
-          <resize t="boolean">false</resize>
-          <size>2147483648</size>
-          <stripes t="integer">1</stripes>
-          <stripesize t="integer">0</stripesize>
-        </partition>
-        <partition t="map">
-          <create t="boolean">true</create>
-          <filesystem t="symbol">xfs</filesystem>
-          <format t="boolean">false</format>
-          <label>opt</label>
-          <lv_name>opt</lv_name>
-          <mount>/opt</mount>
-          <mountby t="symbol">device</mountby>
-          <pool t="boolean">false</pool>
-          <resize t="boolean">false</resize>
-          <size>25220349952</size>
-          <stripes t="integer">1</stripes>
-          <stripesize t="integer">0</stripesize>
-        </partition>
-        <partition t="map">
-          <create t="boolean">true</create>
-          <filesystem t="symbol">xfs</filesystem>
+          <fstopt>rw,nodev,nosuid,seclabel,attr2,inode64,noquota</fstopt>
           <format t="boolean">false</format>
           <label>root</label>
           <lv_name>root</lv_name>
@@ -152,7 +134,22 @@
           <mountby t="symbol">device</mountby>
           <pool t="boolean">false</pool>
           <resize t="boolean">false</resize>
-          <size>2147483648</size>
+          <size>2GiB</size>
+          <stripes t="integer">1</stripes>
+          <stripesize t="integer">0</stripesize>
+        </partition>
+        <partition t="map">
+          <create t="boolean">true</create>
+          <filesystem t="symbol">xfs</filesystem>
+          <fstopt>rw,nodev,nosuid,noexec,noatime,seclabel,attr2,inode64,noquota</fstopt>
+          <format t="boolean">false</format>
+          <label>home</label>
+          <lv_name>home</lv_name>
+          <mount>/home</mount>
+          <mountby t="symbol">device</mountby>
+          <pool t="boolean">false</pool>
+          <resize t="boolean">false</resize>
+          <size>2GiB</size>
           <stripes t="integer">1</stripes>
           <stripesize t="integer">0</stripesize>
         </partition>
@@ -166,13 +163,14 @@
           <mountby t="symbol">device</mountby>
           <pool t="boolean">false</pool>
           <resize t="boolean">false</resize>
-          <size>4294967296</size>
+          <size>4GiB</size>
           <stripes t="integer">1</stripes>
           <stripesize t="integer">0</stripesize>
         </partition>
         <partition t="map">
           <create t="boolean">true</create>
           <filesystem t="symbol">xfs</filesystem>
+          <fstopt>rw,nodev,nosuid,noexec,noatime,seclabel,attr2,inode64,noquota</fstopt>
           <format t="boolean">false</format>
           <label>tmp</label>
           <lv_name>tmp</lv_name>
@@ -180,13 +178,14 @@
           <mountby t="symbol">device</mountby>
           <pool t="boolean">false</pool>
           <resize t="boolean">false</resize>
-          <size>1073741824</size>
+          <size>1GiB</size>
           <stripes t="integer">1</stripes>
           <stripesize t="integer">0</stripesize>
         </partition>
         <partition t="map">
           <create t="boolean">true</create>
           <filesystem t="symbol">xfs</filesystem>
+          <fstopt>rw,nodev,noatime,seclabel,attr2,inode64,noquota</fstopt>
           <format t="boolean">false</format>
           <label>usr</label>
           <lv_name>usr</lv_name>
@@ -194,13 +193,14 @@
           <mountby t="symbol">device</mountby>
           <pool t="boolean">false</pool>
           <resize t="boolean">false</resize>
-          <size>3221225472</size>
+          <size>3GiB</size>
           <stripes t="integer">1</stripes>
           <stripesize t="integer">0</stripesize>
         </partition>
         <partition t="map">
           <create t="boolean">true</create>
           <filesystem t="symbol">xfs</filesystem>
+          <fstopt>rw,nodev,nosuid,noexec,seclabel,attr2,inode64,noquota</fstopt>
           <format t="boolean">false</format>
           <label>var</label>
           <lv_name>var</lv_name>
@@ -208,7 +208,22 @@
           <mountby t="symbol">device</mountby>
           <pool t="boolean">false</pool>
           <resize t="boolean">false</resize>
-          <size>2147483648</size>
+          <size>2GiB</size>
+          <stripes t="integer">1</stripes>
+          <stripesize t="integer">0</stripesize>
+        </partition>
+        <partition t="map">
+          <create t="boolean">true</create>
+          <filesystem t="symbol">xfs</filesystem>
+          <fstopt>rw,nodev,nosuid,noatime,seclabel,attr2,inode64,noquota</fstopt>
+          <format t="boolean">false</format>
+          <label>opt</label>
+          <lv_name>opt</lv_name>
+          <mount>/opt</mount>
+          <mountby t="symbol">device</mountby>
+          <pool t="boolean">false</pool>
+          <resize t="boolean">false</resize>
+          <size>max</size>
           <stripes t="integer">1</stripes>
           <stripesize t="integer">0</stripesize>
         </partition>
@@ -246,11 +261,11 @@
           <partition_id t="integer">142</partition_id>
           <partition_nr t="integer">4</partition_nr>
           <resize t="boolean">false</resize>
-          <size>40255864320</size>
+          <size>max</size>
         </partition>
       </partitions>
       <type t="symbol">CT_DISK</type>
-      <use>1,3,4</use>
+      <use>all</use>
     </drive>
   </partitioning>
   <proxy t="map">
@@ -260,54 +275,52 @@
     <default_target>multi-user</default_target>
     <services t="map">
       <enable t="list">
-        <service>YaST2-Firstboot</service>
-        <service>YaST2-Second-Stage</service>
         <service>auditd</service>
         <service>chronyd</service>
-        <service>firewalld</service>
         <service>wickedd-auto4</service>
         <service>wickedd-dhcp4</service>
         <service>wickedd-dhcp6</service>
         <service>wickedd-nanny</service>
         <service>haveged</service>
         <service>irqbalance</service>
-        <service>issue-generator</service>
         <service>kbdsettings</service>
         <service>lvm2-monitor</service>
         <service>wicked</service>
-        <service>purge-kernels</service>
         <service>sshd</service>
-        <service>systemd-remount-fs</service>
-        <service>vgauthd</service>
-        <service>vmtoolsd</service>
       </enable>
     </services>
   </services-manager>
   <software t="map">
-    <install_recommended t="boolean">true</install_recommended>
+    <install_recommended t="boolean">false</install_recommended>
     <instsource/>
     <packages t="list">
       <package>xfsprogs</package>
       <package>wicked</package>
       <package>openssh</package>
       <package>openSUSE-release</package>
-      <package>numactl</package>
       <package>mc</package>
       <package>lvm2</package>
       <package>kexec-tools</package>
       <package>irqbalance</package>
       <package>grub2</package>
-      <package>glibc</package>
-      <package>firewalld</package>
       <package>dosfstools</package>
+      <package>haveged</package>
       <package>chrony</package>
-      <package>aytests-tests</package>
-      <package>autoyast2</package>
+      <package>git</package>
+      <package>audit</package>
+      <package>fail2ban</package>
+      <package>nftables</package>
+      <package>mailx</package>
+      <package>htop</package>
     </packages>
+    <remove-packages t="list">
+   	  <package>postfix</package>
+   	  <package>firewalld</package>
+   	  <package>SuSEfirewall2</package>
+    </remove-packages>
     <patterns t="list">
       <pattern>base</pattern>
       <pattern>minimal_base</pattern>
-      <pattern>yast2_basis</pattern>
     </patterns>
     <products t="list">
       <product>Leap</product>
@@ -333,7 +346,14 @@
   </user_defaults>
   <users t="list">
     <user t="map">
-      <authorized_keys t="list"/>
+  	  <username>root</username>
+  	  <user_password>JaffaKree123!%/</user_password>
+  	  <encrypted t="boolean">false</encrypted>
+    </user>
+    <user t="map">
+      <authorized_keys t="list">
+      	<listentry>ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAsCaKUzXes0z4WMqY8tQ9PsTEFmYVIyj7nYd4F9iZXSHZfDv6AbyCudGVXHdrdAe4VnMmoWVg6j8k546KQzFZ3bQl5UJdWrqulwCvFrH8yEyouqmA6OeSSAz7ALG85FBYiVWVKWrlzLqAIT/Gn+Ud57Pu3d4OowH00EXqksKdeux/eT+nyGuC7Je2ecvXLqETOhOJDhAicZf8SEcu5Rsbz7dEqZPnXC+4zfibqDuldzKDEkYL4Pyc4mcG+F15yxmW0OyjMLUI93kcgtmwXVKRPV2k0ceuqa7a3zlhbwae/ofgC7AwsUBZYdxxSfxmkGIXZYfoaN1PxiXj+aiMFdis5w==</listentry>
+      </authorized_keys>
       <encrypted t="boolean">true</encrypted>
       <fullname>lyynxxx</fullname>
       <gid>100</gid>
@@ -352,215 +372,18 @@
       <user_password>$6$QDGpXOzgjklbon8l$n6rz2Wq9N7DhRPej/NYwG/2.H4BfK/sLAmpVWGpU6t0zduhK9pT1YYK0j.NCio2CG6dg6n0adbtccigofU8xe0</user_password>
       <username>lyynxxx</username>
     </user>
-    <user t="map">
-      <encrypted t="boolean">true</encrypted>
-      <fullname>systemd Resolver</fullname>
-      <gid>481</gid>
-      <home>/</home>
-      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
-      <password_settings t="map">
-        <expire/>
-        <flag/>
-        <inact/>
-        <max/>
-        <min/>
-        <warn/>
-      </password_settings>
-      <shell>/usr/sbin/nologin</shell>
-      <uid>481</uid>
-      <user_password>!*</user_password>
-      <username>systemd-resolve</username>
-    </user>
-    <user t="map">
-      <encrypted t="boolean">true</encrypted>
-      <fullname>bin</fullname>
-      <gid>1</gid>
-      <home>/bin</home>
-      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
-      <password_settings t="map">
-        <expire/>
-        <flag/>
-        <inact/>
-        <max/>
-        <min/>
-        <warn/>
-      </password_settings>
-      <shell>/sbin/nologin</shell>
-      <uid>1</uid>
-      <user_password>!</user_password>
-      <username>bin</username>
-    </user>
-    <user t="map">
-      <encrypted t="boolean">true</encrypted>
-      <fullname>nobody</fullname>
-      <gid>65534</gid>
-      <home>/var/lib/nobody</home>
-      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
-      <password_settings t="map">
-        <expire/>
-        <flag/>
-        <inact/>
-        <max/>
-        <min/>
-        <warn/>
-      </password_settings>
-      <shell>/bin/bash</shell>
-      <uid>65534</uid>
-      <user_password>!</user_password>
-      <username>nobody</username>
-    </user>
-    <user t="map">
-      <encrypted t="boolean">true</encrypted>
-      <fullname>systemd Time Synchronization</fullname>
-      <gid>480</gid>
-      <home>/</home>
-      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
-      <password_settings t="map">
-        <expire/>
-        <flag/>
-        <inact/>
-        <max/>
-        <min/>
-        <warn/>
-      </password_settings>
-      <shell>/usr/sbin/nologin</shell>
-      <uid>480</uid>
-      <user_password>!*</user_password>
-      <username>systemd-timesync</username>
-    </user>
-    <user t="map">
-      <encrypted t="boolean">true</encrypted>
-      <fullname>systemd Core Dumper</fullname>
-      <gid>479</gid>
-      <home>/</home>
-      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
-      <password_settings t="map">
-        <expire/>
-        <flag/>
-        <inact/>
-        <max/>
-        <min/>
-        <warn/>
-      </password_settings>
-      <shell>/usr/sbin/nologin</shell>
-      <uid>479</uid>
-      <user_password>!*</user_password>
-      <username>systemd-coredump</username>
-    </user>
-    <user t="map">
-      <encrypted t="boolean">true</encrypted>
-      <fullname>SSH daemon</fullname>
-      <gid>484</gid>
-      <home>/var/lib/sshd</home>
-      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
-      <password_settings t="map">
-        <expire/>
-        <flag/>
-        <inact/>
-        <max/>
-        <min/>
-        <warn/>
-      </password_settings>
-      <shell>/sbin/nologin</shell>
-      <uid>498</uid>
-      <user_password>!</user_password>
-      <username>sshd</username>
-    </user>
-    <user t="map">
-      <authorized_keys t="list"/>
-      <encrypted t="boolean">true</encrypted>
-      <fullname>root</fullname>
-      <gid>0</gid>
-      <home>/root</home>
-      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
-      <password_settings t="map">
-        <expire/>
-        <flag/>
-        <inact/>
-        <max/>
-        <min/>
-        <warn/>
-      </password_settings>
-      <shell>/bin/bash</shell>
-      <uid>0</uid>
-      <user_password>$6$.XIfFWrjfoBHAXMX$xAlXIo2Mc8DaMaopX3yuJYvvTdd3KRN0aVZYQEKLZJ1788/Pu7jTvtAj9l95rt2fdsgbcZ817Q54Gs8L5D.211</user_password>
-      <username>root</username>
-    </user>
-    <user t="map">
-      <encrypted t="boolean">true</encrypted>
-      <fullname>User for D-Bus</fullname>
-      <gid>485</gid>
-      <home>/run/dbus</home>
-      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
-      <password_settings t="map">
-        <expire/>
-        <flag/>
-        <inact/>
-        <max/>
-        <min/>
-        <warn/>
-      </password_settings>
-      <shell>/usr/bin/false</shell>
-      <uid>499</uid>
-      <user_password>!</user_password>
-      <username>messagebus</username>
-    </user>
-    <user t="map">
-      <encrypted t="boolean">true</encrypted>
-      <fullname>systemd Network Management</fullname>
-      <gid>482</gid>
-      <home>/</home>
-      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
-      <password_settings t="map">
-        <expire/>
-        <flag/>
-        <inact/>
-        <max/>
-        <min/>
-        <warn/>
-      </password_settings>
-      <shell>/usr/sbin/nologin</shell>
-      <uid>482</uid>
-      <user_password>!*</user_password>
-      <username>systemd-network</username>
-    </user>
-    <user t="map">
-      <encrypted t="boolean">true</encrypted>
-      <fullname>Daemon</fullname>
-      <gid>2</gid>
-      <home>/sbin</home>
-      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
-      <password_settings t="map">
-        <expire/>
-        <flag/>
-        <inact/>
-        <max/>
-        <min/>
-        <warn/>
-      </password_settings>
-      <shell>/sbin/nologin</shell>
-      <uid>2</uid>
-      <user_password>!</user_password>
-      <username>daemon</username>
-    </user>
-    <user t="map">
-      <encrypted t="boolean">true</encrypted>
-      <fullname>Chrony Daemon</fullname>
-      <gid>478</gid>
-      <home>/var/lib/chrony</home>
-      <home_btrfs_subvolume t="boolean">false</home_btrfs_subvolume>
-      <password_settings t="map">
-        <expire/>
-        <flag/>
-        <inact/>
-        <max/>
-        <min/>
-        <warn/>
-      </password_settings>
-      <shell>/bin/false</shell>
-      <uid>478</uid>
-      <user_password>!</user_password>
-      <username>chrony</username>
-    </user>
   </users>
+<scripts>
+	<post-scripts t="list">
+		<script>
+			<location>http://192.168.10.125/vm/01-system-setup.sh</location>
+		</script>
+    	<script>
+      		<location>http://192.168.10.125/vm/service-geth.sh</location>
+    	</script>
+		<script>
+			<location>http://192.168.10.125/vm/99-lockdown.sh</location>
+		</script>
+	</post-scripts>
+</scripts>
 </profile>
