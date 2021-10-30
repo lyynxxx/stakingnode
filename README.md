@@ -21,7 +21,7 @@ I do encourage you to experiment on test nets, but keep in mind that running a v
 Personally, knowing these risks, I would build my own validator node. 
 
 # Validator at home vs. run stuff in the Cloud/Data center?
-The beauty of the decentralization is that anyone can participate - naturally, in case you have the required skills and hardware. You can run a validator node at home if you have stable internet and electricity. Obviously, it does matter which network we're talking about. This will be mostly about Eth, but running a Sentry config on Cosmos/Crypto.org Chain is not recommended (or even possible) at home (if you have only one public/dynamic IP). Solana requires extremely high network bandwidth (300Mbit/s symmetric, commercial. 1GBit/s preferred), which most home user doesn't have.
+You can run a validator node at home if you have stable internet and electricity. Obviously, it does matter which network we're talking about. This will be mostly about Eth, but running a Sentry config on Cosmos/Crypto.org Chain is not recommended (or even possible) at home (if you have only one public/dynamic IP). Solana requires extremely high network bandwidth (300Mbit/s symmetric, commercial. 1GBit/s preferred), which most home user doesn't have.
 
 You can use cloud providers or VPS providers too. If you go this way – repeatedly – you don’t have to worry about hardware or internet, but you must build up the system itself. In most cases, you can spin up a new virtual server in about 5 minutes from base images. These are pre-built, easy-to-scale operating systems, but you can’t make many deep customization as they are often optimized for the infrastructure of the service provider.
 
@@ -82,6 +82,8 @@ What happens if:
 You need monitoring. You need constant system metrics and alerting too, otherwise you will not know if your validator is offline or will be offline soon, and you need to do counter-measures.
 
 Most of the clients are supporting Prometheus and have a Grafana dashboard. Setting up a monitoring stack is essential (on a different host)!
+
+NetData(https://www.netdata.cloud/) is also a good option or if system metrics are not so important for you, Beaconcha.in(https://mainnet.beaconcha.in) can monitor the performance of your validator and can send mail alerts if you misses blocks.
 
 # Some other stuff
 I plan to do the system setup and most of the task automated/scripted. This way I can reproduce all steps in the same way and the new node will be the same as the previous one.
