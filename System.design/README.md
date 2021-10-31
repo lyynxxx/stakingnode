@@ -7,7 +7,7 @@ Security begins even before I start the installation. During the installation pr
 | Partition | Size | What for |
 | ------ | ------ | ------ |
 | /boot | 250M | Isolated boot partition for the kernel and the boot config files. I will make this read-only and unlock it only I need to update the system. Also apply nodev,nosuid,noexec flags. (details later)|
-| swap | 8G | It's like virtual memory. Stuff in RAM used a long time ago but not purged, can be "swapped out" to disk, to free up some memory for other applications that needs more. The system may not even use it, but if I have a bare-metal machine it can't be a problem if I have one. Virtual environments often don't have a swap partition. You have to plan your system's available memory so all the applications can fit in and you don't have to swap a lot.|
+| swap | 8G | It's like virtual memory. Stuff in RAM used a long time ago but not purged, can be "swapped out" to disk, to free up some memory for other applications that needs more. The system may not even use it, but if I have a bare-metal machine it can't be a problem if I have one. Virtual environments often don't have a swap partition. You have to plan your system's available memory so all the applications can fit in and you don't have to swap a lot/crash with out of memory errors.|
 | / | 2G | No need for a lot of space. All the other important stuff is separated and has the necessary free space. I don't have a separate user home directory, as I don't want to create many users. Only one, to log into the system. I will harden this, with noexec too also apply nodev and nosuid! |
 | /usr | 3G | Here I have all the important system binaries. This will be read-only. If an attacker gains access to the system often the first thing to alter some system binaries, to hide the traces. In this way, it's not possible (at least it will be harder, but the auditing system can detect this kind of activity.) I apply nodev here too, but we need the other grants so can't apply noexec or nosuid.|
 | /var | 2G | For system logs and the package manager cache. No need much more, if something goes wrong and the system writes a lot of logs or some attacker forces the system to write a bunch of logs, our server won't stop as there is no more free space left, all our services can run. This may have the drawbacks that we don't log the suspicious activity, so making too small /var can be a bad practice, but in this situation, 2G will be fine. I apply nodev,nosid,noexec here.|
@@ -309,7 +309,7 @@ nft add rule inet my_table my_tcp_chain tcp dport 13000 counter accept
 nft add rule inet my_table my_udp_chain udp dport 30303 counter accept
 nft add rule inet my_table my_udp_chain udp dport 12000 counter accept
 ```
-To use native nftables I disable and mask the firewalld service, and enable the nftables service int the kickstart file for RHEL.
+To use native nftables I disable and mask the firewalld service, and enable the nftables service in the kickstart file for RHEL.
 ```
 systemctl disable firewalld
 systemctl mask --now firewalld
@@ -321,7 +321,7 @@ For openSUSE it is in the AutoYast config file, in the disabled services section
 
 Fail2ban scans log files (e.g. /var/log/secure or journald logs) and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc. Generally, Fail2Ban is then used to update firewall rules to reject the IP addresses for a specified amount of time, although any arbitrary other action (e.g. sending an email) could also be configured. Out of the box, Fail2Ban comes with filters for various services (apache, courier, ssh, etc).
 
-Some distros may have an outdated version in the distro's repository. OpenSUSE must use an additional repository to get the latest version, it's in the AutoYast file.
+Some distros may have an outdated version in the distro's repository. OpenSUSE Leap 15.2 must use an additional repository to get the latest version, it's in the AutoYast file.
 
 To override the defaults, I don't change the main configs, as a version update may replace the config/filter files. Fail2ban checks if there is a .local file with the same name. So to modify some settings, I just create a jail.local file, which can contain the same settings as jail.conf, but this will override the defaults. In this file I can define the default backend, the default ban action to use nftables and some filters, like the sshd filter.
 
