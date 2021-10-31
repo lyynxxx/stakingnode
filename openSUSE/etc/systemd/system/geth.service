@@ -12,7 +12,7 @@ RestartSec=5
 LimitNOFILE=5120
 LimitNPROC=5120
 ExecStart=/opt/goethereum/bin/geth --cache=4096 --maxpeers=30 --http --datadir /opt/goethereum/data
-InaccessibleDirectories=/home /var /etc /usr /root /opt/validator
+InaccessibleDirectories=/home /var /etc /usr /root
 PrivateTmp=yes
 NoNewPrivileges=yes
 PrivateDevices=true
