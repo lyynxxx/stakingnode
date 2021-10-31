@@ -7,10 +7,10 @@ useradd --system -g geth --no-create-home --shell /bin/false geth
 mkdir -p /opt/goethereum/bin
 mkdir -p /opt/goethereum/data
 cd /opt/goethereum
-curl https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.8-26675454.tar.gz --output geth-linux-amd64-1.10.8-26675454.tar.gz
-tar xf geth-linux-amd64-1.10.8-26675454.tar.gz
-mv geth-linux-amd64-1.10.8-26675454/geth /opt/goethereum/bin/
-rm -rf geth-linux-amd64-1.10.8-26675454*
+curl https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.11-7231b3ef.tar.gz --output geth-linux-amd64-1.10.11-7231b3ef.tar.gz
+tar xf geth-linux-amd64-1.10.11-7231b3ef.tar.gz
+mv geth-linux-amd64-1.10.11-7231b3ef/geth /opt/goethereum/bin/
+rm -rf geth-linux-amd64-1.10.11-7231b3ef*
 chown -R geth:geth /opt/goethereum
 
 mv /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/geth.service /etc/systemd/system/
