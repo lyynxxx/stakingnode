@@ -26,24 +26,6 @@ chmod og-rwx /etc/at*
 ## Localtime
 ln -sf /usr/share/zoneinfo/Europe/Budapest /etc/localtime
 
-## SSH
-sed -i "s/^PermitRootLogin.*/PermitRootLogin no/g" /etc/ssh/sshd_config
-sed -i "s/^#Port.*/Port 2992/g" /etc/ssh/sshd_config
-sed -i "s/^#StrictModes.*/StrictModes yes/g" /etc/ssh/sshd_config
-sed -i "s/^#MaxAuthTries.*/MaxAuthTries 3/g" /etc/ssh/sshd_config
-sed -i "s/^#HostbasedAuthentication.*/HostbasedAuthentication no/g" /etc/ssh/sshd_config
-sed -i "s/^#IgnoreRhosts.*/IgnoreRhosts yes/g" /etc/ssh/sshd_config
-sed -i "s/^#PasswordAuthentication.*/PasswordAuthentication no/g" /etc/ssh/sshd_config
-sed -i "s/^X11Forwarding.*/#X11Forwarding yes/g" /etc/ssh/sshd_config
-sed -i "s/^#PubkeyAuthentication.*/PubkeyAuthentication yes/g" /etc/ssh/sshd_config
-sed -i "/^#VersionAddendum.*/a AllowUsers=lyynxxx" /etc/ssh/sshd_config
-sed -i "s/#ClientAliveInterval.*/ClientAliveInterval 120/g" /etc/ssh/sshd_config
-sed -i "s/UsePAM.*/UsePAM no/g" /etc/ssh/sshd_config
-
-## Fail2ban aggresive filtering
-sed -i "s/^mode\ =.*/mode\ =\ agressive/g" /etc/fail2ban/filter.d/sshd.conf
-sed -i "s/^#filter\ =.*/filter\ =\ sshd[mode=aggressive]/g" /etc/fail2ban/filter.d/sshd.conf
-
 mkdir -p /tmp/kickstart
 cd /tmp/kickstart
 #git config --global http.sslVerify false
@@ -63,10 +45,6 @@ mv /tmp/kickstart/stakingnode/openSUSE/etc/fail2ban/jail.local /etc/fail2ban/jai
 chown root:root /etc/fail2ban/jail.local
 chmod 644 /etc/fail2ban/jail.local
 
-mv /tmp/kickstart/stakingnode/openSUSE/etc/nftables/fail2ban.conf /etc/nftables/fail2ban.conf
-chown root:root /etc/nftables/fail2ban.conf
-chmod 644 /etc/nftables/fail2ban.conf
-
 ## nftables config
 mv /tmp/kickstart/stakingnode/openSUSE/etc/sysconfig/nftables.conf /etc/sysconfig/nftables.conf
 chown root:root /etc/sysconfig/nftables.conf
@@ -76,15 +54,21 @@ chmod 600 /etc/sysconfig/nftables.conf
 cat /tmp/kickstart/stakingnode/openSUSE/etc/sysctl.d/99-sysctl.conf > /etc/sysctl.d/99-sysctl.conf
 mv /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/nftables.service /etc/systemd/system/
 
+## SSH
+cat /tmp/kickstart/stakingnode/openSUSE/etc/ssh/sshd_config > /etc/ssh/sshd_config
+chown root:root /etc/ssh/sshd_config
+chmod 640 /etc/ssh/sshd_config
 
 # Don't forget to set your own key!!
 mv /tmp/kickstart/stakingnode/openSUSE/root/.mailrc /root/.mailrc
 chown root:root /root/.mailrc
 chmod 640 /root/.mailrc
 
-mv /tmp/kickstart/stakingnode/openSUSE/root/.profile /root/.profile
-chown root:root /root/.profile
-chmod 640 /root/.profile
+# Daily Aureport logs
+mkdir -p /root/bin
+mv /tmp/kickstart/stakingnode/openSUSE/root/bin/reports.sh /root/bin/aureport_daily.sh
+chown root:root /root/bin/aureport_daily.sh
+chmod 640 /root/bin/aureport_daily.sh
 
 
 systemctl daemon-reload
@@ -116,19 +100,30 @@ echo "proc                    /proc                   proc    defaults,hidepid=2
 
 # set /usr to read-only
 LINE=$(grep -n '/usr' /etc/fstab| cut -d ":" -f 1)
-sed -i "${LINE}s/rw/ro/" /etc/fstab
+if [ ! -z "$LINE" ]; then 
+	sed -i "${LINE}s/rw/ro/" /etc/fstab
+fi
+unset LINE
 
 # set /boot to read-only
 LINE=$(grep -n '/boot ' /etc/fstab| cut -d ":" -f 1)
+if [ ! -z "$LINE" ]; then 
 sed -i "${LINE}s/rw/ro/" /etc/fstab
+fi
+unset LINE
 
 # set /boot to read-only
 LINE=$(grep -n '/boot/' /etc/fstab| cut -d ":" -f 1)
-sed -i "${LINE}s/rw/ro/" /etc/fstab
-
+if [ ! -z "$LINE" ]; then 
+	sed -i "${LINE}s/rw/ro/" /etc/fstab
+fi
+unset LINE
 # set / to noexec
 #LINE=$(grep -n '/ ' /etc/fstab| cut -d ":" -f 1)
 #sed -i "${LINE}s/nodev/noexec,nodev/" /etc/fstab
 
 # Prevent chain-maind spamfork dbus sessions, no need anyway
 #chmod o-x /usr/bin/dbus-launch
+
+#TODO: https://gist.github.com/ageis/f5595e59b1cddb1513d1b425a323db04
+###### systemd-analyze security name_of_service.service

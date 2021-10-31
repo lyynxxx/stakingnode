@@ -3,6 +3,8 @@
 
 chattr +i /etc/passwd
 chattr +i /etc/shadow
+#chattr +i /etc/fstab
+
 
 rm -rf /tmp/kickstart
 rm -rf /opt/tmp/*
