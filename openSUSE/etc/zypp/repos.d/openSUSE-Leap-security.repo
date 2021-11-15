@@ -3,6 +3,7 @@ name=openSUSE-Leap-Security
 enabled=1
 autorefresh=1
 baseurl=https://download.opensuse.org/repositories/security/openSUSE_Leap_$releasever/
+gpgkey=https://download.opensuse.org/repositories/security/openSUSE_Leap_$releasever/repodata/repomd.xml.key
 path=/
 type=rpm-md
 keeppackages=0
