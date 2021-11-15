@@ -82,6 +82,10 @@ mv /tmp/kickstart/stakingnode/openSUSE/etc/zypp/repos.d/*.repo /etc/zypp/repos.d
 chown root:root /etc/zypp/repos.d/*.repo
 chmod 600 /etc/zypp/repos.d/*.repo
 
+releasever=15.2
+rpm --import https://download.opensuse.org/repositories/security/openSUSE_Leap_$releasever/repodata/repomd.xml.key
+rpm --import https://download.opensuse.org/repositories/server:/database/openSUSE_Leap_$releasever/repodata/repomd.xml.key
+
 ## sudo by default ask the root pwd, dont't do that..
 #sed -i "s/^Defaults\ targetpw.*/#/g" /etc/sudoers
 #sed -i "s/^ALL\ targetpw.*/#/g" /etc/sudoers
