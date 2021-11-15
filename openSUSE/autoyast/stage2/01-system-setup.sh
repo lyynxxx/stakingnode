@@ -76,7 +76,11 @@ systemctl enable fail2ban
 systemctl enable auditd
 systemctl enable nftables
 
-
+# Zypper repo cleanup
+rm -rf /etc/zypp/repos.d/*.repo
+mv /tmp/kickstart/stakingnode/openSUSE/etc/zypp/repos.d/*.repo /etc/zypp/repos.d/
+chown root:root /etc/zypp/repos.d/*.repo
+chmod 600 /etc/zypp/repos.d/*.repo
 
 ## sudo by default ask the root pwd, dont't do that..
 #sed -i "s/^Defaults\ targetpw.*/#/g" /etc/sudoers
