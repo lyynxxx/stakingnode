@@ -1,0 +1,8 @@
+[openSUSE-Leap-Databases]
+name=openSUSE-Leap-Databases
+enabled=1
+autorefresh=1
+baseurl=https://download.opensuse.org/repositories/server:/database/openSUSE_Leap_15.2/
+path=/
+type=rpm-md
+keeppackages=0
