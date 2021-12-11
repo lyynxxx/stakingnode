@@ -1,3 +1,9 @@
+function geth-prune() {
+	systemctl stop geth
+	sleep 3
+	su - geth -s /bin/bash -c "/opt/goethereum/bin/geth --datadir /opt/goethereum/data snapshot prune-state"
+}
+
 function syncing() {
 	
 	/opt/goethereum/bin/geth attach http://localhost:8545 << EOF
