@@ -1,0 +1,8 @@
+[openSUSE-Leap-Updates]
+name=openSUSE-Leap-Updates
+enabled=1
+autorefresh=1
+baseurl=http://download.opensuse.org/update/leap/$releasever/oss/
+path=/
+type=rpm-md
+keeppackages=0

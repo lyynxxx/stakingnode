@@ -1,0 +1,9 @@
+[openSUSE-Leap-Databases]
+name=openSUSE-Leap-Databases
+enabled=1
+autorefresh=1
+baseurl=https://download.opensuse.org/repositories/server:/database/openSUSE_Leap_$releasever/
+gpgkey=https://download.opensuse.org/repositories/server:/database/openSUSE_Leap_$releasever/repodata/repomd.xml.key
+path=/
+type=rpm-md
+keeppackages=0

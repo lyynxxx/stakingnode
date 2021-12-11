@@ -1,0 +1,8 @@
+[openSUSE-Leap-main]
+name=openSUSE-Leap-Main
+enabled=1
+autorefresh=1
+baseurl=http://download.opensuse.org/distribution/leap/$releasever/repo/oss/
+path=/
+type=rpm-md
+keeppackages=0
