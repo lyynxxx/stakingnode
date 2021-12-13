@@ -1,4 +1,4 @@
-# Autoyast Installation of openSuSE Leap 15.2
+# Autoyast Installation of openSuSE Leap 15.3
 ##### Please read carefully before you would jump into anything directly or even break an already working system!!! Also feel free to correct me if you know better ways, I'm always happy to learn new things (mailto: lyynxxx@gmail.com).
 
 A regular installation of openSUSE Leap is semi-automated by default. The user is prompted to select the necessary information at the beginning of the installation (usually language only). YaST then generates a proposal for the underlying system depending on different factors and system parameters. Usually - and especially for new systems - such proposal can be used to install the system. The steps following the proposal are fully automated.
