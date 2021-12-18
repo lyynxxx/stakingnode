@@ -236,15 +236,15 @@
       <disklabel>gpt</disklabel>
       <partitions t="list">
         <partition t="map">
-          <create t="boolean">false</create>
-          <format t="boolean">false</format>
+          <create t="boolean">true</create>
+          <format t="boolean">true</format>
           <partition_id t="integer">263</partition_id>
           <partition_nr t="integer">1</partition_nr>
           <resize t="boolean">false</resize>
           <size>8388608</size>
         </partition>
         <partition t="map">
-          <create t="boolean">false</create>
+          <create t="boolean">true</create>
           <filesystem t="symbol">xfs</filesystem>
           <format t="boolean">true</format>
           <mount>/boot</mount>
@@ -255,8 +255,8 @@
           <size>268435456</size>
         </partition>
         <partition t="map">
-          <create t="boolean">false</create>
-          <format t="boolean">false</format>
+          <create t="boolean">true</create>
+          <format t="boolean">true</format>
           <lvm_group>system</lvm_group>
           <partition_id t="integer">142</partition_id>
           <partition_nr t="integer">4</partition_nr>

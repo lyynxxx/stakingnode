@@ -1,0 +1,27 @@
+[Unit]
+Description=Taraxa node. 
+After=network.target 
+Wants=network.target
+
+[Service]
+User=taraxa 
+Group=taraxa
+Type=simple
+Restart=always
+RestartSec=5
+LimitNOFILE=5120
+LimitNPROC=5120
+ExecStart=/opt/taraxa/bin/taraxad --data-dir /opt/taraxa/data --config /opt/taraxa/.conf/config.json --wallet /opt/taraxa/.conf/wallet.json
+InaccessibleDirectories=/home /var /usr /root
+ReadOnlyDirectories=/etc
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=default.target
