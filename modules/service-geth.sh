@@ -18,3 +18,7 @@ chown root:root /etc/systemd/system/geth.service
 chmod 644 /etc/systemd/system/geth.service
 
 systemctl enable geth
+
+
+## Prune: 
+## su - geth -s /bin/bash -c "/opt/goethereum/bin/geth --datadir /opt/goethereum/data snapshot prune-state"

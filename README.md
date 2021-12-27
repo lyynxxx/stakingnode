@@ -5,7 +5,7 @@ So… why I'm writing this? For fun and experimenting purposes only, so that I c
 The beauty of the decentralized operation is that anyone can participate in it. Anyone who acquires the necessary knowledge and holds the necessary resources. However, this needs work and dedication. If you start a validator - the backbone of the network - , they reward you for securing the network. On the other hand, as soon as you fail in the duty for which you have applied, you may get a penalty. Your best interest is to provide a secure node and service uptime as close as possible to 100%.
 
 The network’s greatest strength is also it’s greatest weakness: anyone can participate, but if people doesn’t know what they’re doing, then they are practically just dreaming about breathtaking profit, following half-baked guides from the internet and the whole network is about to collapse eventually. 
-Because of that, I try to think carefully about the steps required to get a validator node, mostly secure and well configured. As time is money, I also try to do this as automated as possible, so that if anything goes wrong and I need to spin up a new machine to replace the old one, I could do it ASAP! It's mostly about ETH2.0, but the basics - the OS setup - are the same for almost any validator.
+Because of that, I try to think carefully about the steps required to get a validator node, mostly secure and well configured. As time is money, I also try to do this as automated as possible, so that if anything goes wrong and I need to spin up a new machine to replace the old one, I could do it ASAP! It's mostly about my ETH2.0 validator setup, but the basics - the OS setup - are the same for almost any validator.
 
 
 # My own, full validator or a staking service?
@@ -46,7 +46,7 @@ Minimum 1TB SSD (nvme or sata), a reliable one, with good warranty and customer 
 
 Simple hard disks will not be suitable for this task! Also, I do not recommend Raspberry Pi or other SBC platforms. Maybe after the merge, but definitely not at the starting point.
 
-I have a motherboard with X79 chipset, a Xeon e5-2620 processor and 32GB ECC ram (server grade stuff) and 960GB Samsung P883. 
+I have an old motherboard with X79 chipset, a Xeon e5-2620 processor and 32GB ECC ram (server grade stuff) and 960GB Samsung P883. 
 
 # Operating system
 This could lead to a dark forest. If you are a Windows or MAC fan, check which client supports your system and use it. Initially on test net, of course. I recommend checking all the clients, the installation process, the recovery process and even the migration process from one client to another. You may need these if a bug breaks a validator client, others are not necessarily affected.
@@ -62,11 +62,11 @@ My personal choices at the time are: Prysm, Teku and Lighthouse. They are just w
 
 I have tested methods for system setup using these clients and even migration steps from one to another. Check the client docs and choose wisely!
 
-As for the eth1 node, you can use Infura, Alchemy or some other service providers node but building on them can be a risky (however if you accept the risks, you can spare a lot of SSD disk space and lifetime). Better to run your own node, or with trusted friends, partners run one node and use it altogether. However, I suggest to use service providers as a backup Eth1 client. The free plan is a good solution if you need a new eth1 client within 2 minutes, but only for a few days term while your backup system syncs up fully.
+As for the eth1 node, you can use Infura(https://infura.io/), Alchemy(https://www.alchemy.com/) or some other service providers node but building on them can be a risky (however if you accept the risks, you can spare a lot of SSD disk space and lifetime). Better to run your own node, or with trusted friends, partners run one node and use it altogether. However, I suggest to use these service providers as a backup Eth1 client. The free plan is a good solution if you need a new eth1 client within 2 minutes, but only for a few days term while your backup system syncs up fully.
 
 My personal choice is Geth. This is where you need the SSD! Downloading and later just syncing, processing the eth1 network transactions require a significant amount of storage and I/O speed. Simple, consumer grade hard disks cannot do that task. I would not recommend cheap SSDs, buy one with great durability with a large number, as endurance rating. On my servers I use Intel D3-S4510 Series SSDs as they have 5 years of warranty and a total of 6.5 Petabyte write capacity.
 
-In the validator I use a Samsung P883 – it is a datacenter sata SSD – which is also affordable and worth the price as you will run a “32ETH system” on it.
+In the validator I use a Samsung P883 – it is also datacenter, sata SSD – which is also affordable and worth the price as you will run a “32ETH system” on it.
 
 # Testing
 Before you go to mainnet, it is a wise approach to spend some time on test nets. Do Experiment it!
@@ -83,7 +83,7 @@ You need monitoring. You need constant system metrics and alerting too, otherwis
 
 Most of the clients are supporting Prometheus and have a Grafana dashboard. Setting up a monitoring stack is essential (on a different host)!
 
-NetData(https://www.netdata.cloud/) is also a good option or if system metrics are not so important for you, Beaconcha.in(https://mainnet.beaconcha.in) can monitor the performance of your validator and can send mail alerts if you misses blocks.
+NetData(https://www.netdata.cloud/) is also a good option or if full system metrics are not so important for you, the fee plan of Beaconcha.in(https://mainnet.beaconcha.in) can monitor the performance of your validator and can send mail alerts if you misses blocks.
 
 # Some other stuff
 I plan to do the system setup and most of the task automated/scripted. This way I can reproduce all steps in the same way and the new node will be the same as the previous one.
@@ -92,11 +92,12 @@ I plan to make some – well, I like to believe – advanced system customizatio
 
 I plan to pre-configure all I need, back it up and just download firewall settings, system files, service files, etc. into a fresh system.
 
-I plan to use openSUSE as the host operating system, using a minimal install and AutoYast. As Red Hat closed CentOS – my previous choice of operating system – I move to Suse. I have used it before a lot for different tasks and it just works, I like it.
+I plan to use openSUSE as the host operating system, using a minimal install and AutoYast to automate the system installation, however I will create scripts, kickstart files and configs for the Red Hat line and maybe Ubuntu too.
 
 AutoYast is Suse specific, but most of the commands and methods I use in the scripts after the operating system installation will work on almost any popular Linux.
-Let us dive into the process and plan the base system.
+
+Let us dive into the process and plan the base system (https://gitlab.com/lyynxxx/stakingnode/-/tree/master/System.design).
 
 
  DISCLAIMER: I'm not an expert! Feel free to correct me (mailto: lyynxxx@gmail.com), as I don't want to mislead people, I just documenting my journey here.
- If you find this useful, my coffee fund: ETH --  0xa29C271FF54667691A00359D23815353AC834B8f
+ If you find this useful, my coffee fund: ETH --  0x3f0402c968bB4176d7571DC0822Fd276bF8b8a9F
