@@ -8,9 +8,9 @@ Security begins even before I start the installation. During the installation pr
 | ------ | ------ | ------ |
 | /boot | 250M | Isolated boot partition for the kernel and the boot config files. I will make this read-only and unlock it only I need to update the system. Also apply nodev,nosuid,noexec flags. (details later)|
 | swap | 8G | It's like virtual memory. Stuff in RAM used a long time ago but not purged, can be "swapped out" to disk, to free up some memory for other applications that needs more. The system may not even use it, but if I have a bare-metal machine it can't be a problem if I have one. Virtual environments often don't have a swap partition. You have to plan your system's available memory so all the applications can fit in and you don't have to swap a lot/crash with out of memory errors.|
-| / | 2G | No need for a lot of space. All the other important stuff is separated and has the necessary free space. I don't have a separate user home directory, as I don't want to create many users. Only one, to log into the system. I will harden this, with noexec too also apply nodev and nosuid! |
-| /usr | 3G | Here I have all the important system binaries. This will be read-only. If an attacker gains access to the system often the first thing to alter some system binaries, to hide the traces. In this way, it's not possible (at least it will be harder, but the auditing system can detect this kind of activity.) I apply nodev here too, but we need the other grants so can't apply noexec or nosuid.|
-| /var | 2G | For system logs and the package manager cache. No need much more, if something goes wrong and the system writes a lot of logs or some attacker forces the system to write a bunch of logs, our server won't stop as there is no more free space left, all our services can run. This may have the drawbacks that we don't log the suspicious activity, so making too small /var can be a bad practice, but in this situation, 2G will be fine. I apply nodev,nosid,noexec here.|
+| / | 2G | No need for a lot of space. All the other important stuff is separated and has the necessary free space. I don't have a separate user home directory, as I don't want to create many users. Only one, to log into the system. I will harden this, with noexec (Red Hat only), and apply nodev and nosuid! |
+| /usr | 3G | Here I have all the important system binaries. This will be read-only. If an attacker gains access to the system, often the first thing to do is altering some system binaries, to hide the traces. In this way, it's not possible (at least it will be harder, but the auditing system can detect this kind of activity.) I apply nodev here too, but we need the other grants so can't apply noexec or nosuid.|
+| /var | 2G | For system logs and the package manager cache. No need much more space, if something goes wrong and the system writes a lot of logs or some attacker forces the system to write a bunch of logs, our server won't stop as there is no more free space left, all our services can run. This may have the drawbacks that we don't log the suspicious activity, so making too small /var can be a bad practice, but in this situation, 2G will be fine. I apply nodev,nosid,noexec here.|
 | /tmp | 1G | Isolate the temp directory and disable any binary execution too is a must! We won't use this much, but scripts often use /tmp to do fishy stuff, in this way we can break them. This breaks compiling sources too, but we have a workaround for that. I apply nodev,nosuid,noexec here. |
 | /opt | remaining space | This will be the location where we store the application data. I apply here nodev,nosuid. |
 
@@ -28,7 +28,7 @@ I will use LVM and /opt will grow only for 90% of the available free space durin
  Special settings for /proc:
  - hidepid=2: When looking in /proc I can discover a lot of files and directories. This includes process information from other users, even sensitive details. It is better not to expose this information to everyone. Setting hidepid=2 prevents users from seeing each other's processes.
 
-The final /etc/fstab will look like this:
+The final /etc/fstab will look like this on Red Hat:
 ```
 /dev/mapper/cl-root     /                       xfs     rw,nosuid,noexec,nodev,seclabel,attr2,inode64,noquota 0 0
 UUID=12bb8a4c-3b8a-4e23-888e-de5072313460 /boot                   xfs     ro,nodev,nosuid,noexec,noatime,seclabel,attr2,inode64,noquota 0 0
@@ -39,6 +39,21 @@ UUID=12bb8a4c-3b8a-4e23-888e-de5072313460 /boot                   xfs     ro,nod
 /dev/mapper/cl-swap     swap                    swap    defaults        0 0
 proc                    /proc                   proc    defaults,hidepid=2    0 0
 ```
+
+The final /etc/fstab will look like this on openSUSE Leap 15.3:
+```
+/dev/system/root                           /      xfs   rw,nodev,nosuid,seclabel,attr2,inode64,noquota  0  0
+/dev/system/var                            /var   xfs   rw,nodev,nosuid,noexec,seclabel,attr2,inode64,noquota  0  0
+/dev/system/usr                            /usr   xfs   ro,nodev,noatime,seclabel,attr2,inode64,noquota  0  0
+/dev/system/tmp                            /tmp   xfs   rw,nodev,nosuid,noexec,noatime,seclabel,attr2,inode64,noquota  0  0
+/dev/system/opt                            /opt   xfs   rw,nodev,nosuid,noatime,seclabel,attr2,inode64,noquota  0  0
+/dev/system/home                           /home  xfs   rw,nodev,nosuid,noexec,noatime,seclabel,attr2,inode64,noquota  0  0
+UUID=cc4eebdd-a931-4294-86e5-c21512519d70  /boot  xfs   defaults  0  0
+/dev/system/swap                           swap   swap  defaults  0  0
+proc                    /proc                   proc    defaults,hidepid=2    0 0
+
+```
+
 Some of the settings like read-only /boot and /usr or noexec on / can break the installation process, so these are set later, in the post-install section by the kickstart file and not as part of the base system installation. (Note: on SUSE I can't apply noexec on root it breaks the system! On RHEL/CensOS /bin and /sbin are only symlinks, binaries are under /usr/bin or /usr/sbin, but not on SUSE.)
 
 Later, when I need to install updates I must resolve the read-only restrictions on /boot and /usr with the following commands:
@@ -57,7 +72,7 @@ Although passwords are sent to the server in a secure manner, they are generally
 
 SSH key pairs are two cryptographically secure keys that can be used to authenticate a client to an SSH server. Each key pair consists of a public key and a private key.
 
-The private key is retained by the client and should be kept absolutely secret. Any compromise of the private key will allow the attacker to log into servers that are configured with the associated public key without additional authentication. As an additional precaution, the key can be encrypted on disk with a passphrase, it's highly recommended.
+The private key is retained by the client and should be kept absolutely secret. Any compromise of the private key will allow the attacker to log into servers that are configured with the associated public key without additional authentication. As an additional precaution, the key can be encrypted on disk with a passphrase, it's highly recommended. NEVER EVER use passwordless keys!
 
 The associated public key can be shared freely without any negative consequences. The public key can be used to encrypt messages that only the private key can decrypt. This property is employed as a way of authenticating using the key pair. My public key is part of the kickstart script, the newly installed system will contain it and password authentication will be disabled during the installation before anyone could try to brute force it.
 
@@ -69,7 +84,7 @@ Keep your keys safe!!! Never ever share your keys!!!
 As this service provides the access to the system, we should prepare it for good.
 I DO NOT allow root login! I declare the only user who can log in, using the AllowUseres parameter. I will change the default port too (for RHEL some SELinux config is needed here, as the sshd daemon won't start if SELinux does not know about the port change). Also, it's a good practice to enable StrictMode (in most distros it's on by default), disable host based authentication and password based authentication too. So if I don't have my keys, I can't log in!!!  
 
-In the kickstart script I use the 'sed' command to make changes on our freshly installed system (This is based on a CentOS Linux release 8.2.2004 (Core)/openSUSE Leap 15.2 fresh install... may not work for you if you only copy-paste, without knowing what you are doing without checking your own config files).
+(This is based on a CentOS Linux release 8.2.2004 (Core)/openSUSE Leap 15.3 fresh install... may not work for you if you only copy-paste, without knowing what you are doing, without checking your own config files). As I have a working version with all the options set in my repo, after the operating system installation I just download the pre-configured one and overwrite the original, but these are the steps I created it in the first place.
 ```
 # Disable root login
 sed -i "s/^PermitRootLogin.*/PermitRootLogin no/g" /etc/ssh/sshd_config
@@ -207,12 +222,16 @@ net.ipv4.tcp_rmem = 4096 87380 8388608
 net.ipv4.tcp_wmem = 4096 87380 8388608
  
 # increase Linux auto tuning TCP buffer limits
-net.core.rmem_max = 8388608
-net.core.wmem_max = 8388608
-net.core.netdev_max_backlog = 10000
+net.core.rmem_max = 12582912
+net.core.wmem_max = 12582912
+net.core.netdev_max_backlog = 9000
 net.core.netdev_budget = 600
 net.core.netdev_budget_usecs = 8000
 net.ipv4.tcp_window_scaling = 1
+net.ipv4.tcp_max_syn_backlog=8192
+net.ipv4.tcp_synack_retries=3
+net.ipv4.tcp_retries2=6
+net.ipv4.tcp_keepalive_probes=5
  
 # increase system file descriptor limit    
 fs.file-max = 100000
@@ -254,7 +273,7 @@ vm.dirty_background_ratio = 5
 
 nftables is a netfilter project that aims to replace the existing {ip,ip6,arp,eb}tables framework. It provides a new packet filtering framework, a new user-space utility (nft), and a compatibility layer for {ip,ip6}tables. It uses the existing hooks, connection tracking system, user-space queueing component, and logging subsystem of netfilter.
 
-Firewalld or SuseFirewall2 - in contrast, because in general this can only be encountered in - is a pure frontend which comes with CentOS8/openSUSE. It's not an independent firewall by itself. It only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" and running "nftables only". Let's use nftables only!
+Firewalld or SuseFirewall2 - in contrast, because in general this can only be encountered in - is a pure frontend which comes with Red Hat/openSUSE. It's not an independent firewall by itself. It only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" or running "nftables only". Let's use nftables only!
 
 The rules are in the file /etc/sysconfig/nftables.conf, but here are the details, how it is made:
 ```
@@ -321,7 +340,7 @@ For openSUSE it is in the AutoYast config file, in the disabled services section
 
 Fail2ban scans log files (e.g. /var/log/secure or journald logs) and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc. Generally, Fail2Ban is then used to update firewall rules to reject the IP addresses for a specified amount of time, although any arbitrary other action (e.g. sending an email) could also be configured. Out of the box, Fail2Ban comes with filters for various services (apache, courier, ssh, etc).
 
-Some distros may have an outdated version in the distro's repository. OpenSUSE Leap 15.2 must use an additional repository to get the latest version, it's in the AutoYast file.
+Some distros may have an outdated version in the distro's repository. OpenSUSE Leap 15.3 must use an additional repository to get the latest version, it's in the AutoYast file.
 
 To override the defaults, I don't change the main configs, as a version update may replace the config/filter files. Fail2ban checks if there is a .local file with the same name. So to modify some settings, I just create a jail.local file, which can contain the same settings as jail.conf, but this will override the defaults. In this file I can define the default backend, the default ban action to use nftables and some filters, like the sshd filter.
 
@@ -372,7 +391,8 @@ blocktype       = drop
 nftables_set_prefix =
 ```
 
-Lastly, I have to create the defined new nftables table and chain, where fail2ban will work and include this in the main nftables config. 
+Lastly, I have to create the defined new nftables table and chain, where fail2ban will work and include this in the main nftables config (as an alternative, I can paste the whole table definition to the end of the /etc/sysconfig/nftables file, so all firewall configuration is in the same file).
+
 /etc/nftables/fail2ban.conf
 ```
 #!/usr/sbin/nft -f
@@ -383,7 +403,7 @@ table ip fail2ban {
         }
 }
 ```
-I could set up mail sending action, but I don't want to get notified after every banned IP. Daily reports will be enough from LogWatch.
+I could set up mail sending action, but I don't want to get notified after every banned IP. Daily reports will be enough from LogWatch and the Auditd daemon.
 
 ## Auditing the system
 
@@ -497,21 +517,69 @@ This command shows what happend today.\
  - te now: so the report will contain event up until now
  - summary: a summary of all events
 
-I will use a cron job to send the reports in mail in every 8 hours too, so I can check the system state frequently.
+There is a lot of information which can be drained from aureport. Check this site for more details, to create your own reports (https://www.tecmint.com/create-reports-from-audit-logs-using-aureport-on-centos-rhel/)
+
 To send mails, I use sendgrid and mailx. The mailx config file is /root/.mailrc (ofc I need SendGrid account, and apikey!), I don't want to create global config. Only the root user can use cron too, so only the root user can send mails via SendGrid.
 
-## Logwatch
+
+## Logwatch (Optional)
 
 LogWatch is a Perl-based log management tool that analyses a server’s log files and generates a daily report which summarises and reports on your system’s log activity. It does not provide real-time alerts but instead is most often used to send a short daily digest of server’s log activity to a system administrator.
 
 The default config file is /usr/share/logwatch/default.conf/logwatch.conf, but - just like fail2ban - there is a local config, as packege updates may overwrite the global config, my modifications are safe if I put them into /etc/logwatch/conf/logwatch.conf
 
-I set details level to almost max (8), and change the mailer and parameters to send the reports in email. Also I can define the services I want to include the report or just send everything (by default, but the kernel log is massive).
+I set details level to almost max (8), and change the mailer and parameters to send the reports in email. Also I can define the services I want to include the report or just send everything by default (but the kernel log is massive!).
 
 ```
 Output = mail
-mailer = "/usr/bin/mailx -s 'LogWatch report(StekerNode)' your@email"
+mailer = "/usr/bin/mailx -s 'LogWatch report(StakingNode)' your@email"
 Range = Today
+Detail = 8
+```
+
+I mark this step optional, as most of our applications will use journald logs and we won't have much traditional log files, but it's a handy tool.
+Often I just use the disk usage report, but using the following command in the aureport script, we can get all the informations in one email:
+```
+# df -h -l -x tmpfs
+
+Filesystem               Size  Used Avail Use% Mounted on
+devtmpfs                 4.0M     0  4.0M   0% /dev
+/dev/mapper/system-root  2.0G  108M  1.9G   6% /
+/dev/mapper/system-usr   3.0G  910M  2.2G  30% /usr
+/dev/mapper/system-tmp  1014M   35M  980M   4% /tmp
+/dev/mapper/system-home  2.0G   35M  2.0G   2% /home
+/dev/mapper/system-var   2.0G  124M  1.9G   7% /var
+/dev/mapper/system-opt    36G  2.0G   34G   6% /opt
+/dev/sda2                253M   64M  190M  25% /boot
+```
+
+## My daily reports
+
+Using a small script, I can send daily reports (/root/bin/reports.sh):
+
+```
+#!/bin/bash
+LOGFILE=/tmp/daily.log
+echo > $LOGFILE
+
+/usr/sbin/logwatch >> $LOGFILE
+/usr/sbin/aureport --input-logs -ts yesterday 00:00:00 -te now --summary -i >> $LOGFILE
+/usr/sbin/aureport --input-logs -ts yesterday 00:00:00 -te now -k --summary >> $LOGFILE
+/usr/sbin/aureport --input-logs -ts yesterday 00:00:00 -te now -x --summary >> $LOGFILE
+/usr/sbin/aureport --input-logs -ts yesterday 00:00:00 -te now --mac --summary >> $LOGFILE
+/usr/sbin/aureport --input-logs -ts yesterday 00:00:00 -te now -i --login|tail -n5 >> $LOGFILE
+
+cat ${LOGFILE} | /usr/bin/mailx -s 'Daily report (eth2)' lyynxxx@gmail.com
+
+echo > $LOGFILE
+```
+
+The script runs every day, a few minutes after Midnight.
+
+```
+# crontab -l
+
+04 0 * * * /root/bin/reports.sh
 ```
 
 ## Services users
