@@ -5,20 +5,20 @@ Check details [on their web site](https://www.taraxa.io) or [in this Medium arti
 
 ## Testnet node setup - options
 
-[Reading their guide](https://docs.taraxa.io/node-setup/testnet_node_setup), looks like developers give you containers, and you don't have to bother with complex setup and tuning processes. They even have scripts for different VPS providers to help new node operators, which is really nice! However all the containers are running as root... I think, it's a bad practice for a production environment. Even for the testnet, but there are some other methods to utilize the container images and preserve more security on the host.
+[Reading the official guide](https://docs.taraxa.io/node-setup/testnet_node_setup), looks like developers providing you container images, and you don't have to bother with complex setup and tuning processes. They even have scripts for different VPS providers to help new, less experienced node operators, which is really nice! However all the containers are running as root and I like to avoid this in a production environment. Even for the testnet. As for the base OS setup you can check my openSUSE system design and install notes. To run the containers as non-root user, you have two options.
 
-First of all, you can use Docker daemon as a non-root user. [Details here](https://docs.docker.com/engine/security/rootless/). The Docker Team have instalation guides for different systems, like Ubuntu, Debian, Arch, Suse, etc.
+First, you can use Docker daemon as a non-root user too. [Details here](https://docs.docker.com/engine/security/rootless/). The Docker Team have installation guides for different systems, like Ubuntu, Debian, Arch, Suse, etc.
 
 Or you can use [Podman](https://podman.io/).
-Podman is a daemonless container engine for developing, managing, and running OCI Containers on your Linux System. Containers can either be run as root or in rootless mode. And that's what we want! As escaping the container is very possible, this way if someone break out of the box, only get a limited permission on the host!
+Podman is a daemonless container engine for developing, managing, and running OCI Containers on your Linux System. Containers can either be run as root or in rootless mode. And that's what we want! As escaping a container is very possible, this way if someone breaks out of the box, only get a limited permission on the host!
 
-Your other option, besides containers, if you don't want to bother with container images, to build the binary by yourself. [There is a detailed guide](https://github.com/Taraxa-project/taraxa-node/blob/develop/doc/building.md), which you can copy-paste on a freshly installed Ubuntu 20.04LTS system, and you can easily build the taraxad binary. Signing the proof of ownership is a bit harder this way, but I will cover it later.
+Besides containers, if you don't want to bother with container images, you can build the binary by yourself. [There is a detailed guide](https://github.com/Taraxa-project/taraxa-node/blob/develop/doc/building.md), which you can almost fully copy-paste on a freshly installed Ubuntu 20.04LTS system, and you can easily build the taraxad binary. Signing the proof of ownership is a bit harder this way, but I will cover it later.
 
-I recommend to separate the buildin process and the production node. In general I don't like any compiler on a production server if it's not essential! Mostly it is not! In this scenario you need two servers or VMs. One will be the buildong tool and the other one will be the taraxa node.
+I recommend to separate the buildin environment and the production node. In general I don't like any compiler on a production server if it's not essential! Mostly it is not! In this scenario you need two servers or VMs. One will be the buildong tool and the other one will be the taraxa node.
 
 ### Podman
 
-Moving from Docker Open Source Engine to Podman does not require any changes in the established workflow. There is no need to rebuild images, and you can use the exact same commands to build and manage images as well as running and controlling containers. [The Suse documentation has a good summary](https://documentation.suse.com/sles/15-SP3/html/SLES-all/cha-podman-overview.html)
+Moving from Docker Open Source Engine to Podman does not require any changes in any established workflow. There is no need to rebuild images, and you can use the exact same commands to build and manage images as well as running and controlling containers. [The Suse documentation has a good summary](https://documentation.suse.com/sles/15-SP3/html/SLES-all/cha-podman-overview.html)
 
 Install podman using the [official guide](https://podman.io/getting-started/installation) to your system.
 As I'm using openSUSE it's simply:
@@ -28,18 +28,28 @@ As I'm using openSUSE it's simply:
 
 Podman differs from Docker Open Source Engine in two important ways.
 
-    Podman does not use a daemon, so the container engine interacts directly with an image registry, containers, and image storage. As Podman does not have a daemon, it provides integration with systemd. This makes it possible to control containers via systemd units. You can create these units for existing containers as well as generate units that can start containers if they do not exist in the system. Moreover, Podman can run systemd inside containers.
+ - Podman does not use a daemon, so the container engine interacts directly with an image registry, containers, and image storage. As Podman does not have a daemon, it provides integration with systemd. This makes it possible to control containers via systemd units. You can create these units for existing containers as well as generate units that can start containers if they do not exist in the system. Moreover, Podman can run systemd inside containers.
 
-    Because Podman relies on several namespaces, which provide an isolation mechanism for Linux processes, it does not require root privileges to create and run containers. This means that Podman can run in the root mode as well as in an unprivileged environment. Moreover, a container created by an unprivileged user cannot get higher privileges on the host than the container's creator. (!!!)
+ - Because Podman relies on several namespaces, which provide an isolation mechanism for Linux processes, it does not require root privileges to create and run containers. This means that Podman can run in the root mode as well as in an unprivileged environment. Moreover, a container created by an unprivileged user cannot get higher privileges on the host than the container's creator. (!!!)
 
-To enable rootless mode for your non-privileged user, run the following command as root:
+To enable rootless mode for your non-privileged user, run the following command as root (If you have an already installed system follow the [official guide](https://github.com/containers/podman/blob/main/docs/tutorials/rootless_tutorial.md)) :
 ```
  #usermod --add-subuids 200000-201000 --add-subgids 200000-201000 YOURUSER
 ```
-A fast reboot is required.
-From now on you can pull and run container images with a non-privileged user. In my setup I create a "service user" who is no able to log in with ssh, only to run the containers.
+Rootless Podman requires the user running it to have a range of UIDs listed in the files /etc/subuid and /etc/subgid. The shadow-utils or newuid package provides these files on different distributions and they must be installed on the system. Root privileges are required to add or update entries within these files. 
 
-Let's  chek out, if podman can find the images:
+For each user that will be allowed to create containers, update /etc/subuid and /etc/subgid (the command above) for the user with fields that look like the following. Note that the values for each user must be unique. If there is overlap, there is a potential for a user to use another user's namespace and they could corrupt it.
+
+```
+#cat /etc/subuid
+YOURUSER:200000:1001
+
+```
+
+A fast reboot is required.
+
+From now on you can pull and run container images with a non-privileged user. 
+Let's  chek out, if podman can find the images as YOURUSER:
 
 ```
 $podman search taraxa
@@ -82,7 +92,9 @@ docker.io/taraxa/taraxa-node  latest  sha256:ba6937e8cbc07738603f65485f5b128ff16
 
 Now we have the container, but we still need to create the storage for the config files and the chain data.
 On my node, I use the following directories:
+
 Config files: /opt/taraxa/.conf
+
 Chain data:   /opt/taraxa/data
 
 Let's create these folders and set permissions, so only my user could have access to the files.
@@ -177,3 +189,135 @@ Taraxa node started
 
 ```
 
+Looks fine. It's syncing...
+
+If you are extra paranoid, you can lock this user, so it is not even able to log in with ssh or get a shell. The setup and managemnt process will be a bit different in this case as you must be extra carefull and run all the user commands as root with a temporary shell.
+For example:
+```
+su - taraxa -s /bin/bash -c "podman pull docker.io/taraxa/taraxa-node"
+or
+su - taraxa -s /bin/bash -c "podman start taraxa-node1"
+su - taraxa -s /bin/bash -c "podman logs -f taraxa-node1"
+```
+
+su - taraxa -> run the following command as the user "taraxa", our service user
+-s /bin/bash -> use this temporary bash shell
+-c "" -> the command to execure in the taraxa user namespace
+
+### Self compiled binary
+
+It is always a good practice to build the binary on a different system. If you have the binary, you need only a few step to run your own taraxa node.
+First of all, we need a locked service user (as root):
+
+```
+#groupadd taraxa
+#useradd --system -g taraxa -d /opt/taraxa --shell /bin/false taraxa
+#mkdir -p /opt/taraxa/bin
+#mkdir -p /opt/taraxa/data
+#mkdir -p /opt/taraxa/.conf
+```
+
+On the building VM, you can create a wallet and configuration file for the testnet.
+Assuming you copy-pasted the tutorial while you created the environment to compile the binary, replace only the username:
+
+```
+$/home/YOURUSERNAME/taraxa-node/cmake-build/bin/taraxad --command config
+
+Configuration file does not exist at: /home/YOURUSERNAME/.taraxa/config.json. New config file will be generated
+Wallet file does not exist at: /home/YOURUSERNAME/.taraxa/wallet.json. New wallet file will be generated
+```
+
+Save these files! Also copy them to the node, in the folder /opt/taraxa/.conf/
+Copy the compiled /home/YOURUSERNAME/taraxa-node/cmake-build/bin/taraxad binary to the node, in the folder /opt/taraxa/bin/
+
+Fix the permissions and file ownerships:
+```
+chown -R taraxa:taraxa /opt/taraxa
+chmod +x /opt/taraxa/bin/taraxad
+chmod 750 /opt/taraxa
+```
+
+Create systemd.service file to manage and auto start the service at boot time. /etc/systemd/system/taraxa.service
+(check the wallet and config file names!)
+```
+[Unit]
+Description=Taraxa node. 
+After=network.target 
+Wants=network.target
+
+[Service]
+User=taraxa 
+Group=taraxa
+Type=simple
+Restart=always
+RestartSec=5
+LimitNOFILE=5120
+LimitNPROC=5120
+ExecStart=/opt/taraxa/bin/taraxad --data-dir /opt/taraxa/data --config /opt/taraxa/.conf/config.json --wallet /opt/taraxa/.conf/wallet.json
+InaccessibleDirectories=/home /var /usr /root
+ReadOnlyDirectories=/etc
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=default.target
+```
+
+Reload systemd services, enable and start the service:
+```
+systemctl daemon-reload
+systemctl enable taraxa
+systemctl start taraxa
+```
+
+Check the logs:
+The binary logs under /opt/taraxa/data/logs or you can use journalctl:
+```
+#journalctl -fu taraxa
+```
+
+### Proof of ownership
+
+You need the building environment and your wallet file, check your wallet file for the following lines: node_secret, node_address.
+You need to format them. A small prefix is a must "0x" before you can use them, as you can see soon.
+
+YOURPRIVATE_KEY = 0xnode_secret (in my case: 0x85096c68cab805e964c24a0ef406c71a641d102301857197d7b2d8cf77d615ea)
+YOURTEXT = 0xnode_address (in my case: 2fdc4badc80a53980003e5e606266fe0eb4381db)
+
+type "python3" in a console and press enter. Run the following code, change the variables as your needs:
+```
+import json
+from eth_account import Account
+from eth_utils.curried import keccak
+account = Account.from_key(YOURPRIVATE_KEY)
+text = "YOURTEXT"
+sig = account.signHash(keccak(hexstr=text))
+sig_hex = sig.signature.hex()
+print(sig_hex)
+```
+
+The output will be something like this:
+```
+0x3bada8cd78d6abd36b46d41ee2c15d040a4f087c24bd064749b1754dc316ec167b6070fc4f4e46c5f0e70b5c2f5c2ca28fa840a5afd3e883107edd2c5cb8dd361c
+```
+
+This is the information you need to register your node in the community site.
+
+
+If you use containers you can follow the [official docs](https://docs.taraxa.io/node-setup/proof_owership), just replace docker with podman.
+Use "podman ps" to check the container name. In this case it is "taraxa-node1".
+```
+$podman ps
+CONTAINER ID  IMAGE                                COMMAND               CREATED      STATUS          PORTS                                               NAMES
+a7c70bf16572  docker.io/taraxa/taraxa-node:latest  taraxad --network...  6 hours ago  Up 6 hours ago  0.0.0.0:10002->10002/tcp, 0.0.0.0:10002->10002/udp  taraxa-node1
+
+$podman exec taraxa-node1 taraxa-sign sign --wallet /opt/taraxa_data/conf/wallet.json
+0x3bada8cd78d6abd36b46d41ee2c15d040a4f087c24bd064749b1754dc316ec167b6070fc4f4e46c5f0e70b5c2f5c2ca28fa840a5afd3e883107edd2c5cb8dd361c
+
+```
