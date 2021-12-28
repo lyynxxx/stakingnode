@@ -200,9 +200,9 @@ su - taraxa -s /bin/bash -c "podman start taraxa-node1"
 su - taraxa -s /bin/bash -c "podman logs -f taraxa-node1"
 ```
 
-	* su - taraxa -> run the following command as the user "taraxa", our service user
-	* -s /bin/bash -> use this temporary bash shell
-	* -c "" -> the command to execure in the taraxa user namespace
+ * su - taraxa -> run the following command as the user "taraxa", our service user
+ * -s /bin/bash -> use this temporary bash shell
+ * -c "" -> the command to execute in the taraxa user namespace
 
 ### Self compiled binary
 
@@ -289,6 +289,7 @@ You need to format them. A small prefix is a must "0x" before you can use them, 
 
 YOURPRIVATE_KEY = 0xnode_secret (in my case: 0x85096c68cab805e964c24a0ef406c71a641d102301857197d7b2d8cf77d615ea)
 YOURTEXT = 0xnode_address (in my case: 2fdc4badc80a53980003e5e606266fe0eb4381db)
+While it's only for documentation purposes only, you should NEVER EVER sahre this information!!!!
 
 type "python3" in a console and press enter. Run the following code, change the variables as your needs:
 ```
