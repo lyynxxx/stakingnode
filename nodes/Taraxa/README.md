@@ -200,9 +200,9 @@ su - taraxa -s /bin/bash -c "podman start taraxa-node1"
 su - taraxa -s /bin/bash -c "podman logs -f taraxa-node1"
 ```
 
-su - taraxa -> run the following command as the user "taraxa", our service user
--s /bin/bash -> use this temporary bash shell
--c "" -> the command to execure in the taraxa user namespace
+	* su - taraxa -> run the following command as the user "taraxa", our service user
+	* -s /bin/bash -> use this temporary bash shell
+	* -c "" -> the command to execure in the taraxa user namespace
 
 ### Self compiled binary
 
