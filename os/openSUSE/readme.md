@@ -9,7 +9,7 @@ AutoYaST is not an automated GUI system. This means that usually many screens wi
 
 Using AutoYaST I can spin up a new system faster, if I need a new validator or I have to rebuild my validator in a new environment, maybe with a different client.
 
-Download installer: [openSUSE Leap 15.2 Network Installer](http://download.opensuse.org/distribution/leap/15.2/iso/openSUSE-Leap-15.2-NET-x86_64.iso)
+Download installer: [openSUSE Leap 15.3 Network Installer](https://download.opensuse.org/distribution/leap/15.3/iso/openSUSE-Leap-15.3-NET-x86_64-Media.iso)
 
 
 ## So... How to start???
@@ -17,7 +17,7 @@ Assuming, you made this far and mostly know what we are going to do...
 
 You need a HTTP server, from where the installer can download the AutoYaST control file. You can use your phone at home if it's on the same network as your validator machine,or you can pack the files into the iso too.
 
-At home, I just downloaded the [latest stable nginx for windows](http://nginx.org/download/nginx-1.18.0.zip), extracted the files, and copied my scripts and AutYaST files into the "html" folder.
+At home, I just downloaded the [latest stable nginx for windows](https://nginx.org/en/download.html), extracted the files, and copied my scripts and AutYaST files into the "html" folder.
 
  - If you plan to do this at home: get a PC with the necessary hardware resources, download the openSUSE boot image I linked at the beginning and boot (you can use Rufus to create bootable USB media or use your phone and DriveDroid). In the boot menu select the "Install" with the arrow keys (don't press enter!) and start  adding (by typing the) boot parameters: "autoyast=http://YOURHTTPSREVER/autoyastfile.xml" then press enter. Assuming you have DHCP at home, the installer will get network and will be able to download the ks file and set up the system.
 

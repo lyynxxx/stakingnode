@@ -29,8 +29,8 @@ touch /opt/validator/.wpwd
 chown -R validator:validator /opt/validator
 
 ## Copy service files
-cp /tmp/kickstart/eth2nodes/opensuse/etc/systemd/system/beacon.service /etc/systemd/system/
-cp /tmp/kickstart/eth2nodes/opensuse/etc/systemd/system/validator.service /etc/systemd/system/
+cp /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/beacon-prysm.service /etc/systemd/system/beacon.service
+cp /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/validator-prysm.service /etc/systemd/system/validator.service
 chown root:root /etc/systemd/system/beacon.service
 chmod 644 /etc/systemd/system/beacon.service
 chown root:root /etc/systemd/system/validator.service

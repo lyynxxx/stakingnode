@@ -32,45 +32,45 @@ cd /tmp/kickstart
 git clone https://gitlab.com/lyynxxx/stakingnode.git
 
 ## Auditd
-mv /tmp/kickstart/stakingnode/openSUSE/etc/audit/rules.d/audit.rules /etc/audit/rules.d/audit.rules
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/audit/rules.d/audit.rules /etc/audit/rules.d/audit.rules
 chown root:root /etc/audit/rules.d/audit.rules
 chmod 600 /etc/audit/rules.d/audit.rules
 
 ## Fail2ban & nftables
-mv /tmp/kickstart/stakingnode/openSUSE/etc/fail2ban/action.d/nftables-common.local /etc/fail2ban/action.d/nftables-common.local
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/fail2ban/action.d/nftables-common.local /etc/fail2ban/action.d/nftables-common.local
 chown root:root /etc/fail2ban/action.d/nftables-common.local
 chmod 644 /etc/fail2ban/action.d/nftables-common.local
 
-mv /tmp/kickstart/stakingnode/openSUSE/etc/fail2ban/jail.local /etc/fail2ban/jail.local
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/fail2ban/jail.local /etc/fail2ban/jail.local
 chown root:root /etc/fail2ban/jail.local
 chmod 644 /etc/fail2ban/jail.local
 
 ## nftables config
-mv /tmp/kickstart/stakingnode/openSUSE/etc/sysconfig/nftables.conf /etc/sysconfig/nftables.conf
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/sysconfig/nftables.conf /etc/sysconfig/nftables.conf
 chown root:root /etc/sysconfig/nftables.conf
 chmod 600 /etc/sysconfig/nftables.conf
 
 ## Sysctl tuning
-cat /tmp/kickstart/stakingnode/openSUSE/etc/sysctl.d/99-sysctl.conf > /etc/sysctl.d/99-sysctl.conf
-mv /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/nftables.service /etc/systemd/system/
+cat /tmp/kickstart/stakingnode/os/openSUSE/etc/sysctl.d/99-sysctl.conf > /etc/sysctl.d/99-sysctl.conf
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/nftables.service /etc/systemd/system/
 
 ## SSH
-cat /tmp/kickstart/stakingnode/openSUSE/etc/ssh/sshd_config > /etc/ssh/sshd_config
+cat /tmp/kickstart/stakingnode/os/openSUSE/etc/ssh/sshd_config > /etc/ssh/sshd_config
 chown root:root /etc/ssh/sshd_config
 chmod 640 /etc/ssh/sshd_config
 
 # Don't forget to set your own key!!
-mv /tmp/kickstart/stakingnode/openSUSE/root/.mailrc /root/.mailrc
+mv /tmp/kickstart/stakingnode/os/openSUSE/root/.mailrc /root/.mailrc
 chown root:root /root/.mailrc
 chmod 640 /root/.mailrc
 
 # Daily Aureport logs
 mkdir -p /root/bin
-mv /tmp/kickstart/stakingnode/openSUSE/root/bin/reports.sh /root/bin/aureport_daily.sh
+mv /tmp/kickstart/stakingnode/os/openSUSE/root/bin/reports.sh /root/bin/aureport_daily.sh
 chown root:root /root/bin/aureport_daily.sh
 chmod 640 /root/bin/aureport_daily.sh
 
-
+# Enable fail2ban, auditd and firewall on the new system
 systemctl daemon-reload
 systemctl enable fail2ban
 systemctl enable auditd
@@ -78,17 +78,11 @@ systemctl enable nftables
 
 # Zypper repo cleanup
 rm -rf /etc/zypp/repos.d/*.repo
-mv /tmp/kickstart/stakingnode/openSUSE/etc/zypp/repos.d/*.repo /etc/zypp/repos.d/
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/*.repo /etc/zypp/repos.d/
 chown root:root /etc/zypp/repos.d/*.repo
 chmod 600 /etc/zypp/repos.d/*.repo
 
-## sudo by default ask the root pwd, dont't do that..
-#sed -i "s/^Defaults\ targetpw.*/#/g" /etc/sudoers
-#sed -i "s/^ALL\ targetpw.*/#/g" /etc/sudoers
-#echo "lyynxxx ALL=(ALL) ALL" >> /etc/sudoers
-#echo "" >> /etc/sudoers
-
-## fix home permissions, fluff other users
+## fix home permissions, don't allow the "users" group to see my home dir content
 groupadd lyynxxx
 usermod -G lyynxxx -g lyynxxx lyynxxx
 chmod 750 /home/lyynxxx
@@ -125,9 +119,6 @@ unset LINE
 # set / to noexec
 #LINE=$(grep -n '/ ' /etc/fstab| cut -d ":" -f 1)
 #sed -i "${LINE}s/nodev/noexec,nodev/" /etc/fstab
-
-# Prevent chain-maind spamfork dbus sessions, no need anyway
-#chmod o-x /usr/bin/dbus-launch
 
 #TODO: https://gist.github.com/ageis/f5595e59b1cddb1513d1b425a323db04
 ###### systemd-analyze security name_of_service.service

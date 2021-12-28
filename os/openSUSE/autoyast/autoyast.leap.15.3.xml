@@ -231,6 +231,7 @@
       <pesize>4194304</pesize>
       <type t="symbol">CT_LVM</type>
     </drive>
+
     <drive t="map">
       <device>/dev/sda</device>
       <disklabel>gpt</disklabel>
@@ -312,6 +313,9 @@
       <package>nftables</package>
       <package>mailx</package>
       <package>htop</package>
+      <package>e2fsprogs</package>
+      <package>apparmor-utils</package>
+      <package>apparmor-profiles</package>
     </packages>
     <remove-packages t="list">
    	  <package>postfix</package>
@@ -347,10 +351,12 @@
   <users t="list">
     <user t="map">
   	  <username>root</username>
-  	  <user_password>JaffaKree123!%/</user_password>
+  	  <user_password>Admin123456</user_password>
   	  <encrypted t="boolean">false</encrypted>
     </user>
+
     <user t="map">
+      <username>lyynxxx</username>
       <authorized_keys t="list">
       	<listentry>ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAsCaKUzXes0z4WMqY8tQ9PsTEFmYVIyj7nYd4F9iZXSHZfDv6AbyCudGVXHdrdAe4VnMmoWVg6j8k546KQzFZ3bQl5UJdWrqulwCvFrH8yEyouqmA6OeSSAz7ALG85FBYiVWVKWrlzLqAIT/Gn+Ud57Pu3d4OowH00EXqksKdeux/eT+nyGuC7Je2ecvXLqETOhOJDhAicZf8SEcu5Rsbz7dEqZPnXC+4zfibqDuldzKDEkYL4Pyc4mcG+F15yxmW0OyjMLUI93kcgtmwXVKRPV2k0ceuqa7a3zlhbwae/ofgC7AwsUBZYdxxSfxmkGIXZYfoaN1PxiXj+aiMFdis5w==</listentry>
       </authorized_keys>
@@ -370,17 +376,17 @@
       <shell>/bin/bash</shell>
       <uid>1000</uid>
       <user_password>$6$QDGpXOzgjklbon8l$n6rz2Wq9N7DhRPej/NYwG/2.H4BfK/sLAmpVWGpU6t0zduhK9pT1YYK0j.NCio2CG6dg6n0adbtccigofU8xe0</user_password>
-      <username>lyynxxx</username>
     </user>
   </users>
+
 <scripts>
 	<post-scripts t="list">
 		<script>
 			<location>http://192.168.10.125/vm/01-system-setup.sh</location>
 		</script>
-    	<script>
-      		<location>http://192.168.10.125/vm/service-geth.sh</location>
-    	</script>
+    <script>
+      <location>http://192.168.10.125/vm/service-geth.sh</location>
+    </script>
 		<script>
 			<location>http://192.168.10.125/vm/99-lockdown.sh</location>
 		</script>
