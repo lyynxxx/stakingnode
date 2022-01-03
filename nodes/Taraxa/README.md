@@ -3,6 +3,8 @@
 Taraxa is a public ledger platform purpose-built for audit logging of informal transactions.
 Check details [on their web site](https://www.taraxa.io) or [in this Medium article](https://medium.com/taraxa-project/democratizing-reputation-by-tracking-informal-transactions-6e32ef229b42)
 
+In the following, I'm extending my base operating system setup! Please don't copy-paste without thinking!
+
 ## Testnet node setup - options
 
 [Reading the official guide](https://docs.taraxa.io/node-setup/testnet_node_setup), looks like developers providing you container images, and you don't have to bother with complex setup and tuning processes. They even have scripts for different VPS providers to help new, less experienced node operators, which is really nice! However all the containers are running as root and I like to avoid this in a production environment. Even for the testnet. As for the base OS setup you can check my openSUSE system design and install notes. To run the containers as non-root user, you have two options.
@@ -322,3 +324,18 @@ $podman exec taraxa-node1 taraxa-sign sign --wallet /opt/taraxa_data/conf/wallet
 0x3bada8cd78d6abd36b46d41ee2c15d040a4f087c24bd064749b1754dc316ec167b6070fc4f4e46c5f0e70b5c2f5c2ca28fa840a5afd3e883107edd2c5cb8dd361c
 
 ```
+
+### Firewall
+
+With podman theres no advanced network routing. All the services which are above the privilegized ports can listen on the main network interface.
+Just open the ports: 10002/tcp and 10002/udp. 7777/tcp is just an RPC port, you don't need to open that to the public.
+
+In my setup, using nftables it's the following:
+```
+#nft add rule inet my_table my_tcp_chain tcp dport 10002 accept
+#nft add rule inet my_table my_udp_chain udp dport 10002 accept
+#nft list ruleset > /etc/sysconfig/nftables.conf
+```
+
+## Can I automate the process ?? Sure!
+WIP...
