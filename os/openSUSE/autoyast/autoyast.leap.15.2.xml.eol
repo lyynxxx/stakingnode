@@ -1,3 +1,5 @@
+<!-- This version of opensuse reached end of life period. DON'T USE IT for a new system!!!!
+	 The actual available, stable version is 15.3  -->
 <?xml version="1.0"?>
 <!DOCTYPE profile>
 <profile xmlns="http://www.suse.com/1.0/yast2ns" xmlns:config="http://www.suse.com/1.0/configns">
