@@ -1,18 +1,25 @@
 [Unit]
-Description=Lighthouse Beacon Chain
+Description=Lighthouse Beacon Node
 After=network.target
-StartLimitIntervalSec=0
 
 [Service]
 Type=simple
+User=beacon
 Restart=always
-RestartSec=1
-User=lightbc
+RestartSec=5
 LimitNOFILE=5120
 LimitNPROC=5120
-ExecStart=/opt/lighthouse-bc/bin/lighthouse bc --network rposten --datadir /opt/lighthouse-bc/data --staking --eth1-endpoints http://127.0.0.1:8545
+ExecStart=/opt/beacon-chain/bin/lighthouse beacon --network mainnet --datadir /opt/beacon-chain/data --port 9001 --discovery-port 9001 --eth1 --eth1-endpoints http://localhost:8545 --http --http-port 5052 --eth1-blocks-per-log-query 150 --disable-upnp
 InaccessibleDirectories=/home /var
 ReadOnlyDirectories=/etc /usr
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+RestrictSUIDSGID=true
 
 [Install]
 WantedBy=multi-user.target
