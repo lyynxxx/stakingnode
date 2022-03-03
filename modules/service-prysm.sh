@@ -12,7 +12,7 @@ chmod +x /root/bin/prysm.sh
 
 ## Add service users - BEACON
 groupadd beacon
-useradd --system -g beacon --no-create-home --shell /bin/false beacon
+useradd --system -g beacon -d /opt/beacon-chain --shell /bin/false beacon
 mkdir -p /opt/beacon-chain/data
 mkdir -p /opt/beacon-chain/bin
 cp /opt/tmp/dist/beacon-chain*amd64 /opt/beacon-chain/bin/beacon-chain
