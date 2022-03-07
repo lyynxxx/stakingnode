@@ -19,12 +19,11 @@ chown -R beacon:beacon /opt/beacon
 
 ## Add service users - Lighthouse validator client
 groupadd validator
-useradd --system -g validator -d /opt/validator --shell /bin/false validator
+useradd --system -g validator -d /opt/validator --shell /bin/bash validator
 mkdir -p /opt/validator/data
 mkdir -p /opt/validator/bin
 cp /opt/tmp/lighthouse /opt/validator/bin/
 chmod 755 /opt/validator/bin/lighthouse
-touch /opt/validator/.wpwd
 chown -R validator:validator /opt/validator
 
 
@@ -42,6 +41,9 @@ chmod 644 /etc/systemd/system/validator.service
 #nft add rule inet my_table my_udp_chain udp dport 9001 counter accept
 #nft list ruleset > /etc/sysconfig/nftables.conf
 
+## Import validator key and lock user shell
+# /opt/validator/bin/lighthouse --network mainnet account validator import --directory /opt/validator/import --datadir /opt/validator/data
+# usermod --shell /bin/false validator
 
 ## cleanup
 rm -rf /opt/tmp/*
