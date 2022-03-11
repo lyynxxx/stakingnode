@@ -30,13 +30,13 @@ sudo cp ~/.cargo/bin/lighthouse /usr/local/bin
 Install empty VM with hardening from autoyast file.
 	- create user and directories for Geth
 	- copy geth binary (InaccessibeDirectories change in systemd service!)
-		ExecStart=/opt/goethereum/bin/geth --datadir "/opt/goethereum/data" --http --http.api="engine,eth,web3,net,debug" --http.corsdomain "*" --networkid=1337802 --syncmode=full
+		ExecStart=/opt/goethereum/bin/geth --datadir "/opt/goethereum/data" --http --http.api="engine,eth,web3,net,debug" --http.corsdomain "*" --networkid=1337802 --syncmode=full --override.terminaltotaldifficulty 20000000000000 
 	- geth init
-		git clone https://github.com/eth-clients/merge-testnets.git -> move "kiln" folder to /opt/tmp
-		su - geth -s /bin/bash -c "/opt/goethereum/bin/geth init /opt/tmp/kiln/genesis.json --datadir /opt/goethereum/data"
+		git clone https://github.com/eth-clients/merge-testnets.git -> move "kiln/genesis.json" folder to /tmp
+		su - geth -s /bin/bash -c "/opt/goethereum/bin/geth init /tmp/genesis.json --datadir /opt/goethereum/data"
 	- start/enable geth service
 
 
 	- create user and directories for beacon chain (LH)
 	- copy lighthouse binary
-		ExecStart=/opt/beacon/bin/lighthouse bn --network kiln --datadir /opt/beacon/data --staking --http-allow-sync-stalled --merge --execution-endpoints http://127.0.0.1:8545 --validator-monitor-auto --metrics --boot-nodes="enr:-Iq4QMCTfIMXnow27baRUb35Q8iiFHSIDBJh6hQM5Axohhf4b6Kr_cOCu0htQ5WvVqKvFgY28893DHAg8gnBAXsAVqmGAX53x8JggmlkgnY0gmlwhLKAlv6Jc2VjcDI1NmsxoQK6S-Cii_KmfFdUJL2TANL3ksaKUnNXvTCv1tLwXs0QgIN1ZHCCIyk" --disable-upnp
+		ExecStart=/opt/beacon/bin/lighthouse bn --network kiln --datadir /opt/beacon/data --staking --http-allow-sync-stalled --merge --execution-endpoints http://127.0.0.1:8545 --validator-monitor-auto --metrics --boot-nodes="enr:-Iq4QMCTfIMXnow27baRUb35Q8iiFHSIDBJh6hQM5Axohhf4b6Kr_cOCu0htQ5WvVqKvFgY28893DHAg8gnBAXsAVqmGAX53x8JggmlkgnY0gmlwhLKAlv6Jc2VjcDI1NmsxoQK6S-Cii_KmfFdUJL2TANL3ksaKUnNXvTCv1tLwXs0QgIN1ZHCCIyk" --disable-upnp --terminal-total-difficulty-override=20000000000000
