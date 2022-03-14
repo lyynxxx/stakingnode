@@ -1,0 +1,29 @@
+[Unit]
+Description=Besu ETH client
+After=network.target 
+Wants=network.target
+
+[Service]
+User=besu 
+Group=besu
+Type=simple
+Restart=always
+RestartSec=5
+LimitNOFILE=5120
+LimitNPROC=5120
+#WorkingDirectory=/opt/besu
+#ExecStart=/opt/besu/bin/besu --data-path="/opt/besu/data" --genesis-file="/opt/besu/config/besu_genesis.json" --rpc-http-enabled=true --rpc-http-host="127.0.0.1" --rpc-http-api=ADMIN,ETH,NET,DEBUG,TXPOOL,EXECUTION,ENGINE,WEB3 --p2p-enabled=true --Xmerge-support=true 
+ExecStart=/opt/besu/bin/besu --config-file="/opt/besu/config/config.toml"
+InaccessibleDirectories=/home /var /root
+ReadOnlyDirectories=/etc /usr
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=default.target
