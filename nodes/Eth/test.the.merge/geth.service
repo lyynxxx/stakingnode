@@ -1,0 +1,27 @@
+[Unit]
+Description=Ethereum go client
+After=network.target
+Wants=network.target
+
+[Service]
+User=geth
+Group=geth
+Type=simple
+Restart=always
+RestartSec=5
+LimitNOFILE=5120
+LimitNPROC=5120
+ExecStart=/opt/goethereum/bin/geth --cache=512 --maxpeers=50 --datadir /opt/goethereum/data --http --http.api="engine,eth,web3,net,debug" --syncmode=full --pprof --networkid=1337802 --http.corsdomain "*" --authrpc.jwtsecret=/opt/goethereum/jwtsecret --override.terminaltotaldifficulty 20000000000000  --bootnodes "enode://c354db99124f0faf677ff0e75c3cbbd568b2febc186af664e0c51ac435609badedc67a18a63adb64dacc1780a28dcefebfc29b83fd1a3f4aa3c0eb161364cf94@164.92.130.5:30303"
+InaccessibleDirectories=/home /var /root
+ReadOnlyDirectories=/etc /usr
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=default.target

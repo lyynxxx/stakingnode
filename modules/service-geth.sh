@@ -6,14 +6,14 @@ groupadd geth
 useradd --system -g geth -d /opt/goethereum/ --shell /bin/false geth
 mkdir -p /opt/goethereum/bin
 mkdir -p /opt/goethereum/data
-mkdir -p /opt/goethereum/jwtsecret
+mkdir -p /opt/goethereum/data-ancient
+
 cd /opt/goethereum
 curl https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.16-20356e57.tar.gz --output geth-linux-amd64-1.10.16-20356e57.tar.gz
 tar xf geth-linux-amd64-1.10.16-20356e57.tar.gz
 mv geth-linux-amd64-1.10.16-20356e57/geth /opt/goethereum/bin/
 rm -rf geth-linux-amd64-1.10.16-20356e57*
-chmod 755 /op/goethereum
-chmod 755 /opt/goethereum/jwtsecret
+chmod 755 /opt/goethereum
 chown -R geth:geth /opt/goethereum
 
 mv /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/geth.service /etc/systemd/system/
@@ -30,3 +30,4 @@ systemctl enable geth
 ## FW:
 ## nft add rule inet my_table my_tcp_chain tcp dport 30303 counter accept
 ## nft add rule inet my_table my_udp_chain udp dport 30303 counter accept
+## nft list ruleset > /etc/sysconfig/nftables.conf

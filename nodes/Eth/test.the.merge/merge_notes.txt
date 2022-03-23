@@ -1,3 +1,5 @@
+https://www.youtube.com/watch?v=caaV4oMmWe8
+
 ###############################
 ## Build env
 ###############################
@@ -27,16 +29,59 @@ sudo cp ~/.cargo/bin/lighthouse /usr/local/bin
 ## Merge env
 ###############################
 
+zypper in java-11-openjdk  <--besu
+besu --data-path=/opt/besu/data --genesis-file=/tmp/genesis.json --networkid=1337802
+
 Install empty VM with hardening from autoyast file.
 	- create user and directories for Geth
 	- copy geth binary (InaccessibeDirectories change in systemd service!)
-		ExecStart=/opt/goethereum/bin/geth --datadir "/opt/goethereum/data" --http --http.api="engine,eth,web3,net,debug" --http.corsdomain "*" --networkid=1337802 --syncmode=full --override.terminaltotaldifficulty 20000000000000 
+		ExecStart=/opt/goethereum/bin/geth --datadir "/opt/goethereum/data" --pprof --http --http.api="engine,eth,web3,net,debug" --http.corsdomain "*" --networkid=1337802 --syncmode=full --override.terminaltotaldifficulty 20000000000000 --authrpc.jwtsecret=/opt/goethereum/jwtsecret --bootnodes "enode://c354db99124f0faf677ff0e75c3cbbd568b2febc186af664e0c51ac435609badedc67a18a63adb64dacc1780a28dcefebfc29b83fd1a3f4aa3c0eb161364cf94@164.92.130.5:30303"
 	- geth init
 		git clone https://github.com/eth-clients/merge-testnets.git -> move "kiln/genesis.json" folder to /tmp
-		su - geth -s /bin/bash -c "/opt/goethereum/bin/geth init /tmp/genesis.json --datadir /opt/goethereum/data"
+		su - geth -s /bin/bash -c "/opt/goethereum/bin/geth init /tmp/merge-testnets/kiln/genesis.json --datadir /opt/goethereum/data"
 	- start/enable geth service
 
 
 	- create user and directories for beacon chain (LH)
 	- copy lighthouse binary
-		ExecStart=/opt/beacon/bin/lighthouse bn --network kiln --datadir /opt/beacon/data --staking --http-allow-sync-stalled --merge --execution-endpoints http://127.0.0.1:8545 --validator-monitor-auto --metrics --boot-nodes="enr:-Iq4QMCTfIMXnow27baRUb35Q8iiFHSIDBJh6hQM5Axohhf4b6Kr_cOCu0htQ5WvVqKvFgY28893DHAg8gnBAXsAVqmGAX53x8JggmlkgnY0gmlwhLKAlv6Jc2VjcDI1NmsxoQK6S-Cii_KmfFdUJL2TANL3ksaKUnNXvTCv1tLwXs0QgIN1ZHCCIyk" --disable-upnp --terminal-total-difficulty-override=20000000000000
+		ExecStart=/opt/beacon/bin/lighthouse bn --network kiln --datadir /opt/beacon/data --staking --http-allow-sync-stalled --merge --execution-endpoints http://127.0.0.1:8551 --validator-monitor-auto --metrics --boot-nodes="enr:-Iq4QMCTfIMXnow27baRUb35Q8iiFHSIDBJh6hQM5Axohhf4b6Kr_cOCu0htQ5WvVqKvFgY28893DHAg8gnBAXsAVqmGAX53x8JggmlkgnY0gmlwhLKAlv6Jc2VjcDI1NmsxoQK6S-Cii_KmfFdUJL2TANL3ksaKUnNXvTCv1tLwXs0QgIN1ZHCCIyk" --disable-upnp --terminal-total-difficulty-override=20000000000000 --jwt-secrets=/opt/goethereum/jwtsecret --eth1-purge-cache
+
+Create new wallet and validator keys
+
+curl -sL https://github.com/ethereum/eth2.0-deposit-cli/releases/download/v2.0.0/staking_deposit-cli-e2a7c94-linux-amd64.tar.gz -o staking_deposit-cli-e2a7c94-linux-amd64.tar.gz
+tar -xf staking_deposit-cli-e2a7c94-linux-amd64.tar.gz
+cd staking_deposit-cli-e2a7c94-linux-amd64
+##!! --> error while loading shared libraries: libz.so.1: failed to map segment from shared object  <-- /tmp noexec
+	mkdir /root/tmpdir
+	export TMP=/root/tmpdir
+./deposit new-mnemonic --num_validators 1 --chain kiln
+	validator key passwd: SuperPassword123
+	shaft rack mixture dog notice hotel expect pass job gorilla either wood hero frown tornado cloud mom nerve board surprise spike raw rough cake
+
+
+-------------
+Create validator client
+	su - validator -s /bin/bash -c "/opt/validator/bin/lighthouse account validator import --directory /tmp/validator_keys/ --datadir /opt/validator/data --network kiln"
+
+
+
+
+ADD 2. validator:
+https://medium.com/coinmonks/ethereum-2-adding-a-second-deposit-on-the-beacon-chain-b3d27c8e1b79
+
+
+
+------------------------
+curl -X POST --data '{"jsonrpc":"2.0","method":"eth_syncing","params":[],"id":1}' http://127.0.0.1:8545
+
+curl -X POST --data '{"jsonrpc":"2.0","method":"admin_peers","params":[],"id":1}' http://127.0.0.1:8545
+curl -X POST --data '{"jsonrpc":"2.0","method":"admin_nodeInfo","params":[],"id":1}' http://127.0.0.1:8545
+
+
+
+sudo /usr/local/bin/lighthouse account validator import \
+    --directory /home/lyynxxx/validator_keys \
+    --datadir /var/lib/lighthouse \
+    --network kiln
+
+

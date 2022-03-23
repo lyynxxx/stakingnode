@@ -9,9 +9,8 @@ Restart=always
 RestartSec=5
 LimitNOFILE=5120
 LimitNPROC=5120
-#ExecStart=/opt/beacon-chain/bin/lighthouse beacon --network mainnet --datadir /opt/beacon-chain/data --port 9001 --discovery-port 9001 --eth1 --eth1-endpoints http://localhost:8545 --http --http-port 5052 --eth1-blocks-per-log-query 150 --disable-upnp
-
-ExecStart=/opt/beacon-chain/bin/lighthouse beacon --network mainnet --datadir /opt/beacon-chain/data --eth1-endpoints http://localhost:8545 --staking --eth1-blocks-per-log-query 150 --disable-upnp --validator-monitor-auto --metrics
+#ExecStart=/opt/beacon-chain/bin/lighthouse beacon --network mainnet --datadir /opt/beacon-chain/data --eth1-endpoints http://localhost:8545 --staking --eth1-blocks-per-log-query 150 --disable-upnp --validator-monitor-auto --metrics
+ExecStart=/opt/beacon-chain/bin/lighthouse beacon --network mainnet --datadir /opt/beacon-chain/data --eth1-endpoints https://mainnet.infura.io/v3/240270f16ab84ceaab1d238de6f57f64 --staking --eth1-blocks-per-log-query 150 --disable-upnp --validator-monitor-auto --metrics
 InaccessibleDirectories=/home /var
 ReadOnlyDirectories=/etc /usr
 PrivateTmp=yes

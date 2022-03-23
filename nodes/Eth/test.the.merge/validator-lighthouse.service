@@ -1,0 +1,25 @@
+[Unit]
+Description=Lighthouse Validator Node
+After=network.target
+
+[Service]
+Type=simple
+User=validator
+Restart=always
+RestartSec=5
+LimitNOFILE=5120
+LimitNPROC=5120
+ExecStart=/opt/validator/bin/lighthouse vc --network mainnet --datadir /opt/validator/data --init-slashing-protection --beacon-node "http://localhost:5052" --graffiti "Mom's Old-Fashioned Robot Oil"
+InaccessibleDirectories=/home /var
+ReadOnlyDirectories=/etc /usr
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

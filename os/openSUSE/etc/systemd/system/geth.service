@@ -11,8 +11,7 @@ Restart=always
 RestartSec=5
 LimitNOFILE=5120
 LimitNPROC=5120
-#### Run on 0.0.0.0
-ExecStart=/opt/goethereum/bin/geth --cache=512 --maxpeers=50 --datadir /opt/goethereum/data --datadir.ancient /opt/goethereum/ancient --http --http.addr 0.0.0.0 --http.port 8545 --http.api eth,net,personal,web3
+ExecStart=/opt/goethereum/bin/geth --cache=512 --maxpeers=50 --datadir /opt/goethereum/data --datadir.ancient /opt/goethereum/data-ancient --http --http.addr 127.0.0.1 --http.api eth,net,personal,web3
 InaccessibleDirectories=/home /var /root
 ReadOnlyDirectories=/etc /usr
 PrivateTmp=yes
