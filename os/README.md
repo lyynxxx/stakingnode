@@ -1,16 +1,16 @@
-As I see there isn't such thing as a security "silver bullet", what solves everything. I must assume, my system is not unbreakable, therefore I need to create a few security layer. None of the layers itself are enough, but together they can mitigate a lot of the attack vectors.
+As I see there isn't such thing as a security "silver bullet", what solves everything. I must assume, my system is not unbreakable, therefore I need to create a few security layer. None of the layers itself are enough, but together they can mitigate a lot of the attack vectors. A "default" install is never good enough!
 
 # Planing the partitions
-Security begins even before I start the installation. During the installation process, I have an option to define the different partitions, filesystem types and sizes. I can apply different restrictions or fine tune the behavior of the filesystem. Separating the major system folders can help more then most people thinks.
+Security begins even before I start the installation. During the installation process, I have an option to define the different partitions, filesystem types and sizes. I can apply different restrictions or fine tune the behavior of the filesystem. Separating the major system folders can help more then most people thinks. Before I start anything, let's think about partitions a bit.
 
 
 | Partition | Size | What for |
 | ------ | ------ | ------ |
-| /boot | 250M | Isolated boot partition for the kernel and the boot config files. I will make this read-only and unlock it only I need to update the system. Also apply nodev,nosuid,noexec flags. (details later)|
+| /boot | 512M | Isolated boot partition for the kernel and the boot config files. I will make this read-only and unlock it only when I need to update the system. Also apply nodev,nosuid,noexec flags. (details later)|
 | swap | 8G | It's like virtual memory. Stuff in RAM used a long time ago but not purged, can be "swapped out" to disk, to free up some memory for other applications that needs more. The system may not even use it, but if I have a bare-metal machine it can't be a problem if I have one. Virtual environments often don't have a swap partition. You have to plan your system's available memory so all the applications can fit in and you don't have to swap a lot/crash with out of memory errors.|
-| / | 2G | No need for a lot of space. All the other important stuff is separated and has the necessary free space. I don't have a separate user home directory, as I don't want to create many users. Only one, to log into the system. I will harden this, with noexec (Red Hat only), and apply nodev and nosuid! |
+| / | 2G | No need for a lot of space. All the other important stuff is separated and has the necessary free space. I don't have a separate user home directory, as I don't want to create many users. Only one, to log into the system. I will harden this, with noexec (Red Hat only, on SuSE you need a /home partition with noexec), and apply nodev and nosuid! |
 | /usr | 3G | Here I have all the important system binaries. This will be read-only. If an attacker gains access to the system, often the first thing to do is altering some system binaries, to hide the traces. In this way, it's not possible (at least it will be harder, but the auditing system can detect this kind of activity.) I apply nodev here too, but we need the other grants so can't apply noexec or nosuid.|
-| /var | 2G | For system logs and the package manager cache. No need much more space, if something goes wrong and the system writes a lot of logs or some attacker forces the system to write a bunch of logs, our server won't stop as there is no more free space left, all our services can run. This may have the drawbacks that we don't log the suspicious activity, so making too small /var can be a bad practice, but in this situation, 2G will be fine. I apply nodev,nosid,noexec here.|
+| /var | 2-3G | For system logs and the package manager cache. No need much more space, if something goes wrong and the system writes a lot of logs or some attacker forces the system to write a bunch of logs, our server won't stop as there is no more free space left, all our services can run. This may have the drawbacks that we don't log the suspicious activity, so making too small /var can be a bad practice, but in this situation, 2G will be fine. I apply nodev,nosid,noexec here.|
 | /tmp | 1G | Isolate the temp directory and disable any binary execution too is a must! We won't use this much, but scripts often use /tmp to do fishy stuff, in this way we can break them. This breaks compiling sources too, but we have a workaround for that. I apply nodev,nosuid,noexec here. |
 | /opt | remaining space | This will be the location where we store the application data. I apply here nodev,nosuid. |
 
@@ -22,7 +22,7 @@ I will use LVM and /opt will grow only for 90% of the available free space durin
  - noexec: With this option set, binaries can’t be directly executed. Unfortunately, these settings can easily be circumvented by executing a non-direct path. However, mounting the /tmp directory with noexec will stop the majority of exploits designed to be executed directly from temporary file systems. (non-direct call for example if we pass the script to an interpreter. noexec prevents /tmp/script.py from running but if we use 'python /tmp/script.py' it will run, as not the script is what is executed, then python. As I said there is no such thing as a security silver bullet, but we can harden things. Maybe this is why it's called hardening... )
  - nodev: This option describes that device files are not allowed, like block or character devices. Normally these are only found under /dev and not seen on other mount points. Most mount points will work correctly when these are disabled. Even root, as /dev is in memory now as a devtmpfs.
  - nosuid: Do not use set-user-identifier (SETUID) or set-group-identifier (SETGID) bits to take effect. These bits are set with chmod (u+s, g+s) or unset (u-s, g-s) to allow a binary running under a specific user, which is not the active user itself. For example, SETUID allows a non-privileges user to use the sudo command.
- - noatime: A file has three timestamp. When the file was last modified (mtime), when the file was last changed (ctime), when the file was last accessed (atime). noatime disables the indode updates when the file was last accessed so I can gain some performance.
+ - noatime: A file has three timestamp. When the file was last modified (mtime), when the file was last changed (ctime), when the file was last accessed (atime). noatime disables the indode updates when the file was last accessed so I can gain some performance and extend the SSD lifetime.
  - ro / rw: Mount the filesystem in either read write or read only mode.
 
  Special settings for /proc:
@@ -62,6 +62,11 @@ Later, when I need to install updates I must resolve the read-only restrictions 
 # mount -o remoun,rw /usr
 ```
 This must be executed as root or with sudo. If I reboot the machine I don't have to re-lock them, as during boot time the system reads the /etc/fstab file and mounts the filesystems as they should be. If I don't want to reboot, by changing rw -> ro in the commands I can re-mount the filesystems as read-only.
+
+## Hide some commands
+As I'm paranoid AF, I don't want to log the commands I use to unlock my system before updates (remount /usr and /boot in read-write mode) or before any other software installation or user creation/password change (immutable /etc/passwd).
+If I use an extra space before the commands, they are not placed into the history file, they will be hidden!
+So if anyone cracks my node and tries to add a new user, and they don't think about immutable files, the system won't be altered much. This can buy me some time to mitigate the original attack vector.
 
 ## Thingking about the users and system access
 
