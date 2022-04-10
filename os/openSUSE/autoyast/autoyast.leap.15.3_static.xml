@@ -57,7 +57,7 @@
   </general>
   <networking t="map">
     <dns t="map">
-      <dhcp_hostname t="boolean">true</dhcp_hostname>
+      <dhcp_hostname t="boolean">false</dhcp_hostname>
       <hostname>vobx-geth</hostname>
       <domain>vm</domain>
     	<nameservers t="list">
