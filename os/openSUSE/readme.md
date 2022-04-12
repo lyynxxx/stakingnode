@@ -14,6 +14,13 @@ Download installer: [openSUSE Leap 15.3 Network Installer](https://download.open
 
 ## So... How to start???
 Assuming, you made this far and mostly know what we are going to do...
+First I will show you a simple, manual installation of SUSE and after that I will show how to use the automated setup.
+
+## Manual installation
+
+
+
+
 
 You need a HTTP server, from where the installer can download the AutoYaST control file. You can use your phone at home if it's on the same network as your validator machine,or you can pack the files into the iso too.
 
