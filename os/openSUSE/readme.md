@@ -34,7 +34,7 @@ The first settings, where the installer waits some feedback are the Language set
 If there is newtork, the installer will try to refresh de default repositories. Allow it.
 ![img 6](img/06.PNG?raw=true)
 
-Accept the defaults.
+Accept the defaults. These are good enough, we will update them later.
 ![img 7](img/07.PNG?raw=true)
 
 The installer will update the repositories which will be used.
@@ -47,6 +47,46 @@ Partitioning... the first dark forest. Some may fear this... :)
 I do NOT recommend the defaults. As I wrote earlier, I have my own partition layout designed, let's use that.
 First we tell the installer we want to user the "Expert Partitioner" mode, we can start with the current proposal.
 ![img 10](img/10.PNG?raw=true)
+
+This is the default proposal. First we need to clean up.
+![img 11](img/11.PNG?raw=true)
+The default proposal uses Btrfs for system partitions, while it could work, I prefer XFS and LVM.
+Select the partition that contains the Btrfs filesystem on the left panel, and the filesystem on the right, then click on the "Delete" button on the bottom.
+
+Now that Btrfs subvolumes are purged, also delete some partitions.
+![img 12](img/12.PNG?raw=true)
+Delete all the partitions, we will re-create what we need.
+
+![img 13](img/13.PNG?raw=true)
+With a clean disk, where no partition exsist any more, click on the "Add Partitoin" button. We will create three partition.
+First, we need a partition with type "BIOS Boot Partition". This will contain some data required to boot the system.
+
+![img 14](img/14.PNG?raw=true)
+This partition will be small, only 8M. Leave the geomatry settings default. Newer systems will allign partitions by default to match the disk geometry.
+
+![img 15](img/15.PNG?raw=true)
+The Role is not important here. Basically if you select "Operating system" the GUI will propose to use Btrfs filesystem and if you select "Data nad ISV" the default filesystem is XFS. This is what we need, but if you select "Operating system" we still can change it.
+
+For now, as the first partition is the BIOS Boot Partition, select this from the dropdown menu.
+![img 16](img/16.PNG?raw=true)
+
+This will be the screen, after you first partition created.
+![img 17](img/17.PNG?raw=true)
+
+Now add another partition. The size should be 256M (or 512M if you want to keep more kernel version.)
+![img 18](img/18.PNG?raw=true)
+The partition type should be XFS, also select the mount point, which is "/boot".
+
+The third partition we need is a partition for the Logical Volume. LVM can help us to magage partition sizes dinamically.
+We don't want to format this partition or assign any geomatry. Just select "RAW volume"
+![img 19](img/19.PNG?raw=true)
+
+Important to check the Partition ID: Linux LVM.
+![img 20](img/20.PNG?raw=true)
+
+Now this is the partition layout at the moment.
+![img 21](img/21.PNG?raw=true)
+
 
 
 
