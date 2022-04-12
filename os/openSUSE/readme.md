@@ -50,6 +50,7 @@ First we tell the installer we want to user the "Expert Partitioner" mode, we ca
 
 
 
+
 ## AutoYast installation
 
 You need a HTTP server, from where the installer can download the AutoYaST control file. You can use your phone at home if it's on the same network as your validator machine,or you can pack the files into the iso too.
