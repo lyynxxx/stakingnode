@@ -19,7 +19,34 @@ First I will show you a simple, manual installation of SUSE and after that I wil
 ## Manual installation
 Download the ISO and boot your machine. This is the first screen you can see. As this is an installation, chose the second option "Installation"
 
-![01](https://gitlab.com/lyynxxx/stakingnode/-/blob/master/os/openSUSE/img/01-bios.PNG?raw=true)
+![img 1](img/01-bios.PNG?raw=true)
+
+The ISO will check your system, load all the basic drivers and try to start the installer GUI.
+![img 2](img/02.PNG?raw=true)
+![img 3](img/03.PNG?raw=true)
+
+The installer will try to configure network with DHCP. Mostly this will be fine for you as a home validator.
+![img 4](img/04.PNG?raw=true)
+
+The first settings, where the installer waits some feedback are the Language settings and the License agreement.
+![img 5](img/05.PNG?raw=true)
+
+If there is newtork, the installer will try to refresh de default repositories. Allow it.
+![img 6](img/06.PNG?raw=true)
+
+Accept the defaults.
+![img 7](img/07.PNG?raw=true)
+
+The installer will update the repositories which will be used.
+![img 8](img/08.PNG?raw=true)
+
+System roles are predefined use cases. We want minimal packeges only, just like a server. This won't install any GUI!!!
+![img 9](img/09.PNG?raw=true)
+
+Partitioning... the first dark forest. Some may fear this... :)
+I do NOT recommend the defaults. As I wrote earlier, I have my own partition layout designed, let's use that.
+First we tell the installer we want to user the "Expert Partitioner" mode, we can start with the current proposal.
+![img 10](img/10.PNG?raw=true)
 
 
 
