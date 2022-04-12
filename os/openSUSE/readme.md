@@ -84,11 +84,97 @@ We don't want to format this partition or assign any geomatry. Just select "RAW 
 Important to check the Partition ID: Linux LVM.
 ![img 20](img/20.PNG?raw=true)
 
-Now this is the partition layout at the moment.
+This is the partition layout at the moment.
 ![img 21](img/21.PNG?raw=true)
 
+Let's start to create the volumes. Select the "LVM Volume Groups" on the left and click on the "Add Volume Group" button.
+![img 22](img/22.PNG?raw=true)
+
+Name the volume group. Select the largest partition, this is where the volumes will be hosted, and add to the selected devices list.
+![img 23](img/23.PNG?raw=true)
+
+After the volume group is created we can create the logical volumes. The button is now visible.
+![img 24](img/24.PNG?raw=true)
+Click on the button "Add Logical Volume..."
+
+From now on the steps will repeat. First we name the new logical volume.
+![img 25](img/25.PNG?raw=true)
+
+Add a custom size. Just as we planned. For example if the first partition is the "root", 3G is more then enough.
+![img 26](img/26.PNG?raw=true)
+
+Select the role "Data and ISV". Change the mount options. You can also type into the dropdown menu, not just select what is available there.
+![img 29](img/29.PNG?raw=true)
+
+And now you can see your first logical volume.
+![img 30](img/30.PNG?raw=true)
+
+Repeat these steps to create all the other partitions as logical volumes (/var, /usr, /tmp, swap and /opt). To create swap, the Role must be "swap"
+![img 31](img/31.PNG?raw=true)
+
+![img 32](img/32.PNG?raw=true)
+
+Your final layout will look like this.
+![img 33](img/33.PNG?raw=true)
+
+The defaults are not prepared for this kind of minimal setup, so the system will alert you, that the root is not even 5G. You can ignore the warning.
+![img 34](img/34.PNG?raw=true)
+Click "Yes" to continue...
+
+A summary will show up.
+![img 35](img/35.PNG?raw=true)
+
+Select your timezone.
+![img 36](img/36.PNG?raw=true)
+
+Create a user. This is the only user we will use to log in. No other users will have shell access.
+An important setting is "Use this password for system administration". Basically this means this will be your root password too. I don't recommend this!
+![img 37](img/37.PNG?raw=true)
 
 
+You may want to set static IP address. You can do this from the summary screen. Select "Network settings" link. Or just click "Install" if DHCP is fine.
+![img 39](img/39.PNG?raw=true)
+
+If you don't want DHCP/or want DHCP just not IPv6 select the network card you want to configure and click on "Edit" button.
+![img 40](img/40.PNG?raw=true)
+
+We don't really use IPv6, so better to disable it!
+![img 41](img/41.PNG?raw=true)
+
+Select "Statically Assigned IP Address" to set the IP manually. 
+![img 42](img/42.PNG?raw=true)
+Set your IP, netmask and hostname and "Next".
+
+Select the Hostname/DNS tab.
+![img 43](img/43.PNG?raw=true)
+
+This is where you must specify your DNS servers.
+![img 44](img/44.PNG?raw=true)
+
+And finally we need to add the defaults route. Select the "Routing" tab.
+![img 45](img/45.PNG?raw=true)
+Click "Add"
+
+Define your default route. The IP of your router and the network device you use. Mostly there will be only one.
+![img 46](img/46.PNG?raw=true)
+
+After this click "Next" and the installer will change the settings.
+![img 48](img/48.PNG?raw=true)
+
+Click Install to start the process.
+![img 49](img/49.PNG?raw=true)
+
+Confirm. From now on the installer will create the partitions, download and install the packages, etc.
+![img 50](img/50.PNG?raw=true)
+
+The progress screen will show you what tasks the installer is doing.
+![img 51](img/51.PNG?raw=true)
+
+After everything is finished, the system will reboot.
+![img 53](img/53.PNG?raw=true)
+
+From now on you can log in to the machine with your user. 
+![img 55](img/55.PNG?raw=true)
 
 
 ## AutoYast installation
