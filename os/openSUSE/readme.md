@@ -17,10 +17,13 @@ Assuming, you made this far and mostly know what we are going to do...
 First I will show you a simple, manual installation of SUSE and after that I will show how to use the automated setup.
 
 ## Manual installation
+Download the ISO and boot your machine. This is the first screen you can see. As this is an installation, chose the second option "Installation"
+
+(https://gitlab.com/lyynxxx/stakingnode/-/blob/master/os/openSUSE/img/01-bios.PNG)
 
 
 
-
+## AutoYast installation
 
 You need a HTTP server, from where the installer can download the AutoYaST control file. You can use your phone at home if it's on the same network as your validator machine,or you can pack the files into the iso too.
 
