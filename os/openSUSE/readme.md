@@ -19,7 +19,7 @@ First I will show you a simple, manual installation of SUSE and after that I wil
 ## Manual installation
 Download the ISO and boot your machine. This is the first screen you can see. As this is an installation, chose the second option "Installation"
 
-![01](https://gitlab.com/lyynxxx/stakingnode/-/blob/master/os/openSUSE/img/01-bios.PNG?raw=true)
+![01](img/01-bios.PNG?raw=true)
 
 
 
