@@ -9,10 +9,10 @@ mkdir -p /opt/goethereum/data
 mkdir -p /opt/goethereum/data-ancient
 
 cd /opt/goethereum
-curl https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.16-20356e57.tar.gz --output geth-linux-amd64-1.10.16-20356e57.tar.gz
-tar xf geth-linux-amd64-1.10.16-20356e57.tar.gz
-mv geth-linux-amd64-1.10.16-20356e57/geth /opt/goethereum/bin/
-rm -rf geth-linux-amd64-1.10.16-20356e57*
+curl https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.17-25c9b49f.tar.gz --output geth-linux-amd64-1.10.17-25c9b49f.tar.gz
+tar xf geth-linux-amd64-1.10.17-25c9b49f.tar.gz
+mv geth-linux-amd64-1.10.17-25c9b49f/geth /opt/goethereum/bin/
+rm -rf geth-linux-amd64-1.10.17-25c9b49f*
 chmod 755 /opt/goethereum
 chown -R geth:geth /opt/goethereum
 
