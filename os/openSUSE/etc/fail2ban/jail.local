@@ -19,7 +19,7 @@ chain     = input
 
 
 # Enable custom sshd protection (failed preauth messages are not present in journal...)
-[fail2ban-sshd]
+[sshd]
 enabled  = true
 port     = 2992
 filter   = sshd[mode=aggressive]

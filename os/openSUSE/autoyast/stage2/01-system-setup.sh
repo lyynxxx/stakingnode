@@ -36,11 +36,7 @@ mv /tmp/kickstart/stakingnode/os/openSUSE/etc/audit/rules.d/audit.rules /etc/aud
 chown root:root /etc/audit/rules.d/audit.rules
 chmod 600 /etc/audit/rules.d/audit.rules
 
-## Fail2ban & nftables
-mv /tmp/kickstart/stakingnode/os/openSUSE/etc/fail2ban/action.d/nftables-common.local /etc/fail2ban/action.d/nftables-common.local
-chown root:root /etc/fail2ban/action.d/nftables-common.local
-chmod 644 /etc/fail2ban/action.d/nftables-common.local
-
+## Fail2ban
 mv /tmp/kickstart/stakingnode/os/openSUSE/etc/fail2ban/jail.local /etc/fail2ban/jail.local
 chown root:root /etc/fail2ban/jail.local
 chmod 644 /etc/fail2ban/jail.local
