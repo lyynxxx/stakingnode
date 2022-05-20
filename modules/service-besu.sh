@@ -2,6 +2,9 @@
 
 ## Add service users - besu
 ## Chack latest version and link here: https://besu.ethereum.org/downloads/
+## Bonsai engine: https://consensys.net/blog/news/test-staking-ahead-of-the-merge-with-improved-bonsai-tries-state-storage/
+curl -k https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/22.4.1/besu-22.4.1.tar.gz --output besu-22.4.1.tar.gz
+
 groupadd besu
 useradd --system -g besu -d /opt/besu/ --shell /bin/false besu
 mkdir -p /opt/besu/bin
