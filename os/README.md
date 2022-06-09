@@ -1,4 +1,6 @@
-As I see there isn't such thing as a security "silver bullet", what solves everything. I must assume, my system is not unbreakable, therefore I need to create a few security layer. None of the layers itself are enough, but together they can mitigate a lot of the attack vectors. A "default" install is never good enough!
+As I see there isn't such thing as a security "silver bullet", what solves everything. I must assume, my system is not unbreakable, therefore I need to create more security layer. None of the layers itself are enough, but together they can mitigate a lot of the attack vectors. A "default" install is never good enough!
+
+The followings are generic tips, they work on almost any linux systems.
 
 # Planing the partitions
 Security begins even before I start the installation. During the installation process, I have an option to define the different partitions, filesystem types and sizes. I can apply different restrictions or fine tune the behavior of the filesystem. Separating the major system folders can help more then most people thinks. Before I start anything, let's think about partitions a bit.
@@ -8,9 +10,9 @@ Security begins even before I start the installation. During the installation pr
 | ------ | ------ | ------ |
 | /boot | 512M | Isolated boot partition for the kernel and the boot config files. I will make this read-only and unlock it only when I need to update the system. Also apply nodev,nosuid,noexec flags. (details later)|
 | swap | 8-16G | It's like virtual memory. Stuff in RAM used a long time ago but not purged, can be "swapped out" to disk, to free up some memory for other applications that needs more. The system may not even use it, but if I have a bare-metal machine it can't be a problem if I have one. Virtual environments often don't have a swap partition. You have to plan your system's available memory so all the applications can fit in and you don't have to swap a lot/crash with out of memory errors.|
-| / | 2G | No need for a lot of space. All the other important stuff is separated and has the necessary free space. I don't have a separate user home directory, as I don't want to create many users. Only one, to log into the system. I will harden this, with noexec (Red Hat only, on SuSE you need a /home partition with noexec), and apply nodev and nosuid! |
-| /usr | 3G | Here I have all the important system binaries. This will be read-only. If an attacker gains access to the system, often the first thing to do is altering some system binaries, to hide the traces. In this way, it's not possible (at least it will be harder, but the auditing system can detect this kind of activity.) I apply nodev here too, but we need the other grants so can't apply noexec or nosuid.|
-| /var | 2-3G | For system logs and the package manager cache. No need much more space, if something goes wrong and the system writes a lot of logs or some attacker forces the system to write a bunch of logs, our server won't stop as there is no more free space left, all our services can run. This may have the drawbacks that we don't log the suspicious activity, so making too small /var can be a bad practice, but in this situation, 2G will be fine. I apply nodev,nosid,noexec here.|
+| / | 2-3G | No need for a lot of space. All the other important stuff is separated and has the necessary free space. I don't have a separate user home directory, as I don't want to create many users. Only one, to log into the system. I will harden this, with noexec (Red Hat only, on SuSE you need a /home partition with noexec), and apply nodev and nosuid! |
+| /usr | 3-4G | Here I have all the important system binaries. This will be read-only. If an attacker gains access to the system, often the first thing to do is altering some system binaries, to hide the traces. In this way, it's not possible (at least it will be harder, but the auditing system can detect this kind of activity.) I apply nodev here too, but we need the other grants so can't apply noexec or nosuid.|
+| /var | 2-4G | For system logs and the package manager cache. No need much more space, if something goes wrong and the system writes a lot of logs or some attacker forces the system to write a bunch of logs, our server won't stop as there is no more free space left, all our services can run. This may have the drawbacks that we don't log the suspicious activity, so making too small /var can be a bad practice, but in this situation, 2G will be fine. I apply nodev,nosid,noexec here.|
 | /tmp | 1G | Isolate the temp directory and disable any binary execution too is a must! We won't use this much, but scripts often use /tmp to do fishy stuff, in this way we can break them. This breaks compiling sources too, but we have a workaround for that. I apply nodev,nosuid,noexec here. |
 | /opt | remaining space | This will be the location where we store the application data. I apply here nodev,nosuid. |
 
@@ -54,7 +56,7 @@ proc                    /proc                   proc    defaults,hidepid=2    0 
 
 ```
 
-Some of the settings like read-only /boot and /usr or noexec on / can break the installation process, so these are set later, in the post-install section by the kickstart file and not as part of the base system installation. (Note: on SUSE I can't apply noexec on root it breaks the system! On RHEL/CensOS /bin and /sbin are only symlinks, binaries are under /usr/bin or /usr/sbin, but not on SUSE.)
+Some of the settings like read-only /boot and /usr or noexec on / can break the automated installation process, so these are set later, in the post-install section by the kickstart file and not as part of the base system installation. (Note: on SUSE I can't apply noexec on root it breaks the system! On RHEL/CensOS /bin and /sbin are only symlinks, binaries are under /usr/bin or /usr/sbin, but not on SUSE.)
 
 Later, when I need to install updates I must resolve the read-only restrictions on /boot and /usr with the following commands:
 ```
@@ -142,79 +144,109 @@ The config is written into /etc/sysctl.d/99-sysctl.conf
 # a) 0 (zero) - disabled / no / false
 # b) Non zero - enabled / yes / true
 # --------------------------------------
-# Controls IP packet forwarding
+# Sources:
+# https://madaidans-insecurities.github.io/guides/linux-hardening.html
+# https://www.cyberciti.biz/tips/linux-security.html
+
+### Kernel protection
+
+# A kernel pointer points to a specific location in kernel memory. These can be very useful in exploiting the kernel, but kernel pointers are not hidden by default.
+kernel.kptr_restrict=2
+
+# dmesg is the kernel log. It exposes a large amount of useful kernel debugging information, but this can often leak sensitive information. Changing the above sysctl restricts the kernel log to the CAP_SYSLOG capability. 
+kernel.dmesg_restrict=1
+
+# Set console log level for kernel. Malware that is able to record the screen during boot may be able to abuse this to gain higher privileges. This option prevents those information leaks
+kernel.printk=3 3 3 3
+
+# eBPF exposes quite large attack surface. These sysctls restrict eBPF to the CAP_BPF capability (CAP_SYS_ADMIN on kernel versions prior to 5.8) and enable JIT hardening techniques, such as constant blinding. 
+kernel.unprivileged_bpf_disabled=1
+net.core.bpf_jit_harden=2
+
+# The userfaultfd() syscall is often abused to exploit use-after-free flaws. This sysctl is used to restrict this syscall to the CAP_SYS_PTRACE capability. 
+vm.unprivileged_userfaultfd=0
+
+# This restricts loading TTY line disciplines to the CAP_SYS_MODULE capability to prevent unprivileged attackers from loading vulnerable line disciplines with the TIOCSETD ioctl
+dev.tty.ldisc_autoload=0
+
+# kexec is a system call that is used to boot another kernel during runtime. This functionality can be abused to load a malicious kernel and gain arbitrary code execution in kernel mode, so this sysctl disables it.
+kernel.kexec_load_disabled=1
+
+# The SysRq key exposes a lot of potentially dangerous debugging functionality to unprivileged users. Contrary to common assumptions, SysRq is not only an issue for physical attacks, as it can also be triggered remotely.
+kernel.sysrq=4
+
+# User namespaces are a feature in the kernel which aim to improve sandboxing and make it easily accessible for unprivileged users. However, this feature exposes significant kernel attack surface for privilege escalation, so this sysctl restricts the usage of user namespaces to the CAP_SYS_ADMIN capability. For unprivileged sandboxing, it is instead recommended to use a setuid binary with little attack surface to minimise the potential for privilege escalation.
+## If your kernel does not include this patch, you can alternatively disable user namespaces completely (including for root) by setting:
+# user.max_user_namespaces=0. 
+kernel.unprivileged_userns_clone=0
+
+# Performance events add considerable kernel attack surface and have caused abundant vulnerabilities. This sysctl restricts all usage of performance events to the CAP_PERFMON capability (CAP_SYS_ADMIN on kernel versions prior to 5.8).
+## sysctl also requires a kernel patch that is only available on certain distributions. Otherwise, this setting is equivalent to kernel.perf_event_paranoid=2, which only restricts a subset of this functionality. 
+kernel.perf_event_paranoid=3
+
+# Controls the System Request debugging functionality of the kernel
+kernel.sysrq = 0
+
+# Controls whether core dumps will append the PID to the core filename
+# Useful for debugging multi-threaded applications
+kernel.core_uses_pid = 1
+
+
+### Network
+
+
+# This helps protect against SYN flood attacks, which are a form of denial-of-service attack, in which an attacker sends a large amount of bogus SYN requests in an attempt to consume enough resources to make the system unresponsive to legitimate traffic
+net.ipv4.tcp_syncookies = 1
+net.ipv4.tcp_synack_retries = 5
+
+# RFC 1337 fix. This protects against time-wait assassination by dropping RST packets for sockets in the time-wait state. 
+net.ipv4.tcp_rfc1337=1
+
+# Controls IP packet forwarding, it's not a router!
 net.ipv4.ip_forward = 0
+ipv4.conf.all.forwarding = 0
  
 # Do not accept source routing
 net.ipv4.conf.default.accept_source_route = 0
  
-# Controls the System Request debugging functionality of the kernel
-kernel.sysrq = 0
+# These enable source validation of packets received from all interfaces of the machine. This protects against IP spoofing, in which an attacker sends a packet with a fraudulent IP address.
+net.ipv4.conf.all.rp_filter = 1
+net.ipv4.conf.default.rp_filter = 1
+
+# These disable ICMP redirect acceptance and sending to prevent man-in-the-middle attacks and minimise information disclosure. Send redirects, if router, but this is just server, so no routing allowed!
+net.ipv4.conf.all.accept_redirects=0
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.all.secure_redirects=0
+net.ipv4.conf.default.secure_redirects=0
+net.ipv6.conf.all.accept_redirects=0
+net.ipv6.conf.default.accept_redirects=0
+net.ipv4.conf.all.send_redirects=0
+net.ipv4.conf.default.send_redirects=0
  
-# Controls whether core dumps will append the PID to the core filename
-# Useful for debugging multi-threaded applications
-kernel.core_uses_pid = 1
- 
-# Controls the use of TCP syncookies
-# Turn on SYN-flood protections
-net.ipv4.tcp_syncookies = 1
-net.ipv4.tcp_synack_retries = 5
- 
-########## IPv4 networking start ##############
-# Send redirects, if router, but this is just server
-# So no routing allowed 
-net.ipv4.conf.all.send_redirects = 0
-net.ipv4.conf.default.send_redirects = 0
- 
+# This setting makes your system ignore all ICMP requests to avoid Smurf attacks, make the device more difficult to enumerate on the network and prevent clock fingerprinting through ICMP timestamps. 
+net.ipv4.icmp_echo_ignore_all=1
+
 # Accept packets with SRR option? No
 net.ipv4.conf.all.accept_source_route = 0
- 
-# Accept Redirects? No, this is not router
-net.ipv4.conf.all.accept_redirects = 0
-net.ipv4.conf.all.secure_redirects = 0
- 
-# Log packets with impossible addresses to kernel log? yes
-net.ipv4.conf.all.log_martians = 1
-net.ipv4.conf.default.accept_source_route = 0
-net.ipv4.conf.default.accept_redirects = 0
-net.ipv4.conf.default.secure_redirects = 0
- 
+
+# Source routing is a mechanism that allows users to redirect network traffic. As this can be used to perform man-in-the-middle attacks in which the traffic is redirected for nefarious purposes. This settings disable this functionality. 
+net.ipv4.conf.all.accept_source_route=0
+net.ipv4.conf.default.accept_source_route=0
+net.ipv6.conf.all.accept_source_route=0
+net.ipv6.conf.default.accept_source_route=0
+
+# This disables TCP SACK. SACK is commonly exploited and unnecessary in many circumstances, so it should be disabled if it is not required.
+net.ipv4.tcp_sack=0
+net.ipv4.tcp_dsack=0
+net.ipv4.tcp_fack=0
+
 # Ignore all ICMP ECHO and TIMESTAMP requests sent to it via broadcast/multicast
 net.ipv4.icmp_echo_ignore_broadcasts = 1
  
-# Prevent the common 'syn flood attack'
-net.ipv4.tcp_syncookies = 1
- 
-# Enable source validation by reversed path, as specified in RFC1812
-net.ipv4.conf.all.rp_filter = 1
- 
-# Controls source route verification
-net.ipv4.conf.default.rp_filter = 1 
- 
-########## IPv6 networking start ##############
-# Number of Router Solicitations to send until assuming no routers are present.
-# This is host and not router
-net.ipv6.conf.default.router_solicitations = 0
- 
-# Accept Router Preference in RA?
-net.ipv6.conf.default.accept_ra_rtr_pref = 0
- 
-# Learn Prefix Information in Router Advertisement
-net.ipv6.conf.default.accept_ra_pinfo = 0
- 
-# Setting controls whether the system will accept Hop Limit settings from a router advertisement
-net.ipv6.conf.default.accept_ra_defrtr = 0
- 
-#router advertisements can cause the system to assign a global unicast address to an interface
-net.ipv6.conf.default.autoconf = 0
- 
-#how many neighbor solicitations to send out per address?
-net.ipv6.conf.default.dad_transmits = 0
- 
-# How many global unicast IPv6 addresses can be assigned to each interface?
-net.ipv6.conf.default.max_addresses = 1
- 
-########## IPv6 networking ends ##############
+# Disable ipv6
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
  
 #Enable ExecShield protection
 #Set value to 1 or 2 (recommended) 
@@ -237,7 +269,32 @@ net.ipv4.tcp_max_syn_backlog=8192
 net.ipv4.tcp_synack_retries=3
 net.ipv4.tcp_retries2=6
 net.ipv4.tcp_keepalive_probes=5
- 
+
+# TCP timestamps also leak the system time. The kernel attempted to fix this by using a random offset for each connection, but this is not enough to fix the issue. Thus, TCP timestamps should be disabled.
+net.ipv4.tcp_timestamps=0
+
+### User space
+
+
+# ptrace is a system call that allows a program to alter and inspect another running process, which allows attackers to trivially modify the memory of other running programs. This restricts usage of ptrace to only processes with the CAP_SYS_PTRACE capability. Alternatively, set the sysctl to 3 to disable ptrace entirely. 
+kernel.yama.ptrace_scope=2
+
+# ASLR is a common exploit mitigation which randomises the position of critical parts of a process in memory. This can make a wide variety of exploits harder to pull off, as they first require an information leak. The above settings increase the bits of entropy used for mmap ASLR, improving its effectiveness. 
+vm.mmap_rnd_bits=32
+vm.mmap_rnd_compat_bits=16
+
+# This only permits symlinks to be followed when outside of a world-writable sticky directory, when the owner of the symlink and follower match or when the directory owner matches the symlink's owner. This also prevents hardlinks from being created by users that do not have read/write access to the source file. 
+fs.protected_symlinks=1
+fs.protected_hardlinks=1
+
+# These prevent creating files in potentially attacker-controlled environments, such as world-writable directories, to make data spoofing attacks more difficult. 
+fs.protected_fifos=2
+fs.protected_regular=2
+
+
+### Other...
+
+
 # increase system file descriptor limit    
 fs.file-max = 100000
  
@@ -247,21 +304,11 @@ kernel.pid_max = 65536
 #Increase system IP port limits
 net.ipv4.ip_local_port_range = 2000 65000
  
-# RFC 1337 fix
-net.ipv4.tcp_rfc1337=1
-
 # Addresses of mmap base, heap, stack and VDSO page are randomized
 kernel.randomize_va_space=2
 
 # Ignore bad ICMP errors
 net.ipv4.icmp_ignore_bogus_error_responses=1
-
-# Protects against creating or following links under certain conditions
-fs.protected_hardlinks=1
-fs.protected_symlinks=1
-
-# Set console log level for kernel
-kernel.printk = 4 4 1 7
 
 # The default value of vm.swappiness is 60 and represents the percentage of the free memory before activating swap. The lower the value, the less swapping is used and the more memory pages are kept in physical memory.
 vm.swappiness = 20
@@ -274,6 +321,87 @@ vm.dirty_ratio = 80
 vm.dirty_background_ratio = 5
 
 ```
+
+## Boot parameters
+
+Boot parameters pass settings to the kernel at boot using your bootloader. Some settings can be used to increase security, similar to sysctl.
+The following settings are recommended to increase security.
+
+Using GRUB as bootloader, edit /etc/default/grub, and add parameters to the GRUB_CMDLINE_LINUX_DEFAULT= line.
+
+ - init_on_alloc=1 init_on_free=1
+This enables zeroing of memory during allocation and free time, which can help mitigate use-after-free vulnerabilities and erase sensitive information in memory. 
+
+ - page_alloc.shuffle=1
+This option randomises page allocator freelists, improving security by making page allocations less predictable. This also improves performance.
+
+ - pti=on
+This enables Kernel Page Table Isolation, which mitigates Meltdown and prevents some KASLR bypasses
+
+ - randomize_kstack_offset=on
+This option randomises the kernel stack offset on each syscall, which makes attacks that rely on deterministic kernel stack layout significantly more difficult, such as the exploitation of CVE-2019-18683.
+
+ - vsyscall=none
+This disables vsyscalls, as they are obsolete and have been replaced with vDSO. vsyscalls are also at fixed addresses in memory, making them a potential target for ROP attacks.
+
+ - debugfs=off
+This disables debugfs, which exposes a lot of sensitive information about the kernel. 
+
+ - oops=panic
+Sometimes certain kernel exploits will cause what is known as an "oops". This parameter will cause the kernel to panic on such oopses, thereby preventing those exploits. However, sometimes bad drivers cause harmless oopses which would result in your system crashing, meaning this boot parameter can only be used on certain hardware
+
+ - module.sig_enforce=1
+This only allows kernel modules that have been signed with a valid key to be loaded, which increases security by making it much harder to load a malicious kernel module. This prevents all out-of-tree kernel modules, including DKMS modules from being loaded unless you have signed them, meaning that modules such as the VirtualBox or Nvidia drivers may not be usable, although that may not be important, depending on your setup.
+
+ - lockdown=confidentiality
+The kernel lockdown LSM can eliminate many methods that user space code could abuse to escalate to kernel privileges and extract sensitive information. This LSM is necessary to implement a clear security boundary between user space and the kernel. The above option enables this feature in confidentiality mode, the strictest option. This implies module.sig_enforce=1. 
+
+ - mce=0
+This causes the kernel to panic on uncorrectable errors in ECC memory which could be exploited. This is unnecessary for systems without ECC memory.
+
+ - ipv6.disable=1
+This disables the entire IPv6 stack which may not be required if you have not migrated to it.
+
+
+## Application sandboxing
+While systemd is unrecommended, some may be unable to switch... or don't want to switch. It's your choice. I don't want to tell you what to use. Red Hat and openSUSE also use systemd.
+!!!You cannot just copy this example configuration into yours. Each service's requirements differ, and the sandbox has to be fine-tuned for each of them specifically!!!
+(Well... I have tested these with my setup and with my needs, so following my guide, yes, you can... but you got the point...)
+
+```
+[Service]
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectKernelLogs=true
+ProtectHostname=true
+ProtectClock=true
+ProtectProc=invisible
+ProcSubset=pid
+PrivateTmp=true
+PrivateUsers=true
+PrivateDevices=true
+PrivateIPC=true
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+LockPersonality=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+RestrictAddressFamilies=AF_INET
+RestrictNamespaces=true
+SystemCallFilter=write read openat close brk fstat lseek mmap mprotect munmap rt_sigaction rt_sigprocmask ioctl nanosleep select access execve getuid arch_prctl set_tid_address set_robust_list prlimit64 pread64 getrandom
+SystemCallArchitectures=native
+UMask=0077
+IPAddressDeny=any
+AppArmorProfile=/etc/apparmor.d/usr.bin.example
+```
+
+
+
+
 ## Firewall considerations (Thank you ArchWiki! https://wiki.archlinux.org/index.php/Simple_stateful_firewall)
 
 nftables is a netfilter project that aims to replace the existing {ip,ip6,arp,eb}tables framework. It provides a new packet filtering framework, a new user-space utility (nft), and a compatibility layer for {ip,ip6}tables. It uses the existing hooks, connection tracking system, user-space queueing component, and logging subsystem of netfilter.
