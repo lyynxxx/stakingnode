@@ -437,7 +437,7 @@ TODO: AppArmor/SELinux profile for the beacon chain and validator apps
 
 nftables is a netfilter project that aims to replace the existing {ip,ip6,arp,eb}tables framework. It provides a new packet filtering framework, a new user-space utility (nft), and a compatibility layer for {ip,ip6}tables. It uses the existing hooks, connection tracking system, user-space queueing component, and logging subsystem of netfilter.
 
-Firewalld or SuseFirewall2 - because in general this can only be encountered in - are just pure frontenda which comes with Red Hat/openSUSE. They are not an independent firewall by themself. They only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" or running "nftables only". Let's use nftables only! Much more simle!
+Firewalld or SuseFirewall2 - because in general this can only be encountered in - are just pure frontenda which comes with Red Hat/openSUSE. They are not an independent firewall by themself. They only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" or running "nftables only". Let's use nftables only! Much more simple!
 
 (Note: openSUSE Leap 15.0 introduces firewalld as the new default software firewall, replacing SuSEfirewall2. SuSEfirewall2 has not been removed from openSUSE Leap 15.0 and is still part of the main repository, though not installed by default.)
 
@@ -551,7 +551,7 @@ systemctl mask --now firewalld
 systemctl enable nftables
 ```
 
-If nftables is isntalled but there is no systemd service for it, you have to create one at /etc/systemd/system/nftables.service 
+If nftables is installed but there is no systemd service for it, you have to create one at /etc/systemd/system/nftables.service 
 ```
 [Unit]
 Description=Netfilter Tables
@@ -572,6 +572,7 @@ RemainAfterExit=yes
 WantedBy=multi-user.target
 
 ```
+Now you can enable and start the service.
 
 If you did this from a remote machine, now it's safe to change the default input policy to drop.
 Edit the file /etc/sysconfig/nftables.conf and change
@@ -593,18 +594,21 @@ table inet my_table {
 And reload the rule set:
 ```
 systemctl reload nftables
+OR
+reboot
 ```
 
 ## Fail2ban - ssh protection
 
 Fail2ban scans log files (e.g. /var/log/secure or journald logs) and bans IPs that show the malicious signs -- too many password failures, seeking for exploits, etc. Generally, Fail2Ban is then used to update firewall rules to reject the IP addresses for a specified amount of time, although any arbitrary other action (e.g. sending an email) could also be configured. Out of the box, Fail2Ban comes with filters for various services (apache, courier, ssh, etc).
 
-Some distros may have an outdated version in the distro's repository. OpenSUSE Leap 15.3 must use an additional repository to get the latest version, it's in the AutoYast file.
+Some distros may have an outdated version in the distro's repository, it's worth to check the available versions and use the latest possible.
 
 To override the defaults, I don't change the main configs, as a version update may replace the config/filter files. Fail2ban checks if there is a .local file with the same name. So to modify some settings, I just create a jail.local file, which can contain the same settings as jail.conf, but this will override the defaults. In this file I can define the default backend, the default ban action to use nftables and some filters, like the sshd filter.
 
 /etc/fail2ban/jail.local
 ```
+[DEFAULT]
 # Ban IP/hosts for 24 hour ( 24h*3600s = 86400s):
 bantime = 86400
 backend = systemd
@@ -617,15 +621,16 @@ maxretry = 3
 # will not ban a host which matches an address in this list. Several addresses
 # can be defined using space (and/or comma) separator. For example, add your
 # static IP address that you always use for login such as 103.1.2.3
-ignoreip = 9.10.11.12
+ignoreip = 103.1.2.3
 
 # configure nftables
 banaction = nftables-multiport
 chain     = input
 
 
-# Enable custom sshd protection (failed preauth messages are not present in journal...)
-[fail2ban-sshd]
+# Enable custom sshd protection (failed preauth messages are not present in journal if you not use aggressive mode! So use it.)
+# Don't forget to update your own SSH PORT!
+[sshd]
 enabled  = true
 port     = 2992
 filter   = sshd[mode=aggressive]
@@ -636,32 +641,6 @@ bantime  = 86400
 ```
 Fail2Ban allows me to list IP addresses which should be ignored. This can be useful for testing purposes and can help avoid locking clients (or myself) out unnecessarily. For example, if an attacker knows my IP, he/she or it can send spoofed packages and lock me out. The parameter 'ignoreip' can prevent this. 
 
-In /etc/fail2ban/action.d/nftables-common.local I can connect fail2ban with nftables and define which nftables tables and chains to use. (family and tables names are alligned to my nftables config)
-```
-[Init]
-# Definition of the table used
-nftables_family = inet
-nftables_table  = fail2ban
-
-# Drop packets 
-blocktype       = drop
-
-# Remove nftables prefix. Set names are limited to 15 char so we want them all
-nftables_set_prefix =
-```
-
-Lastly, I have to create the defined new nftables table and chain, where fail2ban will work and include this in the main nftables config (as an alternative, I can paste the whole table definition to the end of the /etc/sysconfig/nftables file, so all firewall configuration is in the same file).
-
-/etc/nftables/fail2ban.conf
-```
-#!/usr/sbin/nft -f
-table ip fail2ban {
-        chain input {
-                # Assign a high priority to reject as fast as possible and avoid more complex rule evaluation
-                type filter hook input priority 100;
-        }
-}
-```
 I could set up mail sending action, but I don't want to get notified after every banned IP. Daily reports will be enough from LogWatch and the Auditd daemon.
 
 ## Auditing the system
