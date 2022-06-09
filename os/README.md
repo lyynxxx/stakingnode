@@ -366,7 +366,7 @@ This disables the entire IPv6 stack which may not be required if you have not mi
 ## Application sandboxing
 While systemd is unrecommended, some may be unable to switch... or don't want to switch. It's your choice. I don't want to tell you what to use. Red Hat and openSUSE also use systemd.
 !!!You cannot just copy this example configuration into yours. Each service's requirements differ, and the sandbox has to be fine-tuned for each of them specifically!!!
-(Well... I have tested these with my setup and with my needs, so following my guide, yes, you can... but you got the point...)
+(Well... I have tested these with my setup and with my needs, so following my guide, you can download the prepared service files... but you got the point... every system is different!)
 
 ```
 [Service]
@@ -399,75 +399,180 @@ IPAddressDeny=any
 AppArmorProfile=/etc/apparmor.d/usr.bin.example
 ```
 
+What all these settings are for:
+ - CapabilityBoundingSet= — Specifies the capabilities the process is given.
+ - ProtectHome=true — Makes all home directories inaccessible.
+ - ProtectKernelTunables=true — Mounts kernel tunables, such as those modified through sysctl, as read-only.
+ - ProtectKernelModules=true — Denies module loading and unloading.
+ - ProtectControlGroups=true — Mounts all control group hierarchies as read-only.
+ - ProtectKernelLogs=true — Prevents accessing the kernel logs.
+ - ProtectHostname=true — Prevents changes to the system hostname.
+ - ProtectClock — Prevents changes to the system clock.
+ - ProtectProc=invisible — Hides all outside processes.
+ - ProcSubset=pid — Permits access to only the pid subset of /proc.
+ - PrivateTmp=true — Mounts an empty tmpfs over /tmp and /var/tmp, therefore hiding their previous contents.
+ - PrivateUsers=true — Sets up an empty user namespace to hide other user accounts on the system.
+ - PrivateDevices=true — Creates a new /dev mount with minimal devices present.
+ - PrivateIPC=true — Sets up an IPC namespace to isolate IPC resources.
+ - MemoryDenyWriteExecute=true — Enforces a memory W^X policy.
+ - NoNewPrivileges=true — Prevents escalating privileges.
+ - LockPersonality=true — Locks down the personality() syscall to prevent switching execution domains.
+ - RestrictRealtime=true — Prevents attempts to enable realtime scheduling.
+ - RestrictSUIDSGID=true — Prevents executing setuid or setgid binaries.
+ - RestrictAddressFamilies=AF_INET — Restricts the usable socket address families to IPv4 only (AF_INET).
+ - RestrictNamespaces=true — Prevents creating any new namespaces.
+ - SystemCallFilter=... — Restricts the allowed syscalls to the absolute minimum. If you aren't willing to maintain your own custom seccomp filter, then systemd provides many predefined system call sets that you can use. @system-service will be suitable for many use cases.
+ - SystemCallArchitectures=native — Prevents executing syscalls from other CPU architectures.
+ - UMask=0077 — Sets the umask to a more restrictive value.
+ - IPAddressDeny=any — Blocks all incoming and outgoing traffic to/from any IP address. Set IPAddressAllow= to configure a whitelist. Alternatively, setup a network namespace with PrivateNetwork=true.
+ - AppArmorProfile=... — Runs the process under the specified AppArmor profile.
 
+TODO: AppArmor/SELinux profile for the beacon chain and validator apps
 
-
-## Firewall considerations (Thank you ArchWiki! https://wiki.archlinux.org/index.php/Simple_stateful_firewall)
+## Firewall considerations (Thank you ArchWiki and Samuel! )
+#### Please read before copy-pasta something... you will LOCK YOURSELF OUT from your server!!!
+--https://wiki.archlinux.org/index.php/Simple_stateful_firewall
+--https://blog.samuel.domains/blog/security/nftables-hardening-rules-and-good-practices
 
 nftables is a netfilter project that aims to replace the existing {ip,ip6,arp,eb}tables framework. It provides a new packet filtering framework, a new user-space utility (nft), and a compatibility layer for {ip,ip6}tables. It uses the existing hooks, connection tracking system, user-space queueing component, and logging subsystem of netfilter.
 
-Firewalld or SuseFirewall2 - in contrast, because in general this can only be encountered in - is a pure frontend which comes with Red Hat/openSUSE. It's not an independent firewall by itself. It only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" or running "nftables only". Let's use nftables only!
+Firewalld or SuseFirewall2 - because in general this can only be encountered in - are just pure frontenda which comes with Red Hat/openSUSE. They are not an independent firewall by themself. They only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" or running "nftables only". Let's use nftables only! Much more simle!
 
-The rules are in the file /etc/sysconfig/nftables.conf, but here are the details, how it is made:
+(Note: openSUSE Leap 15.0 introduces firewalld as the new default software firewall, replacing SuSEfirewall2. SuSEfirewall2 has not been removed from openSUSE Leap 15.0 and is still part of the main repository, though not installed by default.)
+
+You should always block all incoming traffic unless you have a specific reason not to. It is recommended to set up a strict firewall. Firewalls must be fine-tuned for your system, and there is not one ruleset that can fit all of them. Also you must understand the netfilter flow, so your firewall rules could be effective, and can work properly. Reference: neftilter flow: https://wiki.nftables.org/wiki-nftables/index.php/Netfilter_hooks#Priority_within_hook
+
+First we create the skeleton. It's important to use the right order!
+
 ```
-# Flush the current ruleset
+# Flush any current ruleset
 nft flush ruleset
+```
 
+To mitigate DDoS attacks and script kiddies exploration define a new table, with a netdev network family type.
+By setting priority lower than NF_IP_PRI_CONNTRACK_DEFRAG (= -400), we are sure that our chain will be evaluated before any other one registered on the ingress hook. This makes it the perfect place to set our DDoS counter-measures, as we would "spare" a few CPU cycles per packet.
+For some reason the interface name must be hardcoded here (eth0), variable do not work!
+!IMPORTANT: escape any special character/expression, like & or ;
+
+```
+nft add table netdev filter
+nft add chain netdev filter ingress '{type filter hook ingress device eth0 priority -500;}'
+
+# Drop all fragments.
+nft add rule netdev filter ingress 'ip frag-off & 0x1fff != 0 counter drop'
+
+# Drop XMAS packets.
+nft add rule netdev filter ingress 'tcp flags & (fin|syn|rst|psh|ack|urg) == fin|syn|rst|psh|ack|urg counter drop'
+
+# Drop NULL packets.
+nft add rule netdev filter ingress 'tcp flags & (fin|syn|rst|psh|ack|urg) == 0x0 counter drop'
+
+# Drop uncommon MSS values.
+nft add rule netdev filter ingress 'tcp flags syn tcp option maxseg size 1-535 counter drop'
+
+# Drop bogons (on your home lab, this WILL LOCK YOU OUT! Remove your home network from the above list!)
+# If you use 192.168.1.0/24 remove the associated "192.168.0.0/16" rule
+nft add rule netdev filter ingress 'ip saddr { 0.0.0.0/8,10.0.0.0/8,100.64.0.0/10,127.0.0.0/8,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,192.168.0.0/16,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,224.0.0.0/3 } counter drop'
+
+```
+
+Add a table and add the input, forward, and output base chains. The default policy for input and forward will be to drop. The policy for output will be to accept. Describing an inet table allows us to handle any IPv4 (ip) and IPv6 (ip6) packets at the very same location (even if don't use ipv6, one day we may will use it)!
+```
 #Add a table
 nft add table inet my_table
 
-# Add the input, forward, and output base chains. The policy for input and forward will be to drop. The policy for output will be to accept. 
-nft add chain inet my_table my_input '{ type filter hook input priority 0 ; policy drop ; }'
-nft add chain inet my_table my_forward '{ type filter hook forward priority 0 ; policy drop ; }'
-nft add chain inet my_table my_output '{ type filter hook output priority 0 ; policy accept ; }'
+# Add the default chains and policy.
+nft add chain inet my_table input '{ type filter hook input priority 0 ; policy drop ; }'  <--- this will lock you out!!!! Change policy to accept if you do this from a remote machine and modify later, when all other rules are set!
+nft add chain inet my_table forward '{ type filter hook forward priority 0 ; policy drop ; }'
+nft add chain inet my_table output '{ type filter hook output priority 0 ; policy accept ; }'
+```
 
+Add two regular chains that will be associated with tcp and udp rules
+```
 # Add two regular chains that will be associated with tcp and udp
-nft add chain inet my_table my_tcp_chain
-nft add chain inet my_table my_udp_chain
+nft add chain inet my_table tcp_chain
+nft add chain inet my_table udp_chain
+```
 
+In order to match "new" packets, we need the help of the conntrack Netfilter module.
+The problem : It’s not available within a chain registered with the ingress hook, that’s why we gotta use it elsewhere: the PREROUTING chain of the filter table, at the mangle (-150) priority.
+```
+nft add table inet mangle
+nft add chain inet mangle prerouting '{type filter hook prerouting priority -150;}'
+
+# drop any packet flagged as invalid by the conntrack module
+nft add rule inet mangle prerouting ct state invalid counter drop
+
+# drop any new packet, presenting any other TCP flag beside SYN
+nft add rule inet mangle prerouting 'tcp flags & (fin|syn|rst|ack) != syn ct state new counter drop'
+```
+
+The skeleton is ready. We have dropped a lot of fishy traffic and defined the place where we can start to accept incoming connections.
+
+```
 # Related and established traffic will be accepted
-nft add rule inet my_table my_input ct state related,established accept
+nft add rule inet my_table input ct state related,established accept
 
 # All loopback interface traffic will be accepted
-nft add rule inet my_table my_input iif lo accept
+nft add rule inet my_table input iif lo accept
 
-# Drop any invalid traffic
-nft add rule inet my_table my_input ct state invalid drop
-
-# Accept ICMP and IGMP
-nft add rule inet my_table my_input meta l4proto ipv6-icmp icmpv6 type '{ destination-unreachable, packet-too-big, time-exceeded, parameter-problem, mld-listener-query, mld-listener-report, mld-listener-reduction, nd-router-solicit, nd-router-advert, nd-neighbor-solicit, nd-neighbor-advert, ind-neighbor-solicit, ind-neighbor-advert, mld2-listener-report }' limit rate 4/second accept
-
-nft add rule inet my_table my_input meta l4proto icmp icmp type '{ destination-unreachable, router-solicitation, router-advertisement, time-exceeded, parameter-problem }' limit rate 4/second accept
-
-nft add rule inet my_table my_input ip protocol igmp accept
+# Allow but rate limit icmp-echo requests
+nft add rule inet my_table input icmp type echo-request limit rate 1/second burst 5 packets accept
 
 # New udp traffic will jump to the UDP chain
-nft add rule inet my_table my_input meta l4proto udp ct state new jump my_udp_chain
+nft add rule inet my_table input meta l4proto udp ct state new jump udp_chain
 
 # New tcp traffic will jump to the TCP chain
-nft add rule inet my_table my_input 'meta l4proto tcp tcp flags & (fin|syn|rst|ack) == syn ct state new jump my_tcp_chain'
+nft add rule inet my_table input 'meta l4proto tcp tcp flags & (fin|syn|rst|ack) == syn ct state new jump tcp_chain'
 
 # Reject all traffic that was not processed by other rules
-nft add rule inet my_table my_input meta l4proto udp reject
-nft add rule inet my_table my_input meta l4proto tcp reject with tcp reset
-nft add rule inet my_table my_input counter reject with icmpx type port-unreachable
+nft add rule inet my_table input meta l4proto udp drop
+nft add rule inet my_table input meta l4proto tcp reject with tcp reset
+nft add rule inet my_table input counter reject with icmpx type port-unreachable
 
-# Allow ssh&Prysm&Geth TCP ports
-nft add rule inet my_table my_tcp_chain tcp dport 2992 counter limit rate 4/second accept
-nft add rule inet my_table my_tcp_chain tcp dport 30303 counter accept
-nft add rule inet my_table my_tcp_chain tcp dport 13000 counter accept
-
-# Allow Prysm&Geth UDP ports
-nft add rule inet my_table my_udp_chain udp dport 30303 counter accept
-nft add rule inet my_table my_udp_chain udp dport 12000 counter accept
 ```
-To use native nftables I disable and mask the firewalld service, and enable the nftables service in the kickstart file for RHEL.
+At this point you should decide what ports you want to open to incoming connections, which are handled by the TCP and UDP chains. For example to open connections for ssh:
+(REMEMBER: use your own ssh port!!!!)
+
+```
+# Allow ssh
+nft add rule inet my_table tcp_chain tcp dport 2992 counter limit rate 4/second accept
+```
+Save the firewall config
+```
+# nft list ruleset > /etc/sysconfig/nftables.conf
+```
+
+To use native nftables, disable and mask the firewalld/iptables service.
 ```
 systemctl disable firewalld
 systemctl mask --now firewalld
 systemctl enable nftables
 ```
-For openSUSE it is in the AutoYast config file, in the disabled services section.
+
+If nftables is isntalled but there is no systemd service for it, you have to create one at /etc/systemd/system/nftables.service
+
+```
+[Unit]
+Description=Netfilter Tables
+Documentation=man:nft(8)
+Wants=network-pre.target
+Before=network-pre.target
+
+[Service]
+Type=oneshot
+ProtectSystem=full
+ProtectHome=true
+ExecStart=/usr/sbin/nft -f /etc/sysconfig/nftables.conf
+ExecReload=/usr/sbin/nft 'flush ruleset; include "/etc/sysconfig/nftables.conf";'
+ExecStop=/usr/sbin/nft flush ruleset
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+
+```
+
 
 ## Fail2ban - ssh protection
 
