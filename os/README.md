@@ -432,6 +432,7 @@ TODO: AppArmor/SELinux profile for the beacon chain and validator apps
 ## Firewall considerations (Thank you ArchWiki and Samuel! )
 #### Please read before copy-pasta something... you will LOCK YOURSELF OUT from your server!!!
 --https://wiki.archlinux.org/index.php/Simple_stateful_firewall
+
 --https://blog.samuel.domains/blog/security/nftables-hardening-rules-and-good-practices
 
 nftables is a netfilter project that aims to replace the existing {ip,ip6,arp,eb}tables framework. It provides a new packet filtering framework, a new user-space utility (nft), and a compatibility layer for {ip,ip6}tables. It uses the existing hooks, connection tracking system, user-space queueing component, and logging subsystem of netfilter.
@@ -455,6 +456,7 @@ For some reason the interface name must be hardcoded here (eth0), variable do no
 !IMPORTANT: escape any special character/expression, like & or ;
 
 ```
+# Add netdev type table and a chain
 nft add table netdev filter
 nft add chain netdev filter ingress '{type filter hook ingress device eth0 priority -500;}'
 
@@ -478,7 +480,7 @@ nft add rule netdev filter ingress 'ip saddr { 0.0.0.0/8,10.0.0.0/8,100.64.0.0/1
 
 Add a table and add the input, forward, and output base chains. The default policy for input and forward will be to drop. The policy for output will be to accept. Describing an inet table allows us to handle any IPv4 (ip) and IPv6 (ip6) packets at the very same location (even if don't use ipv6, one day we may will use it)!
 ```
-#Add a table
+# Add a table. This will contain the main firewall chains and rules
 nft add table inet my_table
 
 # Add the default chains and policy.
@@ -489,13 +491,12 @@ nft add chain inet my_table output '{ type filter hook output priority 0 ; polic
 
 Add two regular chains that will be associated with tcp and udp rules
 ```
-# Add two regular chains that will be associated with tcp and udp
 nft add chain inet my_table tcp_chain
 nft add chain inet my_table udp_chain
 ```
 
 In order to match "new" packets, we need the help of the conntrack Netfilter module.
-The problem : It’s not available within a chain registered with the ingress hook, that’s why we gotta use it elsewhere: the PREROUTING chain of the filter table, at the mangle (-150) priority.
+The problem : It’s not available within a chain registered with the ingress or my_table input hook, that’s why we gotta use it elsewhere: the PREROUTING chain of the filter table, at the mangle (-150) priority.
 ```
 nft add table inet mangle
 nft add chain inet mangle prerouting '{type filter hook prerouting priority -150;}'
@@ -550,8 +551,7 @@ systemctl mask --now firewalld
 systemctl enable nftables
 ```
 
-If nftables is isntalled but there is no systemd service for it, you have to create one at /etc/systemd/system/nftables.service
-
+If nftables is isntalled but there is no systemd service for it, you have to create one at /etc/systemd/system/nftables.service 
 ```
 [Unit]
 Description=Netfilter Tables
@@ -573,6 +573,27 @@ WantedBy=multi-user.target
 
 ```
 
+If you did this from a remote machine, now it's safe to change the default input policy to drop.
+Edit the file /etc/sysconfig/nftables.conf and change
+```
+table inet my_table {
+        chain input {
+                type filter hook input priority filter; policy accept;
+
+```
+
+to:
+```
+table inet my_table {
+        chain input {
+                type filter hook input priority filter; policy drop;
+
+```
+
+And reload the rule set:
+```
+systemctl reload nftables
+```
 
 ## Fail2ban - ssh protection
 
@@ -619,7 +640,7 @@ In /etc/fail2ban/action.d/nftables-common.local I can connect fail2ban with nfta
 ```
 [Init]
 # Definition of the table used
-nftables_family = ip
+nftables_family = inet
 nftables_table  = fail2ban
 
 # Drop packets 
