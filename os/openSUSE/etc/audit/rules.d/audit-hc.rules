@@ -1,19 +1,17 @@
-## Sources:
-## https://izyknows.medium.com/linux-auditd-for-threat-detection-d06c8b941505
-## https://github.com/Neo23x0/auditd/blob/master/audit.rules
-
-## First rule - delete all
+# Remove any existing rules
 -D
 
-## Increase the buffers to survive stress events.
-## Make this bigger for busy systems
+# Buffer Size
+## Feel free to increase this if the machine panic's
 -b 8192
 
-## This determine how long to wait in burst of events
---backlog_wait_time 60000
-
-## Set failure mode to syslog
+# Failure Mode
+## Possible values: 0 (silent), 1 (printk, print a failure message), 2 (panic, halt the system)
 -f 1
+
+# Ignore errors
+## e.g. caused by users or files not found in the local environment
+-i
 
 # Self Auditing ---------------------------------------------------------------
 
@@ -52,14 +50,12 @@
 ## This is not very interesting and wastes a lot of space if the server is public facing
 -a always,exclude -F msgtype=CRYPTO_KEY_USER
 
-## High Volume Event Filter (especially on Linux Workstations)
--a never,exit -F arch=b32 -F dir=/dev/shm -k sharedmemaccess
--a never,exit -F arch=b64 -F dir=/dev/shm -k sharedmemaccess
--a never,exit -F arch=b32 -F dir=/var/lock/lvm -k locklvm
--a never,exit -F arch=b64 -F dir=/var/lock/lvm -k locklvm
+### High Volume Event Filter (especially on Linux Workstations)
+-a exit,never -F arch=b32 -F dir=/dev/shm -k sharedmemaccess
+-a exit,never -F arch=b64 -F dir=/dev/shm -k sharedmemaccess
+-a exit,never -F arch=b32 -F dir=/var/lock/lvm -k locklvm
+-a exit,never -F arch=b64 -F dir=/var/lock/lvm -k locklvm
 
-## More information on how to filter events
-### https://access.redhat.com/solutions/2482221
 
 # Rules -----------------------------------------------------------------------
 
@@ -94,6 +90,9 @@
 -a always,exit -F arch=b64 -S swapon -S swapoff -F auid!=-1 -k swap
 -a always,exit -F arch=b32 -S swapon -S swapoff -F auid!=-1 -k swap
 
+## Time
+-a always,exit -F arch=b32 -F uid!=ntp -S adjtimex -S settimeofday -S clock_settime -k time
+-a always,exit -F arch=b64 -F uid!=ntp -S adjtimex -S settimeofday -S clock_settime -k time
 ### Local time zone
 -w /etc/localtime -p wa -k localtime
 
@@ -142,19 +141,6 @@
 -w /var/log/lastlog -p wa -k login
 -w /var/log/tallylog -p wa -k login
 
-## Network Environment
-### Changes to hostname
--a always,exit -F arch=b32 -S sethostname -S setdomainname -k network_modifications
--a always,exit -F arch=b64 -S sethostname -S setdomainname -k network_modifications
-
-### Successful IPv4 Connections
--a always,exit -F arch=b64 -S connect -F a2=16 -F success=1 -F key=network_connect_4
--a always,exit -F arch=b32 -S connect -F a2=16 -F success=1 -F key=network_connect_4
-
-### Successful IPv6 Connections
--a always,exit -F arch=b64 -S connect -F a2=28 -F success=1 -F key=network_connect_6
--a always,exit -F arch=b32 -S connect -F a2=28 -F success=1 -F key=network_connect_6
-
 ### Changes to other files
 -w /etc/hosts -p wa -k network_modifications
 -w /etc/sysconfig/network -p wa -k network_modifications
@@ -178,21 +164,9 @@
 ## Systemwide library preloads (LD_PRELOAD)
 -w /etc/ld.so.preload -p wa -k systemwide_preloads
 
-## Pam configuration
--w /etc/pam.d/ -p wa -k pam
--w /etc/security/limits.conf -p wa  -k pam
--w /etc/security/limits.d -p wa  -k pam
--w /etc/security/pam_env.conf -p wa -k pam
--w /etc/security/namespace.conf -p wa -k pam
--w /etc/security/namespace.d -p wa -k pam
--w /etc/security/namespace.init -p wa -k pam
-
 ## SSH configuration
 -w /etc/ssh/sshd_config -k sshd
 -w /etc/ssh/sshd_config.d -k sshd
-
-## root ssh key tampering
--w /root/.ssh -p wa -k rootkey
 
 # Systemd
 -w /bin/systemctl -p x -k systemd
@@ -216,11 +190,6 @@
 -w /usr/bin/sudo -p x -k priv_esc
 -w /etc/sudoers -p rw -k priv_esc
 -w /etc/sudoers.d -p rw -k priv_esc
-
-## Session initiation information
--w /var/run/utmp -p wa -k session
--w /var/log/btmp -p wa -k session
--w /var/log/wtmp -p wa -k session
 
 ## Discretionary Access Control (DAC) modifications
 -a always,exit -F arch=b32 -S chmod -F auid>=1000 -F auid!=-1 -k perm_mod
@@ -298,18 +267,6 @@
 ### may indicate privilege escalation CVE-2021-4034
 -w /usr/bin/pkexec -p x -k pkexec
 
-## Suspicious shells
-#-w /bin/ash -p x -k susp_shell
-#-w /bin/bash -p x -k susp_shell
-#-w /bin/csh -p x -k susp_shell
-#-w /bin/dash -p x -k susp_shell
-#-w /bin/busybox -p x -k susp_shell
-#-w /bin/ksh -p x -k susp_shell
-#-w /bin/fish -p x -k susp_shell
-#-w /bin/tcsh -p x -k susp_shell
-#-w /bin/tclsh -p x -k susp_shell
-#-w /bin/zsh -p x -k susp_shell
-
 ## Shell/profile configurations
 -w /etc/profile.d/ -p wa -k shell_profiles
 -w /etc/profile -p wa -k shell_profiles
@@ -332,33 +289,25 @@
 -a always,exit -F arch=b32 -S ptrace -k tracing
 -a always,exit -F arch=b64 -S ptrace -k tracing
 
-## Privilege Abuse
-### The purpose of this rule is to detect when an admin may be abusing power by looking in user's home dir.
--a always,exit -F dir=/home -F uid=0 -F auid>=1000 -F auid!=-1 -C auid!=obj_uid -k power_abuse
+## Anonymous File Creation
+### These rules watch the use of memfd_create 
+### "memfd_create" creates anonymous file and returns a file descriptor to access it
+### When combined with "fexecve" can be used to stealthily run binaries in memory without touching disk  
+-a always,exit -F arch=b64 -S memfd_create -F key=anon_file_create
+-a always,exit -F arch=b32 -S memfd_create -F key=anon_file_create  
 
-# Software Management ---------------------------------------------------------
-
-# RPM (Redhat/CentOS)
--w /usr/bin/rpm -p x -k software_mgmt
--w /usr/bin/yum -p x -k software_mgmt
-
-# YAST/Zypper/RPM (SuSE)
--w /sbin/yast -p x -k software_mgmt
--w /sbin/yast2 -p x -k software_mgmt
--w /bin/rpm -p x -k software_mgmt
--w /usr/bin/zypper -k software_mgmt
-
-# PIP (Python installs)
--w /usr/bin/pip -p x -k software_mgmt
--w /usr/bin/pip3 -p x -k software_mgmt
+# This rule suppresses events that originate on the below file systems.
+# Typically you would use this in conjunction with rules to monitor
+# kernel modules. The filesystem listed are known to cause hundreds of
+# path records during kernel module load. As an aside, if you do see the
+# tracefs or debugfs module load and this is a production system, you really
+# should look into why its getting loaded and prevent it if possible.
+-a never,filesystem -F fstype=tracefs
+-a never,filesystem -F fstype=debugfs
 
 # High Volume Events ----------------------------------------------------------
 
 ## Remove them if they cause to much volume in your environment
-
-## Root command executions
--a always,exit -F arch=b64 -F euid=0 -S execve -k rootcmd
--a always,exit -F arch=b32 -F euid=0 -S execve -k rootcmd
 
 ## File Deletion Events by User
 -a always,exit -F arch=b32 -S rmdir -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=-1 -k delete
@@ -392,5 +341,4 @@
 
 # Make The Configuration Immutable --------------------------------------------
 
-##
 -e 2
