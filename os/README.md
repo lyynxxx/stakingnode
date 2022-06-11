@@ -72,7 +72,7 @@ So if anyone cracks my node and tries to add a new user, and they don't think ab
 
 ## Thingking about the users and system access
 
-I only need one user, who can log into the system. This non-privilegised user can then use sudo or "su -" to do system administration tasks. But always using passwords! NEVER EVER use passwordless sudo!
+I only need one user, who can log into the system (and thats NOT the root user!). This non-privilegised user can then use sudo or "su -" (?) to do system administration tasks. But always using passwords! NEVER EVER use passwordless sudo!
 
 Also, the user can log in with ssh keys only. I don't allow any passwords. No weak nor strong passwords.
 Although passwords are sent to the server in a secure manner, they are generally not complex or long enough to be resistant to repeated, persistent attackers. Modern processing power combined with automated scripts makes brute-forcing a password-protected account very possible. 
@@ -86,6 +86,65 @@ The associated public key can be shared freely without any negative consequences
 For generating ssh keys check: https://docs.rightscale.com/faq/How_Do_I_Generate_My_Own_SSH_Key_Pair.html
 
 Keep your keys safe!!! Never ever share your keys!!!
+
+## The root account (WIP...!! no copypasta!!)
+
+Root can do anything and has access to the entire system. Thus, it should be locked down as much as possible so attackers cannot easily gain root access.
+The file, /etc/securetty specifies where you are allowed to login as root from. It's important, that the file must exist, deleting it would not solve anything, but it must be empty, otherwise root will be allowed access through any communication device available whether that be console or other. To prevent someone from logging in as root via SSH, we edit /etc/ssh/sshd_config in the following section.
+
+We could even lock the root account to prevent anyone from ever logging in as root, but we must have an alternative method of gaining root... this also could lead to a dark forest... it's about how paranoid you are :)
+
+I think the best way to do system administration task is sudo with a separate admin account.
+
+"su" lets you switch users from a terminal. By default, it tries to login as root. To restrict the use of su to users within the wheel group, edit /etc/pam.d/su and /etc/pam.d/su-l and add: 
+```
+auth required pam_wheel.so use_uid
+```
+
+You should have as little users in the wheel group as possible, and it's never a good practice to keep your default login user in the wheel group.
+
+There are a wide range of methods that malware can use to sniff the password of the root account. As such, traditional ways of accessing the root account are insecure. Preferably, root would not be accessed at all, but this isn't really feasible.
+
+You must not use your ordinary user account to access root, as it may have been compromised. You also must not log directly into the root account. Create a separate "admin" user account that is used solely for accessing root and nothing else! (It's worth to mention, that username admin/sysadmin/operator, etc. are not the best ideas as scripts may will search for them, use ordinary user names, like jarvis or bob.)
+
+This user also should not be in the AllowUseres list, so can't login directly via ssh. You can also "hide" the user from scripts if you create the user home directory in /opt or any other location but the default /home. Also don't put the user into any shared group, like "users".
+```
+groupadd ADMINUSERNAME
+useradd -g ADMINUSERNAME -d /opt/ADMINUSERNAME --shell /bin/bash ADMINUSERNAME
+```
+
+Give the user a strong password!!!
+```
+passwd ADMINUSERNAME
+```
+
+After restricting the "su" access, the only way to switch to this "admin" user is sudo.
+```
+sudo -u ADMINUSERNAME -s
+```
+
+In the default (unconfigured) configuration, sudo asks for the root password. This allows use of an ordinary user account for administration of a freshly installed system. The key parameter are:
+```
+Defaults targetpw   # ask for the password of the target user i.e. root
+ALL   ALL=(ALL) ALL   # WARNING! Only use this together with 'Defaults targetpw'!
+``` 
+
+The second line means: any user can use sudo on any host, in the name of any other user, executing any command... this is not an ideal condition, so let's make some modification. On Unix-like operating systems, the visudo command edits the sudoers file, which is the configuration file of of sudo. To change what users and groups are allowed to run sudo, and what commands they are allowed to use, run visudo.
+
+Comment out the two lines discussed above and search for this line at almost the very bottom of the file: "## User privilege specification", and add the following lines:
+```
+ADMINUSERNAME ALL=(ALL) ALL
+
+Defaults:YOURLOGINUSER targetpw
+Cmnd_Alias TCH = /usr/bin/sudo -u tech -s
+YOURLOGINUSER ALL = (ADMINUSERNAME) TCH,/bin/bash
+```
+ - ADMINUSERNAME ALL=(ALL) ALL: your adnim user is capable to use sudo without any restriction
+ - Defaults:YOURLOGINUSER targetpw: when switching users from your user who you use only to log into the server, sudo will ask for the admin user password.
+ - Cmnd_Alias TCH = /usr/bin/sudo -u tech -s : command alias, this is the command you use to switch users
+ - YOURLOGINUSER ALL = (ADMINUSERNAME) TCH,/bin/bash : your user who you use only to log into the server, can only use sudo in the name of the admin user, and can execute only two commands, switch to the admin user and start a bash shell for the admin user.
+
+If you know a better solution, please don't hold it back...
 
 ## SSH 
 As this service provides the access to the system, we should prepare it for good.
@@ -1092,17 +1151,17 @@ The script runs every day, a few minutes after Midnight.
 
 Every service (geth, the beacon chanin client and the validator client) will run under their own service user. Service users don't have a home directory or grant to login/use shell. Their only purpose is to run one application and nothing more, as limited as possible. I create systemd services to keep them running and start them at boot time.
 
-Using systemd I can apply some extra security settings and try to prevent the applications to sniff around (if compromised) in directories where they should not do anything.
-```
-[Service]
-ExecStart=...
-InaccessibleDirectories=/home
-ReadOnlyDirectories=/var /etc
-...
-```
-With the ReadOnlyDirectories= and InaccessibleDirectories= options, it is possible to make the specified directories inaccessible for writing resp. both reading and writing to the service. With these two configuration lines, the whole tree below /home becomes inaccessible to the service (i.e. the directory will appear empty and with 000 access mode), and the tree below /var and /etc becomes read-only. I can define more folders, separate by spaces.
+You may ask, but how could we import the validator keys or run any commands if the service users don't have login ot shell access???
+Luckily we can run commands as another user with our admin user.
 
-The kickstart file will create separate users both for the beacon chain and the validator and for any other service I need to run on this system. 
+```
+su - validator -P -s /bin/bash -c 'lighthouse --network mainnet account validator import --directory /opt/validator/tmp/validator_keys'
+```
+ - P: Create a pseudo-terminal for the session. The independent terminal provides better security as the user does not share a terminal with the original session. This can be used to avoid TIOCSTI ioctl terminal injection and other security attacks against terminal file descriptors. The entire session can also be moved to the background (e.g., "su --pty -username -c application &"). If the pseudo-terminal is enabled, then su works as a proxy between the sessions (copy stdin and stdout).
+ - s: Run the specified shell instead of the default
+ - c: Pass command to the shell with the -c option
+
+## Compiling from source
 
 If you want to compile from source, you can, but personally in prod I don't like any compiler or building tool if it's not essential and the system can't work without them.
 

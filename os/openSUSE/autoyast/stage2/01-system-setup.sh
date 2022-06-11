@@ -6,7 +6,7 @@ sed -i 's/^UMASK.*/UMASK 077/' /etc/login.defs
 
 
 ## securing the console
-echo "console" > /etc/securetty
+echo > /etc/securetty
 systemctl mask debug-shell.service
 systemctl stop debug-shell.service
 systemctl daemon-reload
