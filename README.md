@@ -96,8 +96,9 @@ I plan to use openSUSE as the host operating system, using a minimal install and
 
 AutoYast is Suse specific, but most of the commands and methods I use in the scripts after the operating system installation will work on almost any popular Linux.
 
-[Let us dive into the process and plan the base system](https://gitlab.com/lyynxxx/stakingnode/-/tree/master/os).
+[Let us dive into the process and plan the base system](https://github.com/lyynxxx/stakingnode/tree/master/os).
 
 
  DISCLAIMER: I'm not an expert! Feel free to correct me (mailto: lyynxxx@gmail.com), as I don't want to mislead people, I just documenting my journey here.
+ 
  If you find this useful, my coffee fund: ETH --  0x3f0402c968bB4176d7571DC0822Fd276bF8b8a9F
