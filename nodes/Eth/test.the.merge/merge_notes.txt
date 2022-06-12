@@ -85,9 +85,5 @@ sudo /usr/local/bin/lighthouse account validator import \
     --network kiln
 
 
-/opt/validator/bin/lighthouse account validator import --directory /opt/tmp/ --datadir /opt/validator/data --network mainnet
+/opt/validator/bin/lighthouse account validator import --directory /opt/tmp/ --datadir /opt/validator/data --network kiln
 
-Running account manager for mainnet network
-validator-dir path: "/opt/validator/data/validators"
-0xade36fbec0b1819aa0947f1c1c8d12d1a4d7d4e4949b0bb0b2a9fe554c75b340a8ca246deb75554cbfe5695061f51fd0 (enabled)
-0xa337c65f0bb1b61bebda1de09f4b1fbbc6c6258f41798fb359eed8df8eca060f6be6e477058a5ae48e62d43e2a4942cc (enabled)
