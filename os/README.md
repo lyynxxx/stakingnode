@@ -120,8 +120,9 @@ passwd ADMINUSERNAME
 
 After restricting the "su" access, the only way to switch to this "admin" user is sudo.
 ```
-sudo -u ADMINUSERNAME -s
+ sudo -u ADMINUSERNAME -s
 ```
+(Use the whitespace at the beginning of the command, to hide it!)
 
 In the default (unconfigured) configuration, sudo asks for the root password. This allows use of an ordinary user account for administration of a freshly installed system. The key parameter are:
 ```
@@ -144,6 +145,7 @@ YOURLOGINUSER ALL = (ADMINUSERNAME) TCH,/bin/bash
  - Cmnd_Alias TCH = /usr/bin/sudo -u tech -s : command alias, this is the command you use to switch users
  - YOURLOGINUSER ALL = (ADMINUSERNAME) TCH,/bin/bash : your user who you use only to log into the server, can only use sudo in the name of the admin user, and can execute only two commands, switch to the admin user and start a bash shell for the admin user.
 
+This won't save you from smart attackers! The sole purpose of the process to break scripts and buy some time! If you only log in from a secure host and don't share your keys you may never need this, but it's better safe then sorry.
 If you know a better solution, please don't hold it back...
 
 ## SSH 
@@ -496,7 +498,7 @@ TODO: AppArmor/SELinux profile for the beacon chain and validator apps
 
 nftables is a netfilter project that aims to replace the existing {ip,ip6,arp,eb}tables framework. It provides a new packet filtering framework, a new user-space utility (nft), and a compatibility layer for {ip,ip6}tables. It uses the existing hooks, connection tracking system, user-space queueing component, and logging subsystem of netfilter.
 
-Firewalld or SuseFirewall2 - because in general this can only be encountered in - are just pure frontenda which comes with Red Hat/openSUSE. They are not an independent firewall by themself. They only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" or running "nftables only". Let's use nftables only! Much more simple!
+Firewalld or SuseFirewall2 - because in general this can only be encountered in - are just pure frontends which comes with Red Hat/openSUSE. They are not an independent firewall by themself. They only operates by taking instructions, then turning them into nftables rules (formerly iptables), and the nftables rules ARE the firewall. So I have a choice between running "firewalld using nftables" or running "nftables only". Let's use nftables only! Much more simple!
 
 (Note: openSUSE Leap 15.0 introduces firewalld as the new default software firewall, replacing SuSEfirewall2. SuSEfirewall2 has not been removed from openSUSE Leap 15.0 and is still part of the main repository, though not installed by default.)
 
