@@ -13,8 +13,8 @@ Download one of the installer ISOs:
 ## So... How to start???
 Assuming, you made this far and mostly know what we are going to do, first I will show you a simple, manual installation of RHEL8 and after that I will show how to use the automated setup.
 
-### Manual installation
-Download the ISO and boot your machine. This is the first screen you can see. As this is an installation, chose the second option "Installation" from the menu. The second menu entry is the default. The color schema is not the best, keep in mind, you hav to move up one line to start the installation!
+### Manual installation (WIP)
+Download the ISO and boot your machine. This is the first screen you can see. As this is an installation, chose the second option "Install Red Hat Enterprise Linux 8.6" from the menu. The second menu entry is the default, the media test! The color schema is not the best, keep in mind, you have to move up one line to start the installation!
 
 ![img 1](img/01.PNG?raw=true)
 
@@ -34,5 +34,15 @@ Depending which ISO you use you may see different settings. For examlple, using 
 
 ![img 5](img/05-boot.PNG?raw=true)
 
+To use the Red Hat CDN to install your system (using to boot ISO), you must have an active subscription and you must connect to Red Hat first before any other step.
+
 ![img 5](img/05-dvd.PNG?raw=true)
+
+If you use the full dvd, your only mandatory setting is to chose the destination drive.
+
+Whatever ISO you use, you must set the followings:
+ - destination drive and partitions
+ - network settings
+ - root account
+ - software selection (keep it minimal!!!)
 
