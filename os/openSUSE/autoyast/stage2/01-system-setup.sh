@@ -29,10 +29,10 @@ ln -sf /usr/share/zoneinfo/Europe/Budapest /etc/localtime
 mkdir -p /tmp/kickstart
 cd /tmp/kickstart
 #git config --global http.sslVerify false
-git clone https://gitlab.com/lyynxxx/stakingnode.git
+git clone https://github.com/lyynxxx/stakingnode.git
 
 ## Auditd
-mv /tmp/kickstart/stakingnode/os/openSUSE/etc/audit/rules.d/audit.rules /etc/audit/rules.d/audit.rules
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/audit/rules.d/audit-hc.rules /etc/audit/rules.d/audit.rules
 chown root:root /etc/audit/rules.d/audit.rules
 chmod 600 /etc/audit/rules.d/audit.rules
 

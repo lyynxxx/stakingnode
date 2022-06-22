@@ -19,7 +19,7 @@ chown -R beacon:beacon /opt/beacon
 
 ## Add service users - Lighthouse validator client
 groupadd validator
-useradd --system -g validator -d /opt/validator --shell /bin/bash validator
+useradd --system -g validator -d /opt/validator --shell /bin/false validator
 mkdir -p /opt/validator/data
 mkdir -p /opt/validator/bin
 cp /opt/tmp/lighthouse /opt/validator/bin/
@@ -47,3 +47,35 @@ chmod 644 /etc/systemd/system/validator.service
 
 ## cleanup
 rm -rf /opt/tmp/*
+
+<< comment
+## Exit validator
+https://lighthouse-book.sigmaprime.io/voluntary-exit.html
+
+lighthouse --network kiln account validator exit --keystore /path/to/keystore --beacon-node http://localhost:5052
+validator@kiln:~> bin/lighthouse --network kiln account validator exit --datadir /opt/validator/data/ --keystore /opt/validator/data/validators/0x87724d8c3869ae540f993302bda2365fe69cf9e82a2d426588aad9b729ceab4179c592c286fd98f6e4e8882a96e3d26b/keystore-m_12381_3600_0_0_0-1647042964.json --beacon-node http://127.0.0.1:5052
+Running account manager for kiln network
+validator-dir path: "/opt/validator/data/validators"
+
+Enter the keystore password for validator in "/opt/validator/data/validators/0x87724d8c3869ae540f993302bda2365fe69cf9e82a2d426588aad9b729ceab4179c592c286fd98f6e4e8882a96e3d26b/keystore-m_12381_3600_0_0_0-1647042964.json":
+
+Password is correct.
+
+Publishing a voluntary exit for validator: 0x87724d8c3869ae540f993302bda2365fe69cf9e82a2d426588aad9b729ceab4179c592c286fd98f6e4e8882a96e3d26b
+
+WARNING: THIS IS AN IRREVERSIBLE OPERATION
+
+WARNING: WITHDRAWING STAKED ETH IS NOT CURRENTLY POSSIBLE
+
+PLEASE VISIT https://lighthouse-book.sigmaprime.io/voluntary-exit.html TO MAKE SURE YOU UNDERSTAND THE IMPLICATIONS OF A VOLUNTARY EXIT.
+Enter the exit phrase from the above URL to confirm the voluntary exit:
+Exit my validator
+Successfully validated and published voluntary exit for validator 0x87724d8c3869ae540f993302bda2365fe69cf9e82a2d426588aad9b729ceab4179c592c286fd98f6e4e8882a96e3d26b
+Voluntary exit has been accepted into the beacon chain, but not yet finalized. Finalization may take several minutes or longer. Before finalization there is a low probability that the exit may be reverted.
+Current epoch: 23130, Exit epoch: 23135, Withdrawable epoch: 23391
+Please keep your validator running till exit epoch
+Exit epoch in approximately 1920 secs
+validator@kiln:~>
+
+
+comment

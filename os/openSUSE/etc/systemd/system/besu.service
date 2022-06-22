@@ -1,5 +1,5 @@
 [Unit]
-Description=Besu ETH client
+Description=Besu ETH Execution Layer
 After=network.target 
 Wants=network.target
 
@@ -16,7 +16,8 @@ Environment="TMP=/opt/besu/tmp"
 Environment="TEMP=/opt/besu/tmp"
 Environment="TMPDIR=/opt/besu/tmp"
 Environment="JAVA_OPTS=-Djava.io.tmpdir=/opt/besu/tmp -Dio.netty.native.workdir=/opt/besu/tmp"
-ExecStart=/opt/besu/bin/besu --data-storage-format=BONSAI --data-path="/opt/besu/data" --rpc-http-enabled=true --rpc-http-host="127.0.0.1" --p2p-enabled=true --Xmerge-support=true --metrics-enabled=true --metrics-host=0.0.0.0 --network=SEPOLIA
+Environment="JAVA_HOME=/opt/jdk/jdk-18.0.1.1"
+ExecStart=/opt/besu/bin/besu --data-storage-format=BONSAI --data-path="/opt/besu/data" --rpc-http-enabled=true --rpc-http-host="127.0.0.1" --p2p-enabled=true --Xmerge-support=true --metrics-enabled=true --metrics-host=127.0.0.1 --network=MAINNET
 
 InaccessibleDirectories=/home /var /root
 ReadOnlyDirectories=/etc /usr

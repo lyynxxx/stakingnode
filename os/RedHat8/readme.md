@@ -8,7 +8,7 @@ The use cases for Red Hat Enterprise Linux have been expanded in the Red Hat Dev
 
 Download one of the installer ISOs:
  - Red Hat Enterprise Linux 8.6 Boot ISO
- - Red Hat Enterprise Linux 8.6 Binary DVD 
+ - Red Hat Enterprise Linux 8.6 Binary DVD (recommended)
 
 ## So... How to start???
 Assuming, you made this far and mostly know what we are going to do, first I will show you a simple, manual installation of RHEL8 and after that I will show how to use the automated setup.
@@ -38,11 +38,7 @@ To use the Red Hat CDN to install your system (using to boot ISO), you must have
 
 ![img 5](img/05-dvd.PNG?raw=true)
 
-If you use the full dvd, your only mandatory setting is to chose the destination drive.
+If you use the full dvd, your only mandatory setting is to chose the destination drive and setup partitions. The full dvd ISO is  recommended, as during the installation you don't have to worry about your subscription, RHN, etc. If you missconfigure your partitions, you can start over and don't have to clean up your registered systems on the Red Hat Customer Portal as the installation itself won't register the system, you must register it after the installation.
 
-Whatever ISO you use, you must set the followings:
- - destination drive and partitions
- - network settings
- - root account
- - software selection (keep it minimal!!!)
+
 
