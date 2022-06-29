@@ -25,7 +25,8 @@ systemctl enable geth
 
 ## Prune: 
 ## switch the beacon chain to Infura and stop geth, then:
-## su - geth -s /bin/bash -c "/opt/goethereum/bin/geth --datadir /opt/goethereum/data snapshot prune-state"
+## Don't forget to increase open files limits if not set in /etc/security/limits !!!! otherwise prune will crash and you can resync from zero...
+## su - geth -s /bin/bash -c "ulimit -n 5120 && /opt/goethereum/bin/geth --datadir /opt/goethereum/data snapshot prune-state"
 
 ## FW:
 ## nft add rule inet my_table my_tcp_chain tcp dport 30303 counter accept
