@@ -1,11 +1,12 @@
-## Cloud-init
-Biggest change is preseed and kickstart files are deprecated in favor of cloud-init. Using ks=http://example.com/install.ks on boot command requires using the legacy-server image! Alternate install is deprecated, renamed to legacy-server install and all installs are supposed to use the full install iso.
+## Autoinstall
+The server installer for 20.04 supports a new mode of operation: automated installation, autoinstallation for short. You might also know this feature as unattended or handsoff or preseeded installation.
 
-It is still possible to use kickstart files. Keep in mind Canonical is making it clear that it's going away soon so may want to get used to the new installer.
+Autoinstallation lets you answer all those configuration questions ahead of time with an autoinstall config and lets the installation process run without any interaction.
 
-### Basic usage
-Create a path for a given install type on a webserver, create an empty meta-data file in that directory.
-Enter the following at end of command, replacing the URL with the address to where the above files are located.
-Copy one of the user-data files to that directory and make sure it is named user-data.
-Boot from Ubuntu 20.04 ISO.
-    autoinstall ds=nocloud-net;s=http://example.com/vm/
+The autoinstall config is provided via cloud-init configuration, which is almost endlessly flexible. In most scenarios the easiest way will be to provide user-data via the nocloud data source.
+
+Introduction: https://ubuntu.com/server/docs/install/autoinstall
+Reference: https://ubuntu.com/server/docs/install/autoinstall-reference
+
+## Create custom ISO for configs:
+https://dustinspecker.com/posts/ubuntu-autoinstallation-virtualbox/
