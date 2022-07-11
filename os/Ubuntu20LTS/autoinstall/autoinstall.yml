@@ -1,0 +1,234 @@
+#cloud-config
+autoinstall:
+  source:
+    source: ubuntu-minimal
+    search_drivers: false
+  apt:
+    disable_components: []
+    geoip: true
+    preserve_sources_list: false
+    primary:
+    - arches:
+      - amd64
+      - i386
+      uri: http://hu.archive.ubuntu.com/ubuntu
+    - arches:
+      - default
+      uri: http://ports.ubuntu.com/ubuntu-ports
+  drivers:
+    install: false
+  identity:
+    hostname: test.vm
+    password: $6$l9QXpP/Uy19Ve7vl$9Ysm.Wn/M9uldfBSp0EpTwzgpoQqdmJROLhNiK3TIDVwCqpJ0uofnXZCTqHd1IbRZM3beZPEJgDEMusQdA5C6.
+    realname: lyynxxx
+    username: lyynxxx
+  kernel:
+    package: linux-generic
+  keyboard:
+    layout: us
+    toggle: null
+    variant: ''
+  locale: en_US.UTF-8
+  network:
+    network:
+      ethernets:
+        enwild:
+          match:
+            name: en*
+          addresses: 
+            - 192.168.10.119/24
+          dhcp4: false
+          gateway4: 192.168.10.1
+          nameservers:
+            addresses:
+              - 192.168.10.1
+      version: 2
+  ssh:
+    allow-pw: false
+    authorized-keys: [ 'ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAsCaKUzXes0z4WMqY8tQ9PsTEFmYVIyj7nYd4F9iZXSHZfDv6AbyCudGVXHdrdAe4VnMmoWVg6j8k546KQzFZ3bQl5UJdWrqulwCvFrH8yEyouqmA6OeSSAz7ALG85FBYiVWVKWrlzLqAIT/Gn+Ud57Pu3d4OowH00EXqksKdeux/eT+nyGuC7Je2ecvXLqETOhOJDhAicZf8SEcu5Rsbz7dEqZPnXC+4zfibqDuldzKDEkYL4Pyc4mcG+F15yxmW0OyjMLUI93kcgtmwXVKRPV2k0ceuqa7a3zlhbwae/ofgC7AwsUBZYdxxSfxmkGIXZYfoaN1PxiXj+aiMFdis5w== tech-nopriv' ]
+    install-server: true
+  storage:
+    config:
+## Create a partition table on the disk
+    - ptable: gpt
+      path: /dev/sda
+      wipe: superblock
+      preserve: false
+      name: ''
+      grub_device: true
+      type: disk
+      id: disk-sda
+## First partition for bootloader
+    - device: disk-sda
+      size: 1M
+      flag: bios_grub
+      number: 1
+      preserve: false
+      grub_device: false
+      type: partition
+      id: partition-0
+## Second partition for /boot
+    - device: disk-sda
+      size: 300M
+      wipe: superblock
+      flag: ''
+      number: 2
+      preserve: false
+      grub_device: false
+      type: partition
+      id: partition-1
+## Filesystem for /boot
+    - fstype: xfs
+      volume: partition-1
+      preserve: false
+      type: format
+      id: format-0
+## Third partition for LVM Volume Group
+    - device: disk-sda
+      size: -1
+      wipe: superblock
+      flag: ''
+      number: 3
+      preserve: false
+      grub_device: false
+      type: partition
+      id: partition-2
+## Add partition to Volume Group
+    - name: vg00
+      devices:
+      - partition-2
+      preserve: false
+      type: lvm_volgroup
+      id: lvm_volgroup-0
+##########################################################################
+## Define Logical Volume for tmp
+    - name: lv-tmp
+      volgroup: lvm_volgroup-0
+      size: 1G
+      wipe: superblock
+      preserve: false
+      type: lvm_partition
+      id: lvm_tmp
+## Define filesystem for tmp
+    - fstype: xfs
+      volume: lvm_tmp
+      preserve: false
+      type: format
+      id: format-tmp
+## Mount root
+    - path: /tmp
+      device: format-tmp
+      type: mount
+      id: mount-tmp
+##########################################################################
+## Define Logical Volume for var
+    - name: lv-var
+      volgroup: lvm_volgroup-0
+      size: 3G
+      wipe: superblock
+      preserve: false
+      type: lvm_partition
+      id: lvm_var
+## Define filesystem for var
+    - fstype: xfs
+      volume: lvm_var
+      preserve: false
+      type: format
+      id: format-var
+## Mount root
+    - path: /var
+      device: format-var
+      type: mount
+      id: mount-var
+##########################################################################
+## Define Logical Volume for usr
+    - name: lv-usr
+      volgroup: lvm_volgroup-0
+      size: 3G
+      wipe: superblock
+      preserve: false
+      type: lvm_partition
+      id: lvm_usr
+## Define filesystem for usr
+    - fstype: xfs
+      volume: lvm_usr
+      preserve: false
+      type: format
+      id: format-usr
+## Mount root
+    - path: /usr
+      device: format-usr
+      type: mount
+      id: mount-usr
+##########################################################################
+## Define Logical Volume for root
+    - name: lv-root
+      volgroup: lvm_volgroup-0
+      size: 5G
+      wipe: superblock
+      preserve: false
+      type: lvm_partition
+      id: lvm_root
+## Define filesystem for root
+    - fstype: xfs
+      volume: lvm_root
+      preserve: false
+      type: format
+      id: format-root
+## Mount root
+    - path: /
+      device: format-root
+      type: mount
+      id: mount-root
+##########################################################################
+## Define Logical Volume for opt
+    - name: lv-opt
+      volgroup: lvm_volgroup-0
+      size: 1G
+      wipe: superblock
+      preserve: false
+      type: lvm_partition
+      id: lvm_opt
+## Define filesystem for opt
+    - fstype: xfs
+      volume: lvm_opt
+      preserve: false
+      type: format
+      id: format-opt
+## Mount root
+    - path: /opt
+      device: format-opt
+      type: mount
+      id: mount-opt
+##########################################################################
+## Mount /boot
+    - path: /boot
+      device: format-0
+      type: mount
+      id: mount-0
+
+  updates: security
+  version: 1
+
+  late-commands:
+#  - curtin in-target --target=/target -- apt update
+  - curtin in-target --target=/target -- sed -i 's/GRUB_TIMEOUT=0/GRUB_TIMEOUT=6/' /etc/default/grub
+#  - curtin in-target --target=/target -- apt upgrade -y
+  - curtin in-target --target=/target -- apt install -y mc git nftables
+  - curtin in-target --target=/target -- lvextend -l 95%FREE /dev/vg00/lv-opt
+  - curtin in-target --target=/target -- xfs_growfs /opt
+  - mkdir -p /target/tmp/kickstart
+  - git clone https://github.com/lyynxxx/stakingnode.git /target/tmp/kickstart
+  - cat /target/tmp/kickstart/os/RedHat8/etc/sysctl.d/99-sysctl.conf > /target/etc/sysctl.conf
+  - cat /target/tmp/kickstart/os/RedHat8/etc/systemd/system/nftables.service > /target/etc/systemd/system/nftables.service
+  - cat /target/tmp/kickstart/os/RedHat8/etc/ssh/sshd_config > /target/etc/ssh/sshd_config
+  - chown root:root /target/etc/ssh/sshd_config
+  - chmod 640 /target/etc/ssh/sshd_config
+  - cat /target/tmp/kickstart/os/RedHat8/etc/sysconfig/nftables.conf > /target/etc/nftables.conf
+  - cat /target/tmp/kickstart/os/RedHat8/etc/systemd/system/nftables.service > /target/etc/systemd/system/nftables.service
+  - chown root:root /target/etc/nftables.conf
+  - chmod 600 /target/etc/nftables.conf
+  - chown root:root /target/etc/systemd/system/nftables.service
+  - chmod 644 /target/etc/nftables.conf
+  - curtin in-target --target=/target -- systemctl enable nftables
+
