@@ -1,4 +1,4 @@
-# Installation of openSuSE Leap 15.3
+# Installation of openSuSE Leap 15.4
 ##### Please read carefully before you would jump into anything directly or even break an already working system!!! Also feel free to correct me if you know better ways, I'm always happy to learn new things (mailto: lyynxxx@gmail.com).
 
 A regular installation of openSUSE Leap is semi-automated by default. The user is prompted to select the necessary information at the beginning of the installation (usually language only). YaST then generates a proposal for the underlying system depending on different factors and system parameters. Usually - and especially for new systems - such proposal can be used to install the system. The steps following the proposal are fully automated.
@@ -9,7 +9,7 @@ AutoYaST is not an automated GUI system. This means that usually many screens wi
 
 Using AutoYaST I can spin up a new system faster, if I need a new validator or I have to rebuild my validator in a new environment, maybe with a different client.
 
-Download installer: [openSUSE Leap 15.3 Network Installer from the official site](https://get.opensuse.org/leap/15.3/)
+Download installer: [openSUSE Leap 15.3 Network Installer from the official site](https://get.opensuse.org/leap/15.4/)
 I prefer to use the Network Installer, but you can use the offline image too.
 
 ## So... How to start???

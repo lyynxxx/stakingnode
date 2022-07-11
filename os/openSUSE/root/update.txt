@@ -1,0 +1,25 @@
+System upgrade
+(https://en.opensuse.org/SDB:System_upgrade)
+
+
+This page explains how to run a series of command line steps to live upgrade your system to the latest version of openSUSE. A live upgrade from the prior version is officially supported. This allows to perform a complete operating system upgrade in place, without reloading everything from scratch. 
+
+Update system to the latest packages
+#zypper ref
+#zypper up
+
+Update the repos
+Check if your Leap repos defined in /etc/zypp/repos.d/ are using the $releasever variable already. If they are still hard-coded with a particular Leap version number, then you need to modify them first. For example, assuming your current version is Leap 15.3, then this can be done with.
+
+#sed -i 's/15.3/${releasever}/g' /etc/zypp/repos.d/*.repo
+
+Refresh with the new repos
+Switch and refresh all repositories to 15.4
+#zypper --releasever=15.4 refresh
+
+Execute the full distribution upgrade
+#zypper --releasever=15.4 dup
+
+Once the dup is finished, openSUSE sets the releasever variable to the new version
+
+#reboot
