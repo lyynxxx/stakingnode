@@ -1,0 +1,53 @@
+lyynxxx@goerli:/opt/tmp/eth2deposit-cli-256ea21-linux-amd64> ./deposit new-mnemonic
+Please choose your mnemonic language (chinese_simplified, chinese_traditional, czech, english, italian, korean, portuguese, spanish) [english]:
+Please choose how many validators you wish to run: 1
+Please choose the (mainnet or testnet) network/chain name (mainnet, pyrmont, prater) [mainnet]: prater
+Type the password that secures your validator keystore(s):   ---------------------------------------------------Jelszo123!%/
+Repeat for confirmation:
+This is your seed phrase. Write it down and store it safely, it is the ONLY way to retrieve your deposit.
+
+
+inch month quit rebel addict excuse drive ball eight result slim month sphere equip worry weather butter provide cake pencil ugly essay coach margin
+
+
+Press any key when you have written down your mnemonic.
+Please type your mnemonic (separated by spaces) to confirm you have written it down
+
+: inch month quit rebel addict excuse drive ball eight result slim month sphere equip worry weather butter provide cake pencil ugly essay coach margin
+
+
+                  #####     #####
+                ##     #####     ##
+    ###         ##   #######     #########################
+    ##  ##      #####               ##                   ##
+    ##     #####                 ##                       ##
+    ##     ##                     ##                      ###
+   ########                        ##                     ####
+   ##        ##   ###         #####                       #####
+   #                          ##                         # #####
+   #                            #                        #  #####
+   ##                             ##                    ##
+   ##                              ##                   ##
+   ##             ###              ##                   ##
+   ###############                 ##                   ##
+   ###               ##                                 ##
+      #############################                    ##
+                     ##                             ###
+                     #######     #################     ###
+                     ##   ## ##        ##   ##    ###
+                     ##############          #############
+
+Creating your keys.
+Creating your keys:               [####################################]  1/1
+Creating your keystores:          [####################################]  1/1
+Creating your depositdata:        [####################################]  1/1
+Verifying your keystores:         [####################################]  1/1
+Verifying your deposits:          [####################################]  1/1
+
+Success!
+Your keys can be found at: /opt/tmp/eth2deposit-cli-256ea21-linux-amd64/validator_keys
+
+
+Press any key.
+
+
