@@ -33,48 +33,12 @@ cp -a /opt/tmp/teku-$LATEST/bin/teku /opt/teku/bin/
 cp -a /opt/tmp/teku-$LATEST/lib /opt/teku/
 chown -R teku:teku /opt/teku
 
-cat > /etc/systemd/system/teku.service << EOF
-[Unit]
-Description=Teku ETH Client
-After=network.target
-
-[Service]
-Type=simple
-User=teku
-Restart=always
-RestartSec=5
-LimitNOFILE=5120
-LimitNPROC=5120
-Environment="JAVA_OPTS=-Xmx4g -Djava.io.tmpdir=/opt/teku/tmp -Dio.netty.native.workdir=/opt/teku/tmp"
-Environment="JAVA_HOME=/opt/jdk/jdk-18.0.1.1"
-Environment="TMP=/opt/teku/tmp"
-Environment="TEMP=/opt/teku/tmp"
-Environment="TMPDIR=/opt/teku/tmp"
-ExecStart=/opt/teku/bin/teku --network=prater --ee-endpoint=http://127.0.0.1:8551 --ee-jwt-secret-file "/opt/goethereum/jwtsecret" --data-base-path=/opt/teku/data --metrics-enabled --rest-api-enabled --validator-keys=/opt/teku/validators/keys:/opt/teku/validators/pwds --validators-graffiti="Mom's Old-Fashioned Robot Oil" --validators-proposer-default-fee-recipient 0x452D545Ea9Fcf6564370Ae418bcE49404994Bd3f 
-InaccessibleDirectories=/home /var
-ReadOnlyDirectories=/etc /usr
-PrivateTmp=yes
-NoNewPrivileges=yes
-PrivateDevices=true
-ProtectControlGroups=true
-ProtectHome=true
-ProtectKernelTunables=true
-ProtectSystem=full
-RestrictSUIDSGID=true
-
-[Install]
-WantedBy=multi-user.target
-
-EOF
-
-
----------------
 
 
 ## Limits:
 
-## echo "teku soft nofile 100000" > /etc/security/limits.d/teku.conf
-## echo "teku hard nofile 100000" >> /etc/security/limits.d/teku.conf
+echo "teku soft nofile 100000" > /etc/security/limits.d/teku.conf
+echo "teku hard nofile 100000" >> /etc/security/limits.d/teku.conf
 
 
 ## FW:
