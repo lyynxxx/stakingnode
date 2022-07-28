@@ -9,10 +9,10 @@ mkdir -p /opt/goethereum/data
 mkdir -p /opt/goethereum/data-ancient
 
 cd /opt/goethereum
-curl https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.19-23bee162.tar.gz --output geth-linux-amd64-1.10.19-23bee162.tar.gz
-tar xf geth-linux-amd64-1.10.19-23bee162.tar.gz
-mv geth-linux-amd64-1.10.19-23bee162/geth /opt/goethereum/bin/
-rm -rf geth-linux-amd64-1.10.19-23bee162*
+curl https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.20-8f2416a8.tar.gz --output geth-linux-amd64-1.10.20-8f2416a8.tar.gz
+tar xf geth-linux-amd64-1.10.20-8f2416a8.tar.gz
+mv geth-linux-amd64-1.10.20-8f2416a8/geth /opt/goethereum/bin/
+rm -rf geth-linux-amd64-1.10.20-8f2416a8*
 chmod 755 /opt/goethereum
 chown -R geth:geth /opt/goethereum
 
@@ -28,7 +28,12 @@ systemctl enable geth
 ## Don't forget to increase open files limits if not set in /etc/security/limits !!!! otherwise prune will crash and you can resync from zero...
 ## su - geth -s /bin/bash -c "ulimit -n 5120 && /opt/goethereum/bin/geth --datadir /opt/goethereum/data snapshot prune-state"
 
+## Limits:
+
+## echo "geth soft nofile 100000" > /etc/security/limits.d/geth.conf
+## echo "geth hard nofile 100000" >> /etc/security/limits.d/geth.conf
+
 ## FW:
-## nft add rule inet my_table my_tcp_chain tcp dport 30303 counter accept
-## nft add rule inet my_table my_udp_chain udp dport 30303 counter accept
+## nft add rule inet my_table tcp_chain tcp dport 30303 counter accept
+## nft add rule inet my_table udp_chain udp dport 30303 counter accept
 ## nft list ruleset > /etc/sysconfig/nftables.conf

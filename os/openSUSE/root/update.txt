@@ -23,3 +23,4 @@ Execute the full distribution upgrade
 Once the dup is finished, openSUSE sets the releasever variable to the new version
 
 #reboot
+
