@@ -1,50 +1,37 @@
 MY_INDEX=("21820" "352969")
 
-check_proposals() {
+
+check_proposal_duties() {
 
 CURR_EPOCH=$(curl -s -X GET "https://beaconcha.in/api/v1/epoch/latest" -H  "accept: application/json"  | jq .data.epoch)
 CURR_EPOCH_PROPOSERS=$(curl -s -X GET "http://localhost:5052/eth/v1/validator/duties/proposer/$CURR_EPOCH" -H  "accept: application/json"  | jq .)
 NEXT_EPOCH_PROPOSERS=$(curl -s -X GET "http://localhost:5052/eth/v1/validator/duties/proposer/$((CURR_EPOCH+1))" -H  "accept: application/json"  | jq .)
-NEXT_2EPOCH_PROPOSERS=$(curl -s -X GET "http://localhost:5052/eth/v1/validator/duties/proposer/$((CURR_EPOCH+2))" -H  "accept: application/json"  | jq .)
 
-echo "-----------Block proposers in epoch ${CURR_EPOCH} "
+echo "--Checking block proposal duties in epoch ${CURR_EPOCH} "
 	for (( i=0; i<32; i++ )); do
 		VAL=$( echo "$CURR_EPOCH_PROPOSERS" | jq .data[$i].validator_index | sed 's/\"//g')
 		SLOT=$( echo "$CURR_EPOCH_PROPOSERS" | jq .data[$i].slot | sed 's/\"//g')
 #		echo "Slot: ${SLOT}  :  validator index: ${VAL}"
-		for myvalidator in ${MY_INDEX}; do
+		for myvalidator in ${MY_INDEX[@]}; do
 			if [ "$VAL" == "$myvalidator" ];then
-				echo "---------------------------------Yeah! It's my time to propose a block!"
+				echo "---------------------------------Yeah! It's my time to propose a block! Send some love to validator ${myvalidator}"
 			fi
 		done
 	done
 
-echo "-----------Block proposers in epoch $((CURR_EPOCH +1)) "
+echo "--Checking block proposal duties in epoch $((CURR_EPOCH +1)) "
 	for (( i=0; i<32; i++ )); do
-		VAL=$( echo "$CURR_EPOCH_PROPOSERS" | jq .data[$i].validator_index | sed 's/\"//g')
-		SLOT=$( echo "$CURR_EPOCH_PROPOSERS" | jq .data[$i].slot | sed 's/\"//g')
+		VAL=$( echo "$NEXT_EPOCH_PROPOSERS" | jq .data[$i].validator_index | sed 's/\"//g')
+		SLOT=$( echo "$NEXT_EPOCH_PROPOSERS" | jq .data[$i].slot | sed 's/\"//g')
 #		echo "Slot: ${SLOT}  :  validator index: ${VAL}"
-		for myvalidator in ${MY_INDEX}; do
+		for myvalidator in ${MY_INDEX[@]}; do
 			if [ "$VAL" == "$myvalidator" ];then
-				echo "---------------------------------Yeah! It's my time to propose a block!"
-			fi
-		done
-	done
-
-echo "-----------Block proposers in epoch $((CURR_EPOCH +1)) "
-	for (( i=0; i<32; i++ )); do
-		VAL=$( echo "$NEXT_2EPOCH_PROPOSERS" | jq .data[$i].validator_index | sed 's/\"//g')
-		SLOT=$( echo "$NEXT_2EPOCH_PROPOSERS" | jq .data[$i].slot | sed 's/\"//g')
-#		echo "Slot: ${SLOT}  :  validator index: ${VAL}"
-		for myvalidator in ${MY_INDEX}; do
-			if [ "$VAL" == "$myvalidator" ];then
-				echo "---------------------------------Yeah! It's my time to propose a block!"
+				echo "---------------------------------Yeah! It's my time to propose a block! Send some love to validator ${myvalidator}"
 			fi
 		done
 	done
 
 }
-
 
 check_epochs(){
 GENESIS_TIMESTAMP=1606824023
@@ -77,6 +64,7 @@ echo "-------------------------------------------"
 echo "Currents epoch's first slot: ${CURR_EPOCH_SLOT1}, started at Unix timestamp ${CURR_EPOCH_SLOT1_TIMESTAMP} or ${CURR_EPOCH_SLOT1_TIMESTAMP2DATE} "
 echo "Currents epoch's last slot: ${CURR_EPOCH_SLOT32}, will end at Unix timestamp ${CURR_EPOCH_SLOT32_TIMESTAMP} or ${CURR_EPOCH_SLOT32_TIMESTAMP2DATE}"
 
+echo "" ;echo "" ;echo "" ;
 echo "-------------------------------------------"
 echo "---Following epochs------------------------"
 echo "-------------------------------------------"
@@ -121,25 +109,3 @@ for myvalidator in ${MY_INDEX[@]}; do
 done
 echo "---------------------------------------------"
 }
-
-
-curl -s -X GET http://localhost:5052/eth/v1/beacon/states/finalized/sync_committees?epoch=${CURR_EPOCH}
-
-
-
-
-
-
-
-curl -s -X GET http://localhost:5052/eth/v1/beacon/states/finalized/sync_committees?epoch=${CURR_EPOCH}
-
-curl -s -X GET "http://localhost:5052/eth/v1/beacon/states/head/sync_committees?epoch=$((`curl -s -X GET 'http://localhost:5052/eth/v1/beacon/headers/head' | jq .data.header.message.slot -r` / 32 + 256))"
-
-
-CURR_EPOCH=$(curl -s -X GET "https://beaconcha.in/api/v1/epoch/latest" -H  "accept: application/json"  | jq .data.epoch)
-CURR_START_EPOCH=`expr \( $CURR_EPOCH / 256 \) \* 256`
-
-
-
-curl -s -X POST http://localhost:5051/eth/v1/validator/duties/sync/111111
-curl -X GET "http://localhost:5051/eth/v1/beacon/states/finalized/sync_committees?epoch=111111" -H  "accept: application/json"
