@@ -1,45 +1,16 @@
-MY_INDEX=("21820" "352969")
+MY_INDEX=("x" "x")
 
-
-check_proposal_duties() {
-
-CURR_EPOCH=$(curl -s -X GET "https://beaconcha.in/api/v1/epoch/latest" -H  "accept: application/json"  | jq .data.epoch)
-CURR_EPOCH_PROPOSERS=$(curl -s -X GET "http://localhost:5052/eth/v1/validator/duties/proposer/$CURR_EPOCH" -H  "accept: application/json"  | jq .)
-NEXT_EPOCH_PROPOSERS=$(curl -s -X GET "http://localhost:5052/eth/v1/validator/duties/proposer/$((CURR_EPOCH+1))" -H  "accept: application/json"  | jq .)
-
-echo "--Checking block proposal duties in epoch ${CURR_EPOCH} "
-	for (( i=0; i<32; i++ )); do
-		VAL=$( echo "$CURR_EPOCH_PROPOSERS" | jq .data[$i].validator_index | sed 's/\"//g')
-		SLOT=$( echo "$CURR_EPOCH_PROPOSERS" | jq .data[$i].slot | sed 's/\"//g')
-#		echo "Slot: ${SLOT}  :  validator index: ${VAL}"
-		for myvalidator in ${MY_INDEX[@]}; do
-			if [ "$VAL" == "$myvalidator" ];then
-				echo "---------------------------------Yeah! It's my time to propose a block! Send some love to validator ${myvalidator}"
-			fi
-		done
-	done
-
-echo "--Checking block proposal duties in epoch $((CURR_EPOCH +1)) "
-	for (( i=0; i<32; i++ )); do
-		VAL=$( echo "$NEXT_EPOCH_PROPOSERS" | jq .data[$i].validator_index | sed 's/\"//g')
-		SLOT=$( echo "$NEXT_EPOCH_PROPOSERS" | jq .data[$i].slot | sed 's/\"//g')
-#		echo "Slot: ${SLOT}  :  validator index: ${VAL}"
-		for myvalidator in ${MY_INDEX[@]}; do
-			if [ "$VAL" == "$myvalidator" ];then
-				echo "---------------------------------Yeah! It's my time to propose a block! Send some love to validator ${myvalidator}"
-			fi
-		done
-	done
-
-}
-
-check_epochs(){
+check_duties(){
+CURRENT_TIMESTAMP=$(date +%s)
 GENESIS_TIMESTAMP=1606824023
+DELTA_TIMESTAMP=$(( $CURRENT_TIMESTAMP - $GENESIS_TIMESTAMP ))
 SLOTS_PER_EPOCH=32
 SECONDS_PER_SLOT=12
+EPOCHS_PER_SYNC_COMMITTEE_PERIOD=256
 
-CURR_EPOCH=$(curl -s -X GET "https://beaconcha.in/api/v1/epoch/latest" -H  "accept: application/json"  | jq .data.epoch)
-echo "Current epoch:  " $CURR_EPOCH
+CURR_SLOT=$(( $DELTA_TIMESTAMP / $SECONDS_PER_SLOT ))
+CURR_EPOCH=$(( $CURR_SLOT / 32 ))
+CURR_INDEX=$(( $CURR_SLOT % 32 ))
 
 CURR_EPOCH_SLOT1=$(( CURR_EPOCH * SLOTS_PER_EPOCH ))
 CURR_EPOCH_SLOT32=$(( CURR_EPOCH_SLOT1 +31 ))
@@ -57,29 +28,71 @@ NEXT_2EPOCH_SLOT1=$(( NEXT_EPOCH_SLOT1 +32 ))
 TIME2NEXT_2EPOCH_TIMESTAMP=$(( CURR_EPOCH_SLOT32_TIMESTAMP + 12 + 384))
 TIME2NEXT_2EPOCH_TIMESTAMP2DATE=$(date -d @$TIME2NEXT_2EPOCH_TIMESTAMP)
 
+TIME2NEXTSLOT=$(( x=DELTA_TIMESTAMP % SECONDS_PER_SLOT, SECONDS_PER_SLOT - x ))
+TIME2NEXTEPOCH=$(( x=30 - CURR_INDEX, y=x * SECONDS_PER_SLOT, y + TIME2NEXTSLOT  ))
+
+CURR_EPOCH_PROPOSERS=$(curl -s -X GET "http://localhost:5052/eth/v1/validator/duties/proposer/$CURR_EPOCH" -H  "accept: application/json"  | jq .)
+NEXT_EPOCH_PROPOSERS=$(curl -s -X GET "http://localhost:5052/eth/v1/validator/duties/proposer/$((CURR_EPOCH+1))" -H  "accept: application/json"  | jq .)
+
 
 echo "-------------------------------------------"
-echo "---Current epoch data----------------------"
-echo "-------------------------------------------"
-echo "Currents epoch's first slot: ${CURR_EPOCH_SLOT1}, started at Unix timestamp ${CURR_EPOCH_SLOT1_TIMESTAMP} or ${CURR_EPOCH_SLOT1_TIMESTAMP2DATE} "
-echo "Currents epoch's last slot: ${CURR_EPOCH_SLOT32}, will end at Unix timestamp ${CURR_EPOCH_SLOT32_TIMESTAMP} or ${CURR_EPOCH_SLOT32_TIMESTAMP2DATE}"
+echo "Current time: `date -d @$CURRENT_TIMESTAMP`"
+echo "Current epoch: ${CURR_EPOCH}"
+echo "Current epoch's first slot: ${CURR_EPOCH_SLOT1}, started at Unix timestamp ${CURR_EPOCH_SLOT1_TIMESTAMP} or ${CURR_EPOCH_SLOT1_TIMESTAMP2DATE} "
+echo "Current epoch's last slot: ${CURR_EPOCH_SLOT32}, will end at Unix timestamp ${CURR_EPOCH_SLOT32_TIMESTAMP} or ${CURR_EPOCH_SLOT32_TIMESTAMP2DATE}"
+echo "Remaining time to next slot: ${TIME2NEXTSLOT} sec"
+echo "Remaining time to next epoch: "
+date -d@$TIME2NEXTEPOCH -u +%H:%M:%S
 
-echo "" ;echo "" ;echo "" ;
 echo "-------------------------------------------"
-echo "---Following epochs------------------------"
-echo "-------------------------------------------"
+echo "Next epoch: $(( CURR_EPOCH +1 ))"
 echo "Epoch $((CURR_EPOCH+1)) with slot ${NEXT_EPOCH_SLOT1}, will start at Unix timestamp ${TIME2NEXT_EPOCH_TIMESTAMP} or ${TIME2NEXT_EPOCH_TIMESTAMP2DATE}"
 echo "Epoch $((CURR_EPOCH+2)) with slot ${NEXT_2EPOCH_SLOT1}, will start at Unix timestamp ${TIME2NEXT_2EPOCH_TIMESTAMP} or ${TIME2NEXT_2EPOCH_TIMESTAMP2DATE}"
-}
 
+echo "-------------------------------------------"
+echo "Attestation duties:"
 
-check_sync_duties() {
-EPOCHS_PER_SYNC_COMMITTEE_PERIOD=256
+for myvalidator in ${MY_INDEX[@]}; do
+	CURR_EPOCH_ATTEST_DATA=$(curl -s -X POST "http://localhost:5052/eth/v1/validator/duties/attester/$CURR_EPOCH" -H  "accept: application/json" -H  "Content-Type: application/json" -d "[${myvalidator}]" )
+	CURR_ATTEST_SLOT=$( echo ${CURR_EPOCH_ATTEST_DATA} | jq .data[].slot | sed 's/\"//g')
+	CURR_ATTEST_SLOT_TIMESPAMP=$(( GENESIS_TIMESTAMP + (CURR_ATTEST_SLOT * SECONDS_PER_SLOT) ))
+	CURR_ATTEST_SLOT_TIME=$(date -d @$CURR_ATTEST_SLOT_TIMESPAMP )
+	echo "Attestation dutie for validator ${myvalidator} in current epoch at slot: ${CURR_ATTEST_SLOT} at time: ${CURR_ATTEST_SLOT_TIME} "
 
-CURR_EPOCH=$(curl -s -X GET "https://beaconcha.in/api/v1/epoch/latest" -H  "accept: application/json"  | jq .data.epoch)
-echo "---------------------------------------------"
-echo "Current epoch:  ${CURR_EPOCH}"
-echo "---------------------------------------------"
+	NEXT_EPOCH_ATTEST_DATA=$(curl -s -X POST "http://localhost:5052/eth/v1/validator/duties/attester/$((CURR_EPOCH+1))" -H  "accept: application/json" -H  "Content-Type: application/json" -d "[${myvalidator}]" )
+	NEXT_ATTEST_SLOT=$( echo ${NEXT_EPOCH_ATTEST_DATA} | jq .data[].slot | sed 's/\"//g')
+	NEXT_ATTEST_SLOT_TIMESPAMP=$(( GENESIS_TIMESTAMP + (NEXT_ATTEST_SLOT * SECONDS_PER_SLOT) ))
+	NEXT_ATTEST_SLOT_TIME=$(date -d @$NEXT_ATTEST_SLOT_TIMESPAMP )
+	echo "Attestation dutie for validator ${myvalidator} in current epoch at slot: ${NEXT_ATTEST_SLOT} at time: ${NEXT_ATTEST_SLOT_TIME} "
+done
+
+echo "-------------------------------------------"
+echo "Block proposal duties:"
+echo "--Checking block proposal duties in epoch ${CURR_EPOCH} "
+	for (( i=0; i<32; i++ )); do
+		VAL=$( echo "$CURR_EPOCH_PROPOSERS" | jq .data[$i].validator_index | sed 's/\"//g')
+		SLOT=$( echo "$CURR_EPOCH_PROPOSERS" | jq .data[$i].slot | sed 's/\"//g')
+		for myvalidator in ${MY_INDEX[@]}; do
+			if [ "$VAL" == "$myvalidator" ];then
+				echo "----Yeah! It's my time to propose a block! Send some love to validator ${myvalidator}"
+			fi
+		done
+	done
+
+echo "--Checking block proposal duties in epoch $((CURR_EPOCH +1)) "
+	for (( i=0; i<32; i++ )); do
+		VAL=$( echo "$NEXT_EPOCH_PROPOSERS" | jq .data[$i].validator_index | sed 's/\"//g')
+		SLOT=$( echo "$NEXT_EPOCH_PROPOSERS" | jq .data[$i].slot | sed 's/\"//g')
+		for myvalidator in ${MY_INDEX[@]}; do
+			if [ "$VAL" == "$myvalidator" ];then
+				echo "----Yeah! It's my time to propose a block! Send some love to validator ${myvalidator}"
+			fi
+		done
+	done
+
+echo "-------------------------------------------"
+echo "Check sync duties:"
+
 CURR_SYNC_PERIOD=$(( CURR_EPOCH / EPOCHS_PER_SYNC_COMMITTEE_PERIOD ))
 CURR_SYNC_START_EPOCH=$(( CURR_SYNC_PERIOD * 256 ))
 CURR_SYNC_DUTIES=$(curl -s -X GET http://localhost:5052/eth/v1/beacon/states/finalized/sync_committees?epoch=${CURR_EPOCH})
@@ -107,5 +120,5 @@ for myvalidator in ${MY_INDEX[@]}; do
 		echo "Validator ${myvalidator} :  Nothing to do..."
 	fi
 done
-echo "---------------------------------------------"
+
 }
