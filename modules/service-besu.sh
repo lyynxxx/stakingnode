@@ -46,5 +46,3 @@ systemctl enable besu
 
 ## besu --data-path=/opt/besu/data --genesis-file=/tmp/besu_genesis.json --network-id=1337802
 ## su - besu -s /bin/bash -c "/opt/jdk/jdk-18.0.1.1/bin/java --version"
-
-
