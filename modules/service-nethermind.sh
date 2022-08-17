@@ -85,6 +85,7 @@ https://github.com/ObolNetwork/charon-distributed-validator-node
 https://www.youtube.com/watch?v=4tVLDpp2P0I
 
 ETH rewards and penalities
+https://twitter.com/EthereumPools/status/1542241205597134849
 https://twitter.com/EthereumPools/status/1547619229175668736
 
 mev-boost
