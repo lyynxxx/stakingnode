@@ -26,7 +26,9 @@ systemctl enable geth
 ## Prune: 
 ## switch the beacon chain to Infura and stop geth, then:
 ## Don't forget to increase open files limits if not set in /etc/security/limits !!!! otherwise prune will crash and you can resync from zero...
-## su - geth -s /bin/bash -c "ulimit -n 5120 && /opt/goethereum/bin/geth --datadir /opt/goethereum/data --datadir.ancient /opt/geth-ancient/ancient snapshot prune-state"
+## use screen, so you can disconnect while pruning:
+## screen -L -Logfile /tmp/screen -S prune
+## su - geth -s /bin/bash -c "/opt/goethereum/bin/geth --datadir /opt/goethereum/data --datadir.ancient /opt/geth-ancient/ancient snapshot prune-state"
 
 ## Limits:
 
