@@ -9,10 +9,10 @@ mkdir -p /opt/goethereum/data
 mkdir -p /opt/goethereum/data-ancient
 
 cd /opt/goethereum
-curl https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.23-d901d853.tar.gz --output geth-linux-amd64-1.10.23-d901d853.tar.gz
-tar xf geth-linux-amd64-1.10.23-d901d853.tar.gz
-mv geth-linux-amd64-1.10.23-d901d853/geth /opt/goethereum/bin/
-rm -rf geth-linux-amd64-1.10.23-d901d853*
+curl https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.10.25-69568c55.tar.gz --output geth-linux-amd64-1.10.25-69568c55.tar.gz
+tar xf geth-linux-amd64-1.10.25-69568c55.tar.gz
+mv geth-linux-amd64-1.10.25-69568c55/geth /opt/goethereum/bin/
+rm -rf geth-linux-amd64-1.10.25-69568c55*
 chmod 755 /opt/goethereum
 chown -R geth:geth /opt/goethereum
 
@@ -28,7 +28,7 @@ systemctl enable geth
 ## Don't forget to increase open files limits if not set in /etc/security/limits !!!! otherwise prune will crash and you can resync from zero...
 ## use screen, so you can disconnect while pruning:
 ## screen -L -Logfile /tmp/screen -S prune
-## su - geth -s /bin/bash -c "/opt/goethereum/bin/geth --datadir /opt/goethereum/data --datadir.ancient /opt/geth-ancient/ancient snapshot prune-state"
+## su - geth -s /bin/bash -c "/opt/goethereum/bin/geth --datadir /opt/goethereum/data --datadir.ancient /opt/goethereum/data-ancient snapshot prune-state"
 
 ## Limits:
 

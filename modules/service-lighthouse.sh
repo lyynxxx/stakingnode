@@ -10,12 +10,12 @@ tar -xf lighthouse-$LATEST-x86_64-unknown-linux-gnu-portable.tar.gz
 
 ## Add service users - Lighthouse Beacon Chain
 groupadd beacon
-useradd --system -g beacon -d /opt/beacon-chain --shell /bin/false beacon
-mkdir -p /opt/beacon/data
-mkdir -p /opt/beacon/bin
-cp /opt/tmp/lighthouse /opt/beacon/bin/
-chmod 755 /opt/beacon/bin/lighthouse
-chown -R beacon:beacon /opt/beacon
+useradd --system -g beacon -d /opt/beacon-lh --shell /bin/false beacon
+mkdir -p /opt/beacon-lh/data
+mkdir -p /opt/beacon-lh/bin
+cp /opt/tmp/lighthouse /opt/beacon-lh/bin/
+chmod 755 /opt/beacon-lh/bin/lighthouse
+chown -R beacon:beacon /opt/beacon-lh
 
 ## Add service users - Lighthouse validator client
 groupadd validator

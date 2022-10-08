@@ -6,7 +6,7 @@ sed -i 's/^UMASK.*/UMASK 077/' /etc/login.defs
 
 
 ## securing the console
-echo > /etc/securetty
+echo "console" > /etc/securetty
 systemctl mask debug-shell.service
 systemctl stop debug-shell.service
 systemctl daemon-reload
@@ -28,7 +28,6 @@ ln -sf /usr/share/zoneinfo/Europe/Budapest /etc/localtime
 
 mkdir -p /tmp/kickstart
 cd /tmp/kickstart
-#git config --global http.sslVerify false
 git clone https://github.com/lyynxxx/stakingnode.git
 
 ## Auditd
