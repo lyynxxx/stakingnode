@@ -321,6 +321,7 @@
       <package>e2fsprogs</package>
       <package>apparmor-utils</package>
       <package>apparmor-profiles</package>
+      <package>audit-audispd-plugins</package>
     </packages>
     <remove-packages t="list">
    	  <package>postfix</package>

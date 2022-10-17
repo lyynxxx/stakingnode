@@ -58,24 +58,16 @@
   </general>
   <networking t="map">
     <dns t="map">
-      <dhcp_hostname t="boolean">false</dhcp_hostname>
-      <hostname>vobx-geth</hostname>
+      <dhcp_hostname t="boolean">true</dhcp_hostname>
+      <hostname>eth2</hostname>
       <domain>vm</domain>
-    	<nameservers t="list">
-    	  <nameserver>192.168.10.1</nameserver>
-  	  	  <nameserver>8.8.8.8</nameserver>
-  	    </nameservers>
-  	  <resolv_conf_policy>auto</resolv_conf_policy>
+      <resolv_conf_policy>auto</resolv_conf_policy>
     </dns>
     <interfaces t="list">
       <interface t="map">
-        <bootproto>static</bootproto>
+        <bootproto>dhcp4</bootproto>
         <name>eth0</name>
         <startmode>auto</startmode>
-  		<ipaddr>192.168.10.235</ipaddr>
-  		<netmask>255.255.255.0</netmask>
-  		<network>192.168.10.0</network>
-  		<prefixlen>24</prefixlen>
       </interface>
     </interfaces>
     <ipv6 t="boolean">false</ipv6>
@@ -84,13 +76,6 @@
     <routing t="map">
       <ipv4_forward t="boolean">false</ipv4_forward>
       <ipv6_forward t="boolean">false</ipv6_forward>
-      <routes t="list">
-	    <route>
-	      <destination>default</destination>
-	      <device>eth0</device>
-	      <gateway>192.168.10.1</gateway>
-	    </route>
-      </routes>
     </routing>
   </networking>
   <ntp-client t="map">
@@ -321,7 +306,6 @@
       <package>e2fsprogs</package>
       <package>apparmor-utils</package>
       <package>apparmor-profiles</package>
-      <package>audit-audispd-plugins</package>
     </packages>
     <remove-packages t="list">
    	  <package>postfix</package>
