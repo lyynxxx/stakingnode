@@ -33,7 +33,7 @@ cp -a /opt/tmp/teku-$LATEST/bin/teku /opt/teku/bin/
 cp -a /opt/tmp/teku-$LATEST/lib /opt/teku/
 chown -R teku:teku /opt/teku
 
-mv /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/teku.service /etc/systemd/system/
+cp /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/teku.service /etc/systemd/system/
 chown root:root /etc/systemd/system/teku.service
 chmod 644 /etc/systemd/system/teku.service
 

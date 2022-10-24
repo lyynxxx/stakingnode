@@ -16,7 +16,7 @@ rm -rf geth-linux-amd64-1.10.25-69568c55*
 chmod 755 /opt/goethereum
 chown -R geth:geth /opt/goethereum
 
-mv /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/geth.service /etc/systemd/system/
+cp /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/geth.service /etc/systemd/system/
 chown root:root /etc/systemd/system/geth.service
 chmod 644 /etc/systemd/system/geth.service
 
@@ -32,8 +32,8 @@ systemctl enable geth
 
 ## Limits:
 
-echo "geth soft nofile 10000" > /etc/security/limits.d/geth.conf
-echo "geth hard nofile 10000" >> /etc/security/limits.d/geth.conf
+echo "geth soft nofile 8192" > /etc/security/limits.d/geth.conf
+echo "geth hard nofile 8192" >> /etc/security/limits.d/geth.conf
 
 ## FW:
 ## nft add rule inet my_table tcp_chain tcp dport 30303 counter accept
