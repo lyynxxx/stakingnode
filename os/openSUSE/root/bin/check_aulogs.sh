@@ -10,58 +10,17 @@ else
 	date > $SEM
 fi
 
-echo "Checking sshd configs:"
-RESULT=$(ausearch --node eth.vm -ts recent -k sshd)
-if [ -z "$RESULT" ]; then
-	echo "No result... all fine!"
-else
-	echo "SSH CONFIG FUCKERY DETECTED!!!"
-fi
+## Auditd keys to check
+CHECK_KEYS=( "sshd" "identity" "susp_activity" "sbin_susp" "perm_mod" "file_modification" "file_access" "unauthedfileaccess" "priv_esc" "perm_mod" )
 
-echo "Checking /etc/shadow:"
-RESULT=$(ausearch --node eth.vm -ts recent -k etcshadow)
-if [ -z "$RESULT" ]; then
-	echo "No result... all fine!"
-else
-	echo "/ETC/SHADOW FUCKERY DETECTED!!!"
-fi
+for i in ${CHECK_KEYS[@]};do
+	echo "Check recent audit logs for key: $i"
 
-echo "Checking /etc/passwd:"
-RESULT=$(ausearch --node eth.vm -ts recent -k etcpasswd)
-if [ -z "$RESULT" ]; then
-	echo "No result... all fine!"
-else
-	echo "/ETC/PASSWD FUCKERY DETECTED!!!"
-fi
+	RESULT=$(ausearch --node eth.vm -ts recent -k $i)
+	if [ -z "$RESULT" ]; then
+		echo "No result... all fine!"
+	else
+		echo "SOME FUCKERY DTECTED WITH KEY: $i"
+	fi
 
-echo "Checking susp_activity:"
-RESULT=$(ausearch --node eth.vm -ts recent -k susp_activity)
-if [ -z "$RESULT" ]; then
-	echo "No result... all fine!"
-else
-	echo "SOME FUCKERY DETECTED!!!"
-fi
-
-echo "Checking sbin_susp:"
-RESULT=$(ausearch --node eth.vm -ts recent -k sbin_susp)
-if [ -z "$RESULT" ]; then
-	echo "No result... all fine!"
-else
-	echo "SOME ADVANCED FUCKERY DETECTED!!!"
-fi
-
-echo "Checking perm_mod:"
-RESULT=$(ausearch --node eth.vm -ts recent -k perm_mod)
-if [ -z "$RESULT" ]; then
-	echo "No result... all fine!"
-else
-	echo "SOME PERMISSION FUCKERY DETECTED!!!"
-fi
-
-echo "Checking file_modification:"
-RESULT=$(ausearch --node eth.vm -ts recent -k file_modification)
-if [ -z "$RESULT" ]; then
-	echo "No result... all fine!"
-else
-	echo "SOME FILE MOD FUCKERY DETECTED!!!"
-fi
+done
