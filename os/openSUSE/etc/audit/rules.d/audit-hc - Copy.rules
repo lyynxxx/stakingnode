@@ -343,6 +343,9 @@
 ### bit API.
 -a always,exit -F arch=b32 -S all -k 32bit_api
 
+### Validator spec 
+-w /opt/teku/validators/ -k validator_keys
+
 # Make The Configuration Immutable --------------------------------------------
 
 -e 2
