@@ -38,7 +38,7 @@
 -a always,exclude -F msgtype=AVC
 
 ## Ignore current working directory records
--a always,exclude -F msgtype=CWD
+#-a always,exclude -F msgtype=CWD
 
 ## Cron jobs fill the logs with stuff we normally don't want (works with SELinux)
 -a never,user -F subj_type=crond_t
@@ -112,11 +112,12 @@
 -w /var/spool/cron/ -k cron
 
 ## User, group, password databases
--w /etc/group -p wa -k etcgroup
--w /etc/passwd -p wa -k etcpasswd
--w /etc/gshadow -k etcgroup
--w /etc/shadow -k etcpasswd
--w /etc/security/opasswd -k opasswd
+## Things that affect identity
+-w /etc/group -p wa -k identity
+-w /etc/passwd -p wa -k identity
+-w /etc/gshadow -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/security/opasswd -p wa -k identity
 
 ## Sudoers file changes
 -w /etc/sudoers -p wa -k actions
@@ -206,6 +207,7 @@
 -a always,exit -F arch=b32 -S lsetxattr -F auid>=1000 -F auid!=-1 -k perm_mod
 -a always,exit -F arch=b32 -S removexattr -F auid>=1000 -F auid!=-1 -k perm_mod
 -a always,exit -F arch=b32 -S setxattr -F auid>=1000 -F auid!=-1 -k perm_mod
+
 -a always,exit -F arch=b64 -S chmod  -F auid>=1000 -F auid!=-1 -k perm_mod
 -a always,exit -F arch=b64 -S chown -F auid>=1000 -F auid!=-1 -k perm_mod
 -a always,exit -F arch=b64 -S fchmod -F auid>=1000 -F auid!=-1 -k perm_mod
