@@ -14,6 +14,7 @@ LimitNPROC=8192
 ExecStart=/opt/goethereum/bin/geth --maxpeers 50 --datadir /opt/goethereum/data --http --http.api="engine,eth,web3,net,debug" --ws --http.addr 127.0.0.1 --metrics --metrics.addr 127.0.0.1 --syncmode snap --pprof --authrpc.addr localhost --authrpc.port 8551 --authrpc.vhosts localhost --authrpc.jwtsecret=/opt/goethereum/jwtsecret
 InaccessibleDirectories=/home /var /root
 ReadOnlyDirectories=/etc /usr
+DevicePolicy=closed
 PrivateTmp=yes
 NoNewPrivileges=yes
 PrivateDevices=true
@@ -21,7 +22,14 @@ ProtectControlGroups=true
 ProtectHome=true
 ProtectKernelTunables=true
 ProtectSystem=full
+ProtectProc=invisible
 RestrictSUIDSGID=true
+RestrictNamespaces=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+#Drop all capabilites!!
+CapabilityBoundingSet=
 
 [Install]
 WantedBy=default.target
