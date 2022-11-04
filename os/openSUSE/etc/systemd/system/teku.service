@@ -15,9 +15,9 @@ Environment="TMP=/opt/teku/tmp"
 Environment="TEMP=/opt/teku/tmp"
 Environment="TMPDIR=/opt/teku/tmp"
 ExecStart=/opt/teku/bin/teku --network=prater --ee-endpoint=http://127.0.0.1:8551 --ee-jwt-secret-file "/opt/goethereum/jwtsecret" --data-base-path=/opt/teku/data --metrics-enabled --rest-api-enabled 
-#enable validator:--validator-keys=/opt/teku/validators/keys:/opt/teku/validators/pwds --validators-graffiti="Mom's Old-Fashioned Robot Oil" --validators-proposer-default-fee-recipient 0x452D545Ea9Fcf6564370Ae418bcE49404994Bd3f
 InaccessibleDirectories=/home /var
 ReadOnlyDirectories=/etc /usr
+DevicePolicy=closed
 PrivateTmp=yes
 NoNewPrivileges=yes
 PrivateDevices=true
@@ -25,7 +25,14 @@ ProtectControlGroups=true
 ProtectHome=true
 ProtectKernelTunables=true
 ProtectSystem=full
+ProtectProc=invisible
 RestrictSUIDSGID=true
+RestrictNamespaces=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+#Drop all capabilites!!
+CapabilityBoundingSet=
 
 [Install]
 WantedBy=multi-user.target
@@ -33,3 +40,5 @@ WantedBy=multi-user.target
 
 ## To use checkpoint sync:
 ### --initial-state=https://user:pass@endpoint
+
+#enable validator:--validator-keys=/opt/teku/validators/keys:/opt/teku/validators/pwds --validators-graffiti="Mom's Old-Fashioned Robot Oil" --validators-proposer-default-fee-recipient 0x452D545Ea9Fcf6564370Ae418bcE49404994Bd3f
