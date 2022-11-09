@@ -243,7 +243,7 @@
           <partition_id t="integer">131</partition_id>
           <partition_nr t="integer">3</partition_nr>
           <resize t="boolean">false</resize>
-          <size>268435456</size>
+          <size>367001600</size>
         </partition>
         <partition t="map">
           <create t="boolean">true</create>
