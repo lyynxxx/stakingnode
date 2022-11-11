@@ -47,8 +47,8 @@
       <update_nvram>true</update_nvram>
       <xen_kernel_append>vga=gfx-1024x768x16</xen_kernel_append>
     </global>
-    <loader_type>grub2</loader_type>
-    <!--loader_type>grub2-efi</loader_type-->
+    <!--loader_type>grub2</loader_type-->
+    <loader_type>grub2-efi</loader_type>
   </bootloader>
   
   <general t="map">
