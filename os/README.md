@@ -8,15 +8,15 @@ Security begins even before I start the installation. During the installation pr
 
 | Partition | Size | What for |
 | ------ | ------ | ------ |
-| /boot | 512M | Isolated boot partition for the kernel and the boot config files. I will make this read-only and unlock it only when I need to update the system. Also apply nodev,nosuid,noexec flags. (details later)|
+| /boot | 350M | Isolated boot partition for the kernel and the boot config files. I will make this read-only and unlock it only when I need to update the system. Also apply nodev,nosuid,noexec flags. (details later)|
 | swap | 8-16G | It's like virtual memory. Stuff in RAM used a long time ago but not purged, can be "swapped out" to disk, to free up some memory for other applications that needs more. The system may not even use it, but if I have a bare-metal machine it can't be a problem if I have one. Virtual environments often don't have a swap partition. You have to plan your system's available memory so all the applications can fit in and you don't have to swap a lot/crash with out of memory errors.|
-| / | 2-3G | No need for a lot of space. All the other important stuff is separated and has the necessary free space. I don't have a separate user home directory, as I don't want to create many users. Only one, to log into the system. I will harden this, with noexec (Red Hat only, on SuSE you need a /home partition with noexec), and apply nodev and nosuid! |
+| / | 2-3G | No need for a lot of space for the root. All the other important stuff is separated and has the necessary free space. I don't have a separate user home directory, as I don't want to create many users. Only one, to log into the system. I will harden this, with noexec (Red Hat only, on SuSE you need a /home partition with noexec), and apply nodev and nosuid! |
 | /usr | 3-4G | Here I have all the important system binaries. This will be read-only. If an attacker gains access to the system, often the first thing to do is altering some system binaries, to hide the traces. In this way, it's not possible (at least it will be harder, but the auditing system can detect this kind of activity.) I apply nodev here too, but we need the other grants so can't apply noexec or nosuid.|
 | /var | 2-4G | For system logs and the package manager cache. No need much more space, if something goes wrong and the system writes a lot of logs or some attacker forces the system to write a bunch of logs, our server won't stop as there is no more free space left, all our services can run. This may have the drawbacks that we don't log the suspicious activity, so making too small /var can be a bad practice, but in this situation, 2G will be fine. I apply nodev,nosid,noexec here.|
 | /tmp | 1G | Isolate the temp directory and disable any binary execution too is a must! We won't use this much, but scripts often use /tmp to do fishy stuff, in this way we can break them. This breaks compiling sources too, but we have a workaround for that. I apply nodev,nosuid,noexec here. |
 | /opt | remaining space | This will be the location where we store the application data. I apply here nodev,nosuid. |
 
-In case of UEFI boot/install a separate /boot/efi partition is also needed, in size of 200M and vfat filesystem.
+In case of UEFI boot/install a separate /boot/efi partition is also needed, in size of 8MB and vfat filesystem.
 
 I will use LVM and /opt will grow only for 90% of the available free space during the install process, so if any other logvol needs some love and extra space, I can allocate more with ease.
 

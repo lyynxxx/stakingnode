@@ -1,0 +1,39 @@
+[Unit]
+Description=Sui Full Node
+After=network.target
+
+[Service]
+Type=simple
+User=sui
+Group=sui
+Environment=TMP=/opt/sui/tmp/
+Environment=TEMP=/opt/sui/tmp/
+Environment=TMPDIR=/opt/sui/tmp/
+Environment=PATH=/opt/sui/.cargo/bin
+ExecStart=/opt/sui/.cargo/bin/sui-node --config-path /opt/sui/.sui/sui_config/fullnode.yaml
+Restart=always
+RestartSec=5
+LimitNOFILE=5120
+LimitNPROC=5120
+InaccessibleDirectories=/home /var
+ReadOnlyDirectories=/etc /usr
+SyslogIdentifier=SUI-FULLNODE
+DevicePolicy=closed
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+ProtectProc=invisible
+RestrictSUIDSGID=true
+RestrictNamespaces=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+#Drop all capabilites!!
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target
