@@ -1,0 +1,10 @@
+[Unit]
+Description=Timer for auditd remote log checks (every 10 minutes)
+
+[Timer]
+OnCalendar=*-*-* *:0/10:00
+Persistent=true
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=Check auditd logs
+
+[Service]
+ExecStart=/root/bin/check_aulogs.sh
+
+[Install]
+WantedBy=multi-user.target
