@@ -1,8 +1,9 @@
 #!/bin/bash
 # Netdata
+# 	to manual update just run the export and the sh
 
 ## if /tmp has noexec
-export TMPDIR=/opt/tmp
+export TMPDIR=/opt/tmp/netdata_tmp
 
 cd /opt/tmp
 mkdir /opt/tmp/netdata_tmp
