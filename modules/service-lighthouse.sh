@@ -19,17 +19,17 @@ chown -R beacon:beacon /opt/beacon-lh
 
 ## Add service users - Lighthouse validator client
 groupadd validator
-useradd --system -g validator -d /opt/validator --shell /bin/false validator
-mkdir -p /opt/validator/data
-mkdir -p /opt/validator/bin
-cp /opt/tmp/lighthouse /opt/validator/bin/
-chmod 755 /opt/validator/bin/lighthouse
-chown -R validator:validator /opt/validator
+useradd --system -g validator -d /opt/validator-lh --shell /bin/false validator
+mkdir -p /opt/validator-lh/data
+mkdir -p /opt/validator-lh/bin
+cp /opt/tmp/lighthouse /opt/validator-lh/bin/
+chmod 755 /opt/validator-lh/bin/lighthouse
+chown -R validator:validator /opt/validator-lh
 
 
 ## Copy service files
-cp /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/beacon-lh.service /etc/systemd/system/beacon.service
-cp /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/validator-lh.service /etc/systemd/system/validator.service
+cp /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/beacon-lighthouse.service /etc/systemd/system/beacon.service
+cp /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/validator-lighthouse.service /etc/systemd/system/validator.service
 chown root:root /etc/systemd/system/beacon.service
 chmod 644 /etc/systemd/system/beacon.service
 chown root:root /etc/systemd/system/validator.service
@@ -37,8 +37,8 @@ chmod 644 /etc/systemd/system/validator.service
 
 
 ## FW open
-#nft add rule inet my_table my_tcp_chain tcp dport 9001 counter accept
-#nft add rule inet my_table my_udp_chain udp dport 9001 counter accept
+#nft add rule inet my_table tcp_chain tcp dport 9001 counter accept
+#nft add rule inet my_table udp_chain udp dport 9001 counter accept
 #nft list ruleset > /etc/sysconfig/nftables.conf
 
 ## Import validator key and lock user shell
