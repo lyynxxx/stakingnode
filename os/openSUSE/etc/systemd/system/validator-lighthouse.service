@@ -9,9 +9,10 @@ Restart=always
 RestartSec=5
 LimitNOFILE=5120
 LimitNPROC=5120
-ExecStart=/opt/validator/bin/lighthouse vc --network mainnet --datadir /opt/validator/data --beacon-node "http://localhost:5052" --graffiti "Mom's Old-Fashioned Robot Oil" --suggested-fee-recipient 0x452d545ea9fcf6564370ae418bce49404994bd3f
+ExecStart=/opt/validator-lh/bin/lighthouse vc --network mainnet --datadir /opt/validator-lh/data --beacon-node "http://localhost:5052" --graffiti "Mom's Old-Fashioned Robot Oil" --suggested-fee-recipient 0x452d545ea9fcf6564370ae418bce49404994bd3f
 InaccessibleDirectories=/home /var
 ReadOnlyDirectories=/etc /usr
+DevicePolicy=closed
 PrivateTmp=yes
 NoNewPrivileges=yes
 PrivateDevices=true
@@ -19,7 +20,14 @@ ProtectControlGroups=true
 ProtectHome=true
 ProtectKernelTunables=true
 ProtectSystem=full
+ProtectProc=invisible
 RestrictSUIDSGID=true
+RestrictNamespaces=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+#Drop all capabilites!!
+CapabilityBoundingSet=
 
 [Install]
 WantedBy=multi-user.target
