@@ -84,4 +84,7 @@ Exit epoch in approximately 1920 secs
 validator@kiln:~>
 
 
+# su - validator -s /bin/bash
+$/opt/validator-lh/bin/lighthouse --network mainnet account validator import --keystore /opt/validator-lh/validators.x/keys/keystore_xxxxxx.json --datadir /opt/validator-lh/data
+
 comment
