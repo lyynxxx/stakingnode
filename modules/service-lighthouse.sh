@@ -36,6 +36,12 @@ chown root:root /etc/systemd/system/validator.service
 chmod 644 /etc/systemd/system/validator.service
 
 
+
+## Limits:
+
+echo "beacon soft nofile 8192" > /etc/security/limits.d/beacon.conf
+echo "beacon hard nofile 8192" >> /etc/security/limits.d/beacon.conf
+
 ## FW open
 #nft add rule inet my_table tcp_chain tcp dport 9001 counter accept
 #nft add rule inet my_table udp_chain udp dport 9001 counter accept
