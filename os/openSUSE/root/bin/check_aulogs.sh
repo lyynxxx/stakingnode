@@ -1,8 +1,10 @@
 #!/bin/bash
-# runs on remote auditd vm every 10 min
 
 ALERT=/root/bin/audit_alert.txt
 LOGFILE=/root/bin/audit.log
+TEXTFILE_COLLECTOR_DIR=/opt/node_exporter
+
+
 if ! [ -f $SEM ]; then
         echo "Creating logfile..."
         echo "-------------------------" > $LOGFILE
@@ -42,15 +44,32 @@ for i in ${CHECK_KEYS[@]};do
 
                 FWBANNSPAM=$(grep "EXECVE" audit_alert.txt | grep -v "nft")
                 if [ -z $FWBANNSPAM ]; then
-                    echo "Only some ips banned... not spamming mailbox, but logged activity..."
+                    echo "Only some ips banned... not spamming mailbox, but activity logged..." >> $LOGFILE
                 else
-                    echo "Sending mail..."
+                    echo "Sending mail..." >> $LOGFILE
                     set_mail=TRUE
                 fi
 
         fi
 
 done
+
+echo "Creating tmp file for Prometheus metrc to check audisp is sending auditd logs..."
+umask 222
+touch "$TEXTFILE_COLLECTOR_DIR/auditd_textfcollector.prom.$$"
+echo "##Check is remote server getting logs. 0=no 1=yes, Prometheus will send alert if 0" > $TEXTFILE_COLLECTOR_DIR/auditd_textfcollector.prom.$$
+
+## update texfile collector
+ISTHISEMPTY=$(ausearch --node eth.vm -ts recent)
+if [ -z "$ISTHISEMPTY" ]; then 
+        # the variable is empty, which means the remote node not sending logs here, write "0" as metric to Prometheus
+        echo "audisp_got_recent_logs    0" >> $TEXTFILE_COLLECTOR_DIR/auditd_textfcollector.prom.$$
+else
+        # the variable is not empty, which means the remote node is sending logs here, write "1" as metric to Prometheus
+        echo "audisp_got_recent_logs    1" >> $TEXTFILE_COLLECTOR_DIR/auditd_textfcollector.prom.$$
+fi
+mv "$TEXTFILE_COLLECTOR_DIR/auditd_textfcollector.prom.$$" "$TEXTFILE_COLLECTOR_DIR/auditd_textfcollector.prom"
+
 
 ## if file is not empty, send mail
 if  [ "$set_mail" = "TRUE" ]; then
