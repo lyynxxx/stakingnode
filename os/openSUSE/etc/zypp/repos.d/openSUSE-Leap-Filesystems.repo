@@ -1,0 +1,9 @@
+[openSUSE-Leap-Filesystems]
+name=openSUSE-Leap-Filesystems
+enabled=1
+autorefresh=1
+baseurl=https://download.opensuse.org/repositories/filesystems/$releasever/
+gpgkey=https://download.opensuse.org/repositories/filesystems/$releasever/repodata/repomd.xml.key
+path=/
+type=rpm-md
+keeppackages=0
