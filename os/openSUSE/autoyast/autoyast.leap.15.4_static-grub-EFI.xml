@@ -318,6 +318,7 @@
       <package>nftables</package>
       <package>mailx</package>
       <package>htop</package>
+      <package>vim</package>
       <package>e2fsprogs</package>
       <package>apparmor-utils</package>
       <package>apparmor-profiles</package>
@@ -326,7 +327,6 @@
     <remove-packages t="list">
    	  <package>postfix</package>
    	  <package>firewalld</package>
-   	  <package>SuSEfirewall2</package>
     </remove-packages>
     <patterns t="list">
       <pattern>base</pattern>
