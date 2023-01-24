@@ -1,17 +1,17 @@
 [Unit]
 Description=Ethereum go client
-After=network.target 
+After=network.target
 Wants=network.target
 
 [Service]
-User=geth 
+User=geth
 Group=geth
 Type=simple
 Restart=always
 RestartSec=5
-LimitNOFILE=8192
-LimitNPROC=8192
-ExecStart=/opt/goethereum/bin/geth --maxpeers 50 --datadir /opt/goethereum/data --http --http.api="engine,eth,web3,net,debug" --ws --http.addr 127.0.0.1 --metrics --metrics.addr 127.0.0.1 --syncmode snap --pprof --authrpc.addr localhost --authrpc.port 8551 --authrpc.vhosts localhost --authrpc.jwtsecret=/opt/goethereum/jwtsecret
+LimitNOFILE=5120
+LimitNPROC=5120
+ExecStart=/opt/goethereum/bin/geth --maxpeers 60 --datadir /opt/goethereum/data --datadir.ancient /opt/goethereum/data-ancient/ancient --http --metrics --metrics.addr 127.0.0.1 --syncmode snap --pprof --authrpc.addr 127.0.0.1 --authrpc.port 8551 --authrpc.vhosts * --authrpc.jwtsecret=/opt/goethereum/jwtsecret
 InaccessibleDirectories=/home /var /root
 ReadOnlyDirectories=/etc /usr
 DevicePolicy=closed
