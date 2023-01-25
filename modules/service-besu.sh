@@ -9,7 +9,7 @@
 ## Java 11+. We recommend using at least Java 17 because that will be the minimum requirement in the next Besu version series. You can install Java using brew install openjdk. Alternatively, you can manually install the Java JDK.
 
 cd /opt/tmp
-curl -k https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/22.7.1/besu-22.7.1.tar.gz --output besu-22.7.1.tar.gz
+curl -k https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/22.10.3/besu-22.10.3.tar.gz --output besu-22.10.3.tar.gz
 
 ## OpenJDK 18 GA:
 ## https://jdk.java.net/18/
@@ -28,9 +28,9 @@ mkdir -p /opt/besu/data
 mkdir -p /opt/besu/config
 mkdir -p /opt/besu/tmp
 ## extract binary and libs
-tar -zxf /opt/tmp/besu-22.7.1.tar.gz -C /opt/tmp/
-mv /opt/tmp/besu-22.7.1/* /opt/besu/
-rm -rf /opt/tmp/besu-22.7.1
+tar -zxf /opt/tmp/besu-22.10.3.tar.gz -C /opt/tmp/
+mv /opt/tmp/besu-22.10.3/* /opt/besu/
+rm -rf /opt/tmp/besu-22.10.3
 ## copy compiled binary
 chown -R besu:besu /opt/besu
 mv /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/besu.service /etc/systemd/system/
@@ -39,6 +39,8 @@ chmod 644 /etc/systemd/system/besu.service
 
 systemctl enable besu
 
+echo "besu soft nofile 8192" > /etc/security/limits.d/besu.conf
+echo "besu hard nofile 8192" >> /etc/security/limits.d/besu.conf
 
 ## FW:
 ## nft add rule inet my_table tcp_chain tcp dport 30303 counter accept
