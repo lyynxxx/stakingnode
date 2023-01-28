@@ -12,7 +12,7 @@ LimitNPROC=5120
 ExecStart=/opt/beacon-lh/bin/lighthouse beacon --network mainnet --datadir /opt/beacon-lh/data \
                                                --checkpoint-sync-url=https://mainnet.checkpoint.sigp.io/ \
                                                --execution-endpoints http://127.0.0.1:8551 --execution-jwt /opt/goethereum/jwtsecret \
-                                               --staking --eth1-blocks-per-log-query 500 --disable-upnp --validator-monitor-auto \
+                                               --staking --eth1-blocks-per-log-query 500 --disable-upnp --validator-monitor-auto
                                                ##--metrics --metrics-address 127.0.0.1 --metrics-port 6061
 InaccessibleDirectories=/home /var
 ReadOnlyDirectories=/etc /usr
