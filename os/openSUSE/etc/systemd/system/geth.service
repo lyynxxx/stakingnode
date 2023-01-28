@@ -9,8 +9,8 @@ Group=geth
 Type=simple
 Restart=always
 RestartSec=5
-LimitNOFILE=5120
-LimitNPROC=5120
+LimitNOFILE=8192
+LimitNPROC=8192
 ExecStart=/opt/goethereum/bin/geth --datadir /opt/goethereum/data --datadir.ancient /opt/goethereum/data-ancient \
 								   --http \
 								   --syncmode snap --pprof \
