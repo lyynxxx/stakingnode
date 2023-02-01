@@ -1,9 +1,9 @@
 #!/bin/bash
 
-## Add service users - Geth – Camaron (v1.10.19) 
+## Add service users - Geth – Camaron (v1.10.26) 
 ## Chack latest version and link here: https://geth.ethereum.org/downloads/
 groupadd geth
-useradd --system -g geth -d /opt/goethereum/ --shell /bin/false geth
+useradd --system -g geth --no-create-home --shell /bin/false geth
 mkdir -p /opt/goethereum/bin
 mkdir -p /opt/goethereum/data
 mkdir -p /opt/goethereum/data-ancient
