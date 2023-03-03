@@ -23,19 +23,18 @@ chmod 644 /etc/systemd/system/geth.service
 systemctl enable geth
 
 
-## Prune: 
-## switch the beacon chain to Infura and stop geth, then:
-## Don't forget to increase open files limits if not set in /etc/security/limits !!!! otherwise prune will crash and you can resync from zero...
-## use screen, so you can disconnect while pruning:
-## screen -L -Logfile /tmp/screen -S prune
-## su - geth -s /bin/bash -c "/opt/goethereum/bin/geth --datadir /opt/goethereum/data --datadir.ancient /opt/goethereum/data-ancient snapshot prune-state"
-
 ## Limits:
 
 echo "geth soft nofile 8192" > /etc/security/limits.d/geth.conf
 echo "geth hard nofile 8192" >> /etc/security/limits.d/geth.conf
 
 ## FW:
-## nft add rule inet my_table tcp_chain tcp dport 30303 counter accept
-## nft add rule inet my_table udp_chain udp dport 30303 counter accept
-## nft list ruleset > /etc/sysconfig/nftables.conf
+nft add rule inet my_table tcp_chain tcp dport 30303 counter accept
+nft add rule inet my_table udp_chain udp dport 30303 counter accept
+nft list ruleset > /etc/sysconfig/nftables.conf
+
+## Prune: 
+## In v1.11.0 Pebble was added as a database backend to replace good old LevelDB. Using Pebble, Geth can auto prune in the furure, but until then...
+## use screen, so you can disconnect while pruning:
+## screen -L -Logfile /tmp/screen-geth.log -S prune
+## su - geth -s /bin/bash -c "/opt/goethereum/bin/geth --datadir /opt/goethereum/data --datadir.ancient /opt/goethereum/data-ancient snapshot prune-state"

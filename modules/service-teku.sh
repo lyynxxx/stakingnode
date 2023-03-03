@@ -44,6 +44,10 @@ echo "teku hard nofile 10000" >> /etc/security/limits.d/teku.conf
 
 
 ## FW:
-## nft add rule inet my_table tcp_chain tcp dport 9000 counter accept
-## nft add rule inet my_table udp_chain udp dport 9000 counter accept
-## nft list ruleset > /etc/sysconfig/nftables.conf
+nft add rule inet my_table tcp_chain tcp dport 9000 counter accept
+nft add rule inet my_table udp_chain udp dport 9000 counter accept
+nft list ruleset > /etc/sysconfig/nftables.conf
+
+## Exit:
+## https://docs.teku.consensys.net/HowTo/Voluntary-Exit/
+## /opt/teku/bin voluntary-exit --beacon-node-api-endpoint=http://127.0.0.1:5051 --validator-keys=/opt/teku/validators/keys/validator_1e9f2a.json:/opt/teku/validators/pwds/validator_1e9f2a.txt

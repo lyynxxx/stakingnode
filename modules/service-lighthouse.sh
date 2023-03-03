@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## Download Lighthouse client apps from latest branch
+## Download Lighthouse client apps from latest branch - portable for X99, approx. 20% slower ( https://lighthouse-book.sigmaprime.io/installation-binaries.html )
 mkdir -p /opt/tmp
 cd /opt/tmp
 LATEST=$(curl --silent "https://api.github.com/repos/sigp/lighthouse/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
@@ -43,13 +43,14 @@ echo "beacon soft nofile 8192" > /etc/security/limits.d/beacon.conf
 echo "beacon hard nofile 8192" >> /etc/security/limits.d/beacon.conf
 
 ## FW open
-#nft add rule inet my_table tcp_chain tcp dport 9000 counter accept
-#nft add rule inet my_table udp_chain udp dport 9000 counter accept
-#nft list ruleset > /etc/sysconfig/nftables.conf
+nft add rule inet my_table tcp_chain tcp dport 9000 counter accept
+nft add rule inet my_table udp_chain udp dport 9000 counter accept
+nft list ruleset > /etc/sysconfig/nftables.conf
 
-## Import validator key and lock user shell
+## Import validator key, even with locked shell
+# su - validator -s /bin/bash
 # /opt/validator/bin/lighthouse --network mainnet account validator import --directory /opt/validator/import --datadir /opt/validator/data
-# usermod --shell /bin/false validator
+
 
 ## cleanup
 rm -rf /opt/tmp/*
