@@ -13,7 +13,8 @@ LimitNOFILE=8192
 LimitNPROC=8192
 ExecStart=/opt/goethereum/bin/geth --datadir /opt/goethereum/data --datadir.ancient /opt/goethereum/data-ancient \
   --http --syncmode snap --pprof \
-  --authrpc.addr 127.0.0.1 --authrpc.port 8551 --authrpc.jwtsecret=/opt/goethereum/jwtsecret
+  --authrpc.addr 127.0.0.1 --authrpc.port 8551 --authrpc.jwtsecret=/opt/goethereum/jwtsecret \
+  --db.engine pebble
 ##--metrics --metrics.addr 127.0.0.1
 InaccessibleDirectories=/home /var /root
 ReadOnlyDirectories=/etc /usr
