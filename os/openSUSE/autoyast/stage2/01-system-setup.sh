@@ -73,9 +73,18 @@ systemctl enable nftables
 
 # Zypper repo cleanup
 rm -rf /etc/zypp/repos.d/*.repo
-mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/*.repo /etc/zypp/repos.d/
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-main.repo /etc/zypp/repos.d/
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-nonoss.repo /etc/zypp/repos.d/
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-security.repo /etc/zypp/repos.d/
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-updates.repo /etc/zypp/repos.d/
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-updates-nonoss.repo /etc/zypp/repos.d/
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-updates-backports.repo /etc/zypp/repos.d/
+mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-updates-sle.repo /etc/zypp/repos.d/
+
 chown root:root /etc/zypp/repos.d/*.repo
 chmod 600 /etc/zypp/repos.d/*.repo
+# Delete 0 size files (old repo, used by autoyast installer)
+find /etc/zypp/repos.d/ -type f -size 0 -delete
 
 ## fix home permissions, don't allow the "users" group to see my home dir content
 groupadd lyynxxx
