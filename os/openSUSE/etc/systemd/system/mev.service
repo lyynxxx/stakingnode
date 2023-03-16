@@ -1,0 +1,38 @@
+[Unit]
+Description=mev-boost ethereum mainnet
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=mev
+Group=mev
+Type=simple
+Restart=always
+RestartSec=5
+ExecStart=/opt/mev/bin/mev-boost \
+  -goerli \
+  -min-bid 0.05 \
+  -relay-check \
+  -relay https://0xab78bf8c781c58078c3beb5710c57940874dd96aef2835e7742c866b4c7c0406754376c2c8285a36c630346aa5c5f833@goerli.aestus.live \
+  -relay https://0xb1559beef7b5ba3127485bbbb090362d9f497ba64e177ee2c8e7db74746306efad687f2cf8574e38d70067d40ef136dc@relay-stag.ultrasound.money
+InaccessibleDirectories=/home /var /root
+ReadOnlyDirectories=/etc /usr
+DevicePolicy=closed
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+ProtectProc=invisible
+RestrictSUIDSGID=true
+RestrictNamespaces=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+#Drop all capabilites!!
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target
