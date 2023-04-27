@@ -50,4 +50,7 @@ nft list ruleset > /etc/sysconfig/nftables.conf
 
 ## Exit:
 ## https://docs.teku.consensys.net/HowTo/Voluntary-Exit/
-## /opt/teku/bin voluntary-exit --beacon-node-api-endpoint=http://127.0.0.1:5051 --validator-keys=/opt/teku/validators/keys/validator_1e9f2a.json:/opt/teku/validators/pwds/validator_1e9f2a.txt
+## su - teku -s /bin/bash
+## export JAVA_HOME=/opt/jdk/jdk-18.0.1.1
+## export PATH=$JAVA_HOME/bin:$PATH
+## /opt/teku/bin/teku voluntary-exit --beacon-node-api-endpoint=http://127.0.0.1:5051 --validator-keys=/opt/teku/validators/keys/keystore-m_.json:/opt/teku/validators/pwds/keystore-m_.txt
