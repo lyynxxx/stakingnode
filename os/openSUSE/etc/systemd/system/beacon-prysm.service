@@ -10,8 +10,8 @@ RestartSec=1
 User=beacon
 LimitNOFILE=5120
 LimitNPROC=5120
-Environment="publicIP=$(curl -s v4.ident.me)"
-ExecStart=/opt/beacon-chain/bin/beacon-chain --p2p-max-peers 60 --p2p-host-ip=${publicIP} --datadir=/opt/beacon-chain/data --http-web3provider=http://127.0.0.1:8545 --accept-terms-of-use --log-format=journald
+ExecStart=/opt/prysm-bc/bin/prysm-bc --mainnet --p2p-max-peers 60 --datadir=/opt/prysm-bc/data --execution-endpoint=http://localhost:8551 \
+			--checkpoint-sync-url=https://beaconstate.info --jwt-secret=/opt/goethereum/jwtsecret --accept-terms-of-use --log-format=journald
 InaccessibleDirectories=/home /var
 ReadOnlyDirectories=/etc /usr
 PrivateTmp=yes
