@@ -75,7 +75,6 @@ systemctl enable nftables
 rm -rf /etc/zypp/repos.d/*.repo
 mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-main.repo /etc/zypp/repos.d/
 mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-nonoss.repo /etc/zypp/repos.d/
-mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-security.repo /etc/zypp/repos.d/
 mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-updates.repo /etc/zypp/repos.d/
 mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-updates-nonoss.repo /etc/zypp/repos.d/
 mv /tmp/kickstart/stakingnode/os/openSUSE/etc/zypp/repos.d/openSUSE-Leap-updates-backports.repo /etc/zypp/repos.d/
