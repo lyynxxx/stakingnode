@@ -1,0 +1,8 @@
+#encrypt the content of a txt file
+cat seed.txt | openssl enc -aes-256-cbc -a -md sha512 -pass pass:Jelszo123 -pbkdf2 > seed.txt.enc
+
+#decode encrypted content
+cat seed.txt.enc | openssl enc -d -aes-256-cbc -a -md sha512 -pass pass:Jelszo123 -pbkdf2
+
+# generate QR code from encrypted seed
+cat seed.txt.enc | qrencode -s 3 -l M -o seed.txt.enc.qr.png
