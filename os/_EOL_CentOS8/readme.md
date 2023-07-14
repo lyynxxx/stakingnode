@@ -1,0 +1,3 @@
+EOL ! NOT UPDATED ANY MORE AFTER IBM CLOSED RHEL SOURCES !
+
+No more updates, only the kickstart files for reference, it might still be good for something...

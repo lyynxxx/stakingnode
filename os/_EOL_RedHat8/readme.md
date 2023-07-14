@@ -1,4 +1,4 @@
-# Installation of Red Hat 8.6
+# Installation of Red Hat 8.6 (EOL ! NOT UPDATED ANY MORE AFTER IBM CLOSED RHEL SOURCES ! )
 
 The [Red Hat Developer Subscription for Individuals](https://developers.redhat.com/articles/faqs-no-cost-red-hat-enterprise-linux) is a no-cost offering of the Red Hat Developer program and includes access to Red Hat Enterprise Linux among other Red Hat products. It is a program and an offering designed for individual developers, available through the Red Hat Developer program.
 
