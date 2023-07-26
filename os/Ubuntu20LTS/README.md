@@ -10,3 +10,8 @@ Reference: https://ubuntu.com/server/docs/install/autoinstall-reference
 
 ## Create custom ISO for configs:
 https://dustinspecker.com/posts/ubuntu-autoinstallation-virtualbox/
+
+
+autoinstall ds=nocloud-net;s=http://_gateway:3003/
+autoinstall cloud-config-url=http://192.168.0.2/autoinstall.yaml 
+https://www.molnar-peter.hu/en/ubuntu-jammy-netinstall-pxe.html
