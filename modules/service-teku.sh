@@ -53,4 +53,4 @@ nft list ruleset > /etc/sysconfig/nftables.conf
 ## su - teku -s /bin/bash
 ## export JAVA_HOME=/opt/jdk/jdk-18.0.1.1
 ## export PATH=$JAVA_HOME/bin:$PATH
-## /opt/teku/bin/teku voluntary-exit --beacon-node-api-endpoint=http://127.0.0.1:5051 --validator-keys=/opt/teku/validators/keys/keystore-m_.json:/opt/teku/validators/pwds/keystore-m_.txt
+## /opt/teku/bin/teku voluntary-exit --beacon-node-api-endpoint=http://127.0.0.1:5051 --validator-keys=/opt/teku/validators/keys/keystore-m_12381_3600_1_0_0-1649489984.json:/opt/teku/validators/pwds/keystore-m_12381_3600_1_0_0-1649489984.txt

@@ -1,0 +1,18 @@
+https://github.com/vasi/pixz
+
+Pixz (pronounced pixie) is a parallel, indexing version of xz.
+
+
+ArchLinux:
+pacman -Sy pixz
+
+tar -Ipixz -cf /opt/tmp/nethermind_datadir.tpxz /opt/netherind/.nethermind
+
+
+Extract
+pixz -d nethermind_datadir.tpxz nethermind_datadir.tar
+
+
+Nethermind datadir size (raw):
+Compress time (16 threads): Start: 11:11
+Tarball size:

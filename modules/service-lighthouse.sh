@@ -49,7 +49,7 @@ nft list ruleset > /etc/sysconfig/nftables.conf
 
 ## Import validator key, even with locked shell
 # su - validator -s /bin/bash
-# /opt/validator/bin/lighthouse --network mainnet account validator import --directory /opt/validator/import --datadir /opt/validator/data
+# /opt/validator/bin/lighthouse --network mainnet account validator import --directory /opt/validator-lh/import --datadir /opt/validator-lh/data
 
 
 ## cleanup
@@ -89,3 +89,24 @@ validator@kiln:~>
 $/opt/validator-lh/bin/lighthouse --network mainnet account validator import --keystore /opt/validator-lh/validators.x/keys/keystore_xxxxxx.json --datadir /opt/validator-lh/data
 
 comment
+
+
+/opt/teku/bin/teku slashing-protection export --data-path=/opt/teku/data --to=/opt/tmp/slashing-interchange-format-minimal.json
+/opt/validator-lh/bin/lighthouse account validator slashing-protection import /opt/tmp/slashing-interchange-format-minimal.json --datadir /opt/validator-lh/data
+
+{
+  "metadata" : {
+    "interchange_format_version" : "5",
+    "genesis_validators_root" : "0x4b363db94e286120d76eb905340fdd4e54bfe9f06bf33ff6cf5ad27f511bfe95"
+  },
+  "data" : [ {
+    "pubkey" : "0xade36fbec0b1819aa0947f1c1c8d12d1a4d7d4e4949b0bb0b2a9fe554c75b340a8ca246deb75554cbfe5695061f51fd0",
+    "signed_blocks" : [ {
+      "slot" : "6675956"
+    } ],
+    "signed_attestations" : [ {
+      "source_epoch" : "211547",
+      "target_epoch" : "211548"
+    } ]
+  } ]
+}

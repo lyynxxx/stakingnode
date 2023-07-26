@@ -1,6 +1,6 @@
 #!/bin/bash
 
-## Add service users - Geth – (v1.11.2) 
+## Add service users - Geth – (v1.11.5) 
 ## Chack latest version and link here: https://geth.ethereum.org/downloads/
 groupadd geth
 useradd --system -g geth --no-create-home --shell /bin/false geth
@@ -9,10 +9,10 @@ mkdir -p /opt/goethereum/data
 mkdir -p /opt/goethereum/data-ancient
 
 cd /opt/goethereum
-curl https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.11.2-73b01f40.tar.gz --output geth-linux-amd64-1.11.2-73b01f40.tar.gz
-tar xf geth-linux-amd64-1.11.2-73b01f40.tar.gz
-mv geth-linux-amd64-1.11.2-73b01f40/geth /opt/goethereum/bin/
-rm -rf geth-linux-amd64-1.11.2-73b01f40*
+curl https://gethstore.blob.core.windows.net/builds/geth-linux-amd64-1.11.6-ea9e62ca.tar.gz --output geth-linux-amd64-1.11.6-ea9e62ca.tar.gz
+tar xf geth-linux-amd64-1.11.6-ea9e62ca.tar.gz
+mv geth-linux-amd64-1.11.6-ea9e62ca/geth /opt/goethereum/bin/
+rm -rf geth-linux-amd64-1.11.6-ea9e62ca*
 chmod 755 /opt/goethereum
 chown -R geth:geth /opt/goethereum
 

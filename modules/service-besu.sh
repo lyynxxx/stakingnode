@@ -3,20 +3,23 @@
 
 ## Chack latest version and link here: https://besu.ethereum.org/downloads/
 ## Bonsai engine: https://consensys.net/blog/news/test-staking-ahead-of-the-merge-with-improved-bonsai-tries-state-storage/
+## "We recommend using snap sync with Bonsai for the fastest sync and lowest storage requirements."
 
 ## https://besu.hyperledger.org/en/stable/HowTo/Get-Started/Installation-Options/Install-Binaries/
 ## Hyperledger Besu supports:
-## Java 11+. We recommend using at least Java 17 because that will be the minimum requirement in the next Besu version series. You can install Java using brew install openjdk. Alternatively, you can manually install the Java JDK.
+## Java 11+. We recommend using at least Java 17 because that will be the minimum requirement in the next Besu version series.
 
 cd /opt/tmp
-curl -k https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/22.10.3/besu-22.10.3.tar.gz --output besu-22.10.3.tar.gz
+curl -k https://hyperledger.jfrog.io/artifactory/besu-binaries/besu/23.4.0/besu-23.4.0.tar.gz --output besu-23.4.0.tar.gz
 
-## OpenJDK 18 GA:
-## https://jdk.java.net/18/
+## Java JDK 17 LTS:
+## https://www.oracle.com/java/technologies/downloads/#java17
+## JDK 17 binaries are free to use in production and free to redistribute, at no cost, under the Oracle No-Fee Terms and Conditions.
+## JDK 17 will receive updates under these terms, until September 2024, a year after the release of the next LTS.
 cd /opt/tmp
-curl -k https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_linux-x64_bin.tar.gz --output openjdk-18.0.1.1_linux-x64_bin.tar.gz
+curl -k https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.tar.gz --output jdk-17_linux-x64_bin.tar.gz
 mkdir -p /opt/jdk
-tar -zxf openjdk-18.0.1.1_linux-x64_bin.tar.gz -C /opt/jdk/
+tar -zxf jdk-17_linux-x64_bin.tar.gz -C /opt/jdk/
 chmod -R 755 /opt/jdk
 
 
@@ -28,9 +31,9 @@ mkdir -p /opt/besu/data
 mkdir -p /opt/besu/config
 mkdir -p /opt/besu/tmp
 ## extract binary and libs
-tar -zxf /opt/tmp/besu-22.10.3.tar.gz -C /opt/tmp/
-mv /opt/tmp/besu-22.10.3/* /opt/besu/
-rm -rf /opt/tmp/besu-22.10.3
+tar -zxf /opt/tmp/besu-23.4.0.tar.gz -C /opt/tmp/
+mv /opt/tmp/besu-23.4.0/* /opt/besu/
+rm -rf /opt/tmp/besu-23.4.0
 ## copy compiled binary
 chown -R besu:besu /opt/besu
 mv /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/besu.service /etc/systemd/system/
@@ -39,8 +42,10 @@ chmod 644 /etc/systemd/system/besu.service
 
 systemctl enable besu
 
-echo "besu soft nofile 8192" > /etc/security/limits.d/besu.conf
-echo "besu hard nofile 8192" >> /etc/security/limits.d/besu.conf
+echo "besu soft nofile 12000" > /etc/security/limits.d/besu.conf
+echo "besu hard nofile 12000" >> /etc/security/limits.d/besu.conf
+
+## Good to know: --Xplugin-rocksdb-high-spec-enabled allows Besu increased database performance. Recommended for machines with 16GB of RAM or more.
 
 ## FW:
 ## nft add rule inet my_table tcp_chain tcp dport 30303 counter accept
