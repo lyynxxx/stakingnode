@@ -19,8 +19,8 @@ ExecStart=/opt/teku/bin/teku --network=mainnet --ee-endpoint=http://127.0.0.1:85
 ##--validator-keys=/opt/teku/validators/keys:/opt/teku/validators/pwds --validators-graffiti="Mom's Old-Fashioned Robot Oil" --validators-proposer-default-fee-recipient 0x452D545Ea9Fcf6564370Ae418bcE49404994Bd3f
 
 ##--validators-builder-registration-default-enabled=true --builder-endpoint="http://127.0.0.1:18550"
-InaccessibleDirectories=/home /var
-ReadOnlyDirectories=/etc /usr
+InaccessibleDirectories=/home /root
+ReadOnlyDirectories=/etc /usr /var
 DevicePolicy=closed
 PrivateTmp=yes
 NoNewPrivileges=yes

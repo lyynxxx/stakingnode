@@ -7,7 +7,7 @@ After=network-online.target
 User=node_exporter
 Group=node_exporter
 Type=simple
-ExecStart=/usr/local/bin/node_exporter --collector.systemd --collector.disable-defaults --collector.cpu --collector.filesystem --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|run|boot)($|/) --collector.loadavg --collector.meminfo --log.level=error --collector.textfile --collector.textfile.directory=/opt/node_exporter
+ExecStart=/usr/local/bin/node_exporter --collector.systemd --collector.disable-defaults --collector.cpu --collector.filesystem --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|run|boot|tmp)($|/) --collector.loadavg --collector.meminfo --log.level=error --collector.textfile --collector.textfile.directory=/opt/node_exporter
 DevicePolicy=closed
 PrivateTmp=yes
 NoNewPrivileges=yes
