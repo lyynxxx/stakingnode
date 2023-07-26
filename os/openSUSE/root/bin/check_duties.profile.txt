@@ -1,4 +1,4 @@
-MY_INDEX=("x" "x")
+MY_INDEX=("")
 
 check_duties(){
 CURRENT_TIMESTAMP=$(date +%s)
