@@ -1,0 +1,29 @@
+[DEFAULT]
+# Ban IP/hosts for 24 hour ( 24h*3600s = 86400s):
+bantime = 86400
+backend = systemd
+
+# An ip address/host is banned if it has generated "maxretry" during the last "findtime" seconds.
+findtime = 600
+maxretry = 3
+
+# "ignoreip" can be a list of IP addresses, CIDR masks or DNS hosts. Fail2ban
+# will not ban a host which matches an address in this list. Several addresses
+# can be defined using space (and/or comma) separator. For example, add your
+# static IP address that you always use for login such as 103.1.2.3
+ignoreip =
+
+# configure nftables
+banaction = nftables-multiport
+chain     = input
+
+
+# Enable custom sshd protection (failed preauth messages are not present in journal...)
+# Extend findtime and bantine 10x to default
+[sshd]
+enabled  = true
+port     = 2992
+filter   = sshd[mode=aggressive]
+maxretry = 3
+findtime = 6000
+bantime  = 864000

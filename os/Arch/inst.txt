@@ -1,0 +1,111 @@
+#!/bin/bash
+###################
+##
+## Set some device variables
+
+DISK="/dev/vda"
+NIC=eth0
+IPADDR=""
+PREFIX="24"
+GW=""
+NS=""
+
+##Network config
+
+
+ip a flush dev ${NIC}
+ip a add ${IPADDR}/${PREFIX} dev ${NIC}
+ip route add default via ${GW} dev ${NIC}
+echo "nameserver ${NS}" > /etc/resolv.conf
+
+fdisk ${DISK} <<EEOF
+g
+n
+1
+
++350M
+t
+1
+n
+2
+
+
+t
+2
+44
+w
+EEOF
+
+mkfs.fat -F 32 ${DISK}1
+
+pvcreate ${DISK}2
+vgcreate
+vgcreate sys ${DISK}2
+
+lvcreate -L 4G -n swap sys
+lvcreate -L 3G -n usr sys
+lvcreate -L 1G -n tmp sys
+lvcreate -L 3G -n var sys
+lvcreate -l 90%FREE -n root sys
+
+mkfs.xfs -f /dev/arch/root
+mkfs.xfs -f /dev/arch/usr
+mkfs.xfs -f /dev/arch/var
+mkfs.xfs -f /dev/arch/tmp
+mkswap /dev/arch/swap
+
+mount /dev/arch/root /mnt
+mount --mkdir ${DISK}1 /mnt/boot
+mount --mkdir /dev/arch/usr /mnt/usr
+mount --mkdir /dev/arch/var /mnt/var
+mount --mkdir /dev/arch/tmp /mnt/tmp
+swapon /dev/arch/swap
+
+pacstrap -K /mnt base linux linux-firmware grub efibootmgr mc jq git nftables lvm2 chrony openssh xfsprogs fail2ban p7zip
+genfstab -U /mnt >> /mnt/etc/fstab
+
+
+arch-chroot /mnt
+############################################################################################
+## script stops here...
+
+ln -sf /usr/share/zoneinfo/Europe/Budapest /etc/localtime
+hwclock --systohc
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+echo "LC_ALL=C" >> /etc/locale.conf
+locale-gen
+echo "archtereum" > /etc/hostname
+
+sed -i 's/^HOOKS=.*/HOOKS=(base udev usr fsck shutdown lvm2 block filesystems keyboard)/g' /etc/mkinitcpio.conf
+mkinitcpio -P
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+grub-mkconfig -o /boot/grub/grub.cfg
+
+## Chrony config
+echo > /etc/chrony.conf <<EEOF
+server 0.hu.pool.ntp.org iburst
+server 1.hu.pool.ntp.org iburst
+server 2.hu.pool.ntp.org iburst
+serv/er 3.hu.pool.ntp.org iburst
+driftfile /etc/chrony.drift
+rtconutc
+rtcsync
+EEOF
+
+
+pacman-key --init
+pacman-key --populate
+
+/etc/systemd/network/ens3.network
+[Match]
+Name=ens3
+
+[Network]
+Address=x/24
+Gateway=x
+DNS=ys
+
+systemctl enable systemd-networkd
+
+
+echo "export HISTCONTROL=ignorespace" >> /root/.bash_profile
