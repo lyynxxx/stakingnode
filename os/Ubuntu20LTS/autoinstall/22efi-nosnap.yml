@@ -44,7 +44,7 @@ autoinstall:
     config:
 ## Create a partition table on the disk
     - ptable: gpt
-      path: /dev/sda
+      path: /dev/vda
       wipe: superblock
       preserve: false
       name: ''
