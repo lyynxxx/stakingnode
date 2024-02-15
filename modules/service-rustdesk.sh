@@ -1,4 +1,4 @@
-## RustDesk Relay server
+## RustDesk Relay server (Ubuntu/Debian)
 ## https://rustdesk.com/docs/en/self-host/rustdesk-server-oss/install/#set-up-your-own-server-instance-manually
 
 ## Firewall
