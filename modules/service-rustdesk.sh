@@ -12,7 +12,7 @@ apt install curl wget unzip tar dnsutils
 mkdir -p /opt/tmp
 cd /opt/tmp
 LATEST=$(curl --silent "https://api.github.com/repos/rustdesk/rustdesk-server/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
-curl -L https://github.com/rustdesk/rustdesk-server/releases/download/$LATEST/rustdesk-server-linux-amd64.zip
+curl -L https://github.com/rustdesk/rustdesk-server/releases/download/$LATEST/rustdesk-server-linux-amd64.zip --output rustdesk-server-linux-amd64.zip
 
 ## Create service user: rustdesk
 groupadd rustdesk
@@ -80,6 +80,7 @@ EOF
 ## End service file
 
 ## Enable services
+systemctl daemon-reaload
 systemctl enable rustdesksignal.service
 systemctl start rustdesksignal.service
 systemctl enable rustdeskrelay.service
