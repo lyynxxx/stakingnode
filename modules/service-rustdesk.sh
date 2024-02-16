@@ -80,7 +80,7 @@ EOF
 ## End service file
 
 ## Enable services
-systemctl daemon-reaload
+systemctl daemon-reload
 systemctl enable rustdesksignal.service
 systemctl start rustdesksignal.service
 systemctl enable rustdeskrelay.service
