@@ -48,20 +48,20 @@ lvcreate -L 1G -n tmp sys
 lvcreate -L 3G -n var sys
 lvcreate -l 90%FREE -n root sys
 
-mkfs.xfs -f /dev/arch/root
-mkfs.xfs -f /dev/arch/usr
-mkfs.xfs -f /dev/arch/var
-mkfs.xfs -f /dev/arch/tmp
-mkswap /dev/arch/swap
+mkfs.xfs -f /dev/sys/root
+mkfs.xfs -f /dev/sys/usr
+mkfs.xfs -f /dev/sys/var
+mkfs.xfs -f /dev/sys/tmp
+mkswap /dev/sys/swap
 
-mount /dev/arch/root /mnt
+mount /dev/sys/root /mnt
 mount --mkdir ${DISK}1 /mnt/boot
-mount --mkdir /dev/arch/usr /mnt/usr
-mount --mkdir /dev/arch/var /mnt/var
-mount --mkdir /dev/arch/tmp /mnt/tmp
-swapon /dev/arch/swap
+mount --mkdir /dev/sys/usr /mnt/usr
+mount --mkdir /dev/sys/var /mnt/var
+mount --mkdir /dev/sys/tmp /mnt/tmp
+swapon /dev/sys/swap
 
-pacstrap -K /mnt base linux linux-firmware grub efibootmgr mc jq git nftables lvm2 chrony openssh xfsprogs fail2ban p7zip
+pacstrap -K /mnt base linux linux-firmware grub efibootmgr mc jq git nftables lvm2 chrony openssh xfsprogs fail2ban p7zip htop
 genfstab -U /mnt >> /mnt/etc/fstab
 
 
@@ -109,3 +109,9 @@ systemctl enable systemd-networkd
 
 
 echo "export HISTCONTROL=ignorespace" >> /root/.bash_profile
+
+
+## kvm-clock
+echo "ptp_kvm" > /etc/modules-load.d/ptp_kvm.conf
+# remove server and pool config from /etc/chrony.conf and add
+refclock PHC /dev/ptp0 poll 2

@@ -1,4 +1,4 @@
-MY_INDEX=("")
+MY_INDEX=("1274754")
 
 check_duties(){
 CURRENT_TIMESTAMP=$(date +%s)
@@ -63,7 +63,7 @@ for myvalidator in ${MY_INDEX[@]}; do
 	NEXT_ATTEST_SLOT=$( echo ${NEXT_EPOCH_ATTEST_DATA} | jq .data[].slot | sed 's/\"//g')
 	NEXT_ATTEST_SLOT_TIMESPAMP=$(( GENESIS_TIMESTAMP + (NEXT_ATTEST_SLOT * SECONDS_PER_SLOT) ))
 	NEXT_ATTEST_SLOT_TIME=$(date -d @$NEXT_ATTEST_SLOT_TIMESPAMP )
-	echo "Attestation dutie for validator ${myvalidator} in current epoch at slot: ${NEXT_ATTEST_SLOT} at time: ${NEXT_ATTEST_SLOT_TIME} "
+	echo "Attestation dutie for validator ${myvalidator} in next epoch at slot: ${NEXT_ATTEST_SLOT} at time: ${NEXT_ATTEST_SLOT_TIME} "
 done
 
 echo "-------------------------------------------"
