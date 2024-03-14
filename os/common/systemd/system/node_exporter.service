@@ -1,0 +1,29 @@
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter --collector.systemd --collector.disable-defaults --collector.cpu --collector.filesystem --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|run|boot|tmp)($|/) --collector.loadavg --collector.meminfo --log.level=error --collector.textfile --collector.textfile.directory=/opt/node_exporter
+DevicePolicy=closed
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+ProtectProc=invisible
+RestrictSUIDSGID=true
+RestrictNamespaces=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+#Drop all capabilites!!
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

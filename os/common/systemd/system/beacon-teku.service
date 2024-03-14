@@ -1,0 +1,26 @@
+[Unit]
+Description=Teku Beacon Node
+After=network.target
+
+[Service]
+Type=simple
+User=beacon
+Restart=always
+RestartSec=5
+LimitNOFILE=5120
+LimitNPROC=5120
+Environment="JAVA_OPTS=-Xmx4g"
+ExecStart=/opt/beacon/bin/teku --eth1-endpoint=http://localhost:8545 --data-base-path=/opt/beacon/data --metrics-enabled --rest-api-enabled
+InaccessibleDirectories=/home /var
+ReadOnlyDirectories=/etc /usr
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+RestrictSUIDSGID=true
+
+[Install]
+WantedBy=multi-user.target

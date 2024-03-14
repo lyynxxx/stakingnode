@@ -1,0 +1,37 @@
+[Unit]
+Description=Lighthouse Validator Node
+After=network.target
+
+[Service]
+Type=simple
+User=validator
+Restart=always
+RestartSec=5
+LimitNOFILE=5120
+LimitNPROC=5120
+ExecStart=/opt/validator-lh/bin/lighthouse vc --network mainnet --datadir /opt/validator-lh/data \
+		--beacon-nodes "http://localhost:5052" \
+		--debug-level warn \
+		--graffiti "Mom's Old-Fashioned Robot Oil" \
+		--suggested-fee-recipient 0x452d545ea9fcf6564370ae418bce49404994bd3f
+InaccessibleDirectories=/home 
+ReadOnlyDirectories=/etc /usr /var
+DevicePolicy=closed
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+ProtectProc=invisible
+RestrictSUIDSGID=true
+RestrictNamespaces=yes
+RestrictRealtime=yes
+MemoryDenyWriteExecute=yes
+LockPersonality=yes
+#Drop all capabilites!!
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

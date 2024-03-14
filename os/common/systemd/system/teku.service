@@ -1,0 +1,42 @@
+[Unit]
+Description=Teku ETH Client
+After=network.target
+
+[Service]
+Type=simple
+User=teku
+Restart=always
+RestartSec=5
+LimitNOFILE=5120
+LimitNPROC=5120
+Environment="JAVA_OPTS=-Xmx6g -Djava.io.tmpdir=/opt/teku/tmp -Dio.netty.native.workdir=/opt/teku/tmp"
+Environment="JAVA_HOME=/opt/jdk/jdk-18.0.1.1"
+Environment="TMP=/opt/teku/tmp"
+Environment="TEMP=/opt/teku/tmp"
+Environment="TMPDIR=/opt/teku/tmp"
+ExecStart=/opt/teku/bin/teku --network=mainnet --ee-endpoint=http://127.0.0.1:8551 --ee-jwt-secret-file "/opt/goethereum/jwtsecret" --data-base-path=/opt/teku/data --metrics-enabled --rest-api-enabled --initial-state=https://beaconstate.info/eth/v2/debug/beacon/states/finalized --eth1-deposit-contract-max-request-size=2500
+
+##--validator-keys=/opt/teku/validators/keys:/opt/teku/validators/pwds --validators-graffiti="Mom's Old-Fashioned Robot Oil" --validators-proposer-default-fee-recipient 0x452D545Ea9Fcf6564370Ae418bcE49404994Bd3f
+
+##--validators-builder-registration-default-enabled=true --builder-endpoint="http://127.0.0.1:18550"
+InaccessibleDirectories=/home /root
+ReadOnlyDirectories=/etc /usr /var
+DevicePolicy=closed
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+ProtectProc=invisible
+RestrictSUIDSGID=true
+RestrictNamespaces=yes
+RestrictRealtime=yes
+#MemoryDenyWriteExecute=yes
+LockPersonality=yes
+#Drop all capabilites!!
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,49 @@
+[Unit]
+Description=Besu ETH Execution Layer
+After=network.target 
+Wants=network.target
+
+[Service]
+User=besu 
+Group=besu
+Type=simple
+Restart=always
+RestartSec=5
+LimitNOFILE=12000
+LimitNPROC=12000
+#WorkingDirectory=/opt/besu
+Environment="TMP=/opt/besu/tmp"
+Environment="TEMP=/opt/besu/tmp"
+Environment="TMPDIR=/opt/besu/tmp"
+Environment="JAVA_OPTS=-Xmx6g -Djava.io.tmpdir=/opt/besu/tmp -Dio.netty.native.workdir=/opt/besu/tmp"
+Environment="JAVA_HOME=/opt/jdk/jdk-18.0.1.1"
+ExecStart=/opt/besu/bin/besu --data-storage-format=BONSAI --sync-mode=X_SNAP \
+							 --data-path="/opt/besu/data" \
+							 --rpc-http-enabled=true --rpc-http-host="127.0.0.1" \
+							 --p2p-enabled=true \
+							 --metrics-enabled=true --metrics-host=127.0.0.1 \
+							 --engine-jwt-secret=/opt/besu/jwtsecret \
+							 --pruning-enabled \
+							 --Xplugin-rocksdb-high-spec-enabled 
+
+InaccessibleDirectories=/home /root
+ReadOnlyDirectories=/etc /usr /var
+DevicePolicy=closed
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+ProtectProc=invisible
+RestrictSUIDSGID=true
+RestrictNamespaces=yes
+RestrictRealtime=yes
+#MemoryDenyWriteExecute=yes #this fluffs jvm
+LockPersonality=yes
+#Drop all capabilites!!
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=default.target
