@@ -11,6 +11,7 @@ LimitNOFILE=5120
 LimitNPROC=5120
 ExecStart=/opt/validator-lh/bin/lighthouse vc --network mainnet --datadir /opt/validator-lh/data \
 		--beacon-nodes "http://localhost:5052" \
+		--metrics --metrics-address 127.0.0.1 --metrics-port 55002 \
 		--debug-level warn \
 		--graffiti "Mom's Old-Fashioned Robot Oil" \
 		--suggested-fee-recipient 0x452d545ea9fcf6564370ae418bce49404994bd3f
