@@ -7,15 +7,15 @@ Wants=network.target
 User=geth
 Group=geth
 Type=simple
-Restart=always
-RestartSec=5
+Restart=on-failure
+RestartSec=3
 LimitNOFILE=12000
 LimitNPROC=12000
-ExecStart=/opt/goethereum/bin/geth --datadir /opt/goethereum/data --datadir.ancient /opt/goethereum/data-ancient \
-  --http --syncmode snap --pprof \
-  --authrpc.addr 127.0.0.1 --authrpc.port 8551 --authrpc.jwtsecret=/opt/goethereum/jwtsecret \
-  --db.engine pebble
-##--metrics --metrics.addr 127.0.0.1
+ExecStart=/opt/staking/clients/goethereum/bin/geth --mainnet --maxpeers 50 \
+  --datadir /opt/staking/datadir/geth --datadir.ancient /opt/staking/datadir/geth-ancient \
+  --http --pprof --state.scheme=path \
+  --authrpc.addr 127.0.0.1 --authrpc.port 8551 --authrpc.jwtsecret=/opt/staking/secret/jwtsecret \
+  --metrics --metrics.addr 127.0.0.1 --metrics.port 55000
 InaccessibleDirectories=/home /root
 ReadOnlyDirectories=/etc /usr /var
 DevicePolicy=closed

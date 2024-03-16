@@ -10,26 +10,25 @@ tar -xf lighthouse-$LATEST-x86_64-unknown-linux-gnu-portable.tar.gz
 
 ## Add service users - Lighthouse Beacon Chain
 groupadd beacon
-useradd --system -g beacon -d /opt/beacon-lh --shell /bin/false beacon
-mkdir -p /opt/beacon-lh/data
-mkdir -p /opt/beacon-lh/bin
-cp /opt/tmp/lighthouse /opt/beacon-lh/bin/
-chmod 755 /opt/beacon-lh/bin/lighthouse
-chown -R beacon:beacon /opt/beacon-lh
+useradd --system -g beacon --no-create-home --shell /bin/false beacon
+mkdir -p /opt/staking/datadir/lighthouse/beacon
+mkdir -p /opt/staking/clients/lighthouse/bin
 
-## Add service users - Lighthouse validator client
+cp /opt/tmp/lighthouse /opt/staking/clients/lighthouse/bin/
+chmod 755 /opt/staking/clients/lighthouse/bin/lighthouse
+chown -R beacon:beacon /opt/staking/clients/lighthouse
+chown -R beacon:beacon /opt/staking/datadir/lighthouse/beacon
+
+## Add service users - Lighthouse validator client (will use the same binary)
 groupadd validator
-useradd --system -g validator -d /opt/validator-lh --shell /bin/false validator
-mkdir -p /opt/validator-lh/data
-mkdir -p /opt/validator-lh/bin
-cp /opt/tmp/lighthouse /opt/validator-lh/bin/
-chmod 755 /opt/validator-lh/bin/lighthouse
-chown -R validator:validator /opt/validator-lh
+useradd --system -g validator --no-create-home --shell /bin/false validator
+mkdir -p /opt/staking/datadir/lighthouse/validator
+chown -R validator:validator /opt/staking/datadir/lighthouse/validator
 
 
 ## Copy service files
-cp /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/beacon-lighthouse.service /etc/systemd/system/beacon.service
-cp /tmp/kickstart/stakingnode/openSUSE/etc/systemd/system/validator-lighthouse.service /etc/systemd/system/validator.service
+cp /tmp/kickstart/stakingnode/common/etc/systemd/system/beacon-lh.service /etc/systemd/system/beacon.service
+cp /tmp/kickstart/stakingnode/common/etc/systemd/system/validator-lh.service /etc/systemd/system/validator.service
 chown root:root /etc/systemd/system/beacon.service
 chmod 644 /etc/systemd/system/beacon.service
 chown root:root /etc/systemd/system/validator.service

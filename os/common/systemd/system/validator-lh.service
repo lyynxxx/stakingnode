@@ -9,7 +9,7 @@ Restart=always
 RestartSec=5
 LimitNOFILE=5120
 LimitNPROC=5120
-ExecStart=/opt/validator-lh/bin/lighthouse vc --network mainnet --datadir /opt/validator-lh/data \
+ExecStart=/opt/staking/clients/lighthouse/bin/lighthouse vc --network mainnet --datadir /opt/staking/datadir/lighthouse/validator \
 		--beacon-nodes "http://localhost:5052" \
 		--metrics --metrics-address 127.0.0.1 --metrics-port 55002 \
 		--debug-level warn \

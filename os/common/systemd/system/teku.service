@@ -5,20 +5,23 @@ After=network.target
 [Service]
 Type=simple
 User=teku
-Restart=always
-RestartSec=5
-LimitNOFILE=5120
-LimitNPROC=5120
-Environment="JAVA_OPTS=-Xmx6g -Djava.io.tmpdir=/opt/teku/tmp -Dio.netty.native.workdir=/opt/teku/tmp"
-Environment="JAVA_HOME=/opt/jdk/jdk-18.0.1.1"
-Environment="TMP=/opt/teku/tmp"
-Environment="TEMP=/opt/teku/tmp"
-Environment="TMPDIR=/opt/teku/tmp"
-ExecStart=/opt/teku/bin/teku --network=mainnet --ee-endpoint=http://127.0.0.1:8551 --ee-jwt-secret-file "/opt/goethereum/jwtsecret" --data-base-path=/opt/teku/data --metrics-enabled --rest-api-enabled --initial-state=https://beaconstate.info/eth/v2/debug/beacon/states/finalized --eth1-deposit-contract-max-request-size=2500
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=12000
+LimitNPROC=12000
+Environment="JAVA_OPTS=-Xmx6g -Djava.io.tmpdir=/opt/staking/clients/teku/tmp -Dio.netty.native.workdir=/opt/staking/clients/teku/tmp"
+Environment="TEKU_OPTS=-XX:-HeapDumpOnOutOfMemoryError"
+Environment="TMP=/opt/staking/clients/teku/tmp"
+Environment="TEMP=/opt/staking/clients/teku/tmp"
+Environment="TMPDIR=/opt/staking/clients/teku/tmp"
+ExecStart=/opt/staking/clients/teku/bin/teku --network=mainnet --data-base-path=/opt/staking/datadir/teku --data-storage-mode="prune"\
+		--ee-endpoint=http://127.0.0.1:8551 --ee-jwt-secret-file "/opt/staking/secret/jwtsecret"  \
+		--initial-state="https://beaconstate.info" --rest-api-enabled=true --rest-api-port=5052 \
+		--p2p-peer-upper-bound=100 --p2p-peer-lower-bound=60 \
+		--metrics-enabled --metrics-port=55002 --eth1-deposit-contract-max-request-size=2500
 
-##--validator-keys=/opt/teku/validators/keys:/opt/teku/validators/pwds --validators-graffiti="Mom's Old-Fashioned Robot Oil" --validators-proposer-default-fee-recipient 0x452D545Ea9Fcf6564370Ae418bcE49404994Bd3f
+##--validator-keys=/opt/staking/clients/validators/keys:/opt/staking/clients/validators/pwds --validators-graffiti="Mom's Old-Fashioned Robot Oil" --validators-proposer-default-fee-recipient 0x452D545Ea9Fcf6564370Ae418bcE49404994Bd3f
 
-##--validators-builder-registration-default-enabled=true --builder-endpoint="http://127.0.0.1:18550"
 InaccessibleDirectories=/home /root
 ReadOnlyDirectories=/etc /usr /var
 DevicePolicy=closed

@@ -2,16 +2,12 @@
 ## https://docs.teku.consensys.net/en/latest/HowTo/Get-Started/Run-Teku/
 ## You can run Teku as a beacon node and validator in a single process, or as separate processes.
 
+## Get JAVA, pref 17LTS Runtime Env only, no need for JDK...
+## Arch
+## pacman -S extra/jre17-openjdk-headless
 
-## OpenJDK 18 GA:
-## https://jdk.java.net/18/
-cd /opt/tmp
-curl -k https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_linux-x64_bin.tar.gz --output openjdk-18.0.1.1_linux-x64_bin.tar.gz
-mkdir -p /opt/jdk
-tar -zxf openjdk-18.0.1.1_linux-x64_bin.tar.gz -C /opt/jdk/
-chown -R root:root /opt/jdk
-chmod -R 755 /opt/jdk
-
+## Suse
+## zypper in java-17-openjdk-headless
 
 ## Download Teku
 cd /opt/tmp
@@ -23,24 +19,28 @@ tar -xf teku-$LATEST.tar.gz
 ## Add service users - BEACON
 groupadd teku
 useradd --system -g teku --no-create-home --shell /bin/false teku
-mkdir -p /opt/teku/data
-mkdir -p /opt/teku/bin
-mkdir -p /opt/teku/lib
-mkdir -p /opt/teku/tmp
-mkdir -p /opt/teku/validators/keys
-mkdir -p /opt/teku/validators/pwds
-cp -a /opt/tmp/teku-$LATEST/bin/teku /opt/teku/bin/
-cp -a /opt/tmp/teku-$LATEST/lib /opt/teku/
-chown -R teku:teku /opt/teku
+mkdir -p /opt/staking/datadir/teku
+mkdir -p /opt/staking/clients/teku/bin
+mkdir -p /opt/staking/clients/teku/lib
+mkdir -p /opt/staking/clients/teku/tmp
+mkdir -p /opt/staking/clients/validators/keys
+mkdir -p /opt/staking/clients/validators/pwds
 
-cp /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/teku.service /etc/systemd/system/
+cp -a /opt/tmp/teku-$LATEST/bin/teku /opt/staking/clients/teku/bin/
+cp -a /opt/tmp/teku-$LATEST/lib /opt/staking/clients/teku/
+chown -R teku:teku /opt/staking/clients/teku
+chown -R teku:teku /opt/staking/datadir/teku
+
+rm -rf /opt/tmp/*
+
+cp /tmp/kickstart/stakingnode/os/common/etc/systemd/system/teku.service /etc/systemd/system/
 chown root:root /etc/systemd/system/teku.service
 chmod 644 /etc/systemd/system/teku.service
 
 ## Limits:
 
-echo "teku soft nofile 10000" > /etc/security/limits.d/teku.conf
-echo "teku hard nofile 10000" >> /etc/security/limits.d/teku.conf
+echo "teku soft nofile 12000" > /etc/security/limits.d/teku.conf
+echo "teku hard nofile 12000" >> /etc/security/limits.d/teku.conf
 
 
 ## FW:
