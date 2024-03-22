@@ -2,7 +2,7 @@
 
 # https://github.com/NethermindEth/nethermind
 pacman -S snappy
-
+ln -s `find /usr/lib64/ -type f -name "libbz2.so.1*"` /usr/lib64/libbz2.so.1.0
 
 mkdir -p /opt/tmp
 cd /opt/tmp
@@ -14,30 +14,28 @@ curl -L $URL --output nethermind.$VER.zip
 
 groupadd nethermind
 useradd --system -g nethermind --no-create-home --shell /bin/false nethermind
-mkdir -p /opt/nethermind/app
-mkdir -p /opt/nethermind/data
-mkdir -p /opt/nethermind/tmp
+mkdir -p /opt/staking/clients/nethermind/app
+mkdir -p /opt/staking/datadir/nethermind
+mkdir -p /opt/staking/clients/nethermind/tmp
 
 # NOT TYPO! -o sets the output directory, NO SPACE!
-7z x nethermind.1.19.3.zip -o/opt/nethermind/app/
+7z x nethermind.$VER.zip -o/opt/staking/clients/nethermind/app
 
+mkdir -p /opt/staking/secret
 KEY=$(openssl rand -hex 32 | tr -d "\n" )
-echo ${KEY} > /opt/nethermind/jwtsecret
-chmod 644 /opt/nethermind/jwtsecret
-chown -R nethermind:nethermind /opt/nethermind
+echo ${KEY} > /opt/staking/secret/jwtsecret
+chmod 644 /opt/staking/secret/jwtsecret
+chown -R nethermind:nethermind /opt/staking/clients/nethermind
+chown -R nethermind:nethermind /opt/staking/datadir/nethermind
 
-ln -s `find /usr/lib64/ -type f -name "libbz2.so.1*"` /usr/lib64/libbz2.so.1.0
-
-
-
-cd /opt/nethermind/app
-export DOTNET_BUNDLE_EXTRACT_BASE_DIR=/opt/nethermind/tmp
-
+cp /tmp/kickstart/stakingnode/os/common/systemd/system/nethermind-fullprune.service /etc/systemd/system/nethermind.service
+chown root:root /etc/systemd/system/nethermind.service
+chmod 644 /etc/systemd/system/nethermind.service
 
 ## Limits:
-
-echo "nethermind soft nofile 8192" > /etc/security/limits.d/nethermind.conf
-echo "nethermind hard nofile 8192" >> /etc/security/limits.d/nethermind.conf
+## ARCH -> mkdir -p /etc/security/limits.d/
+echo "nethermind soft nofile 12000" > /etc/security/limits.d/nethermind.conf
+echo "nethermind hard nofile 12000" >> /etc/security/limits.d/nethermind.conf
 
 ## FW open
 nft add rule inet my_table tcp_chain tcp dport 30303 counter accept

@@ -33,7 +33,7 @@ chown -R teku:teku /opt/staking/datadir/teku
 
 rm -rf /opt/tmp/*
 
-cp /tmp/kickstart/stakingnode/os/common/etc/systemd/system/teku.service /etc/systemd/system/
+cp /tmp/kickstart/stakingnode/os/common/systemd/system/teku.service /etc/systemd/system/
 chown root:root /etc/systemd/system/teku.service
 chmod 644 /etc/systemd/system/teku.service
 

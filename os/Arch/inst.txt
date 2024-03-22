@@ -3,7 +3,8 @@
 ##
 ## Set some device variables
 
-DISK="/dev/vda"
+## vda -> KVM guest, sda -> others...
+DISK="/dev/sda"
 NIC=eth0
 IPADDR=""
 PREFIX="24"
@@ -39,10 +40,9 @@ EEOF
 mkfs.fat -F 32 ${DISK}1
 
 pvcreate ${DISK}2
-vgcreate
 vgcreate sys ${DISK}2
 
-lvcreate -L 4G -n swap sys
+lvcreate -L 16G -n swap sys
 lvcreate -L 3G -n usr sys
 lvcreate -L 1G -n tmp sys
 lvcreate -L 3G -n var sys
@@ -86,11 +86,15 @@ echo > /etc/chrony.conf <<EEOF
 server 0.hu.pool.ntp.org iburst
 server 1.hu.pool.ntp.org iburst
 server 2.hu.pool.ntp.org iburst
-serv/er 3.hu.pool.ntp.org iburst
+server 3.hu.pool.ntp.org iburst
 driftfile /etc/chrony.drift
 rtconutc
 rtcsync
 EEOF
+
+systemctl enable chronyd
+
+timedatectl set-ntp true
 
 
 pacman-key --init
@@ -115,3 +119,46 @@ echo "export HISTCONTROL=ignorespace" >> /root/.bash_profile
 echo "ptp_kvm" > /etc/modules-load.d/ptp_kvm.conf
 # remove server and pool config from /etc/chrony.conf and add
 refclock PHC /dev/ptp0 poll 2
+
+
+####################################
+## finre tune stuff
+
+useradd -m lyynxxx
+mkdir /home/lyynxxx/.ssh
+echo "ssh-rsa AAAAB3NzaC1yc2EAAAABJQAAAQEAsCaKUzXes0z4WMqY8tQ9PsTEFmYVIyj7nYd4F9iZXSHZfDv6AbyCudGVXHdrdAe4VnMmoWVg6j8k546KQzFZ3bQl5UJdWrqulwCvFrH8yEyouqmA6OeSSAz7ALG85FBYiVWVKWrlzLqAIT/Gn+Ud57Pu3d4OowH00EXqksKdeux/eT+nyGuC7Je2ecvXLqETOhOJDhAicZf8SEcu5Rsbz7dEqZPnXC+4zfibqDuldzKDEkYL4Pyc4mcG+F15yxmW0OyjMLUI93kcgtmwXVKRPV2k0ceuqa7a3zlhbwae/ofgC7AwsUBZYdxxSfxmkGIXZYfoaN1PxiXj+aiMFdis5w==" > /home/lyynxxx/.ssh/authorized_keys
+chown -R lyynxxx:root /home/lyynxxx/.ssh
+chmod 750 /home/lyynxxx/.ssh
+chmod 400 /home/lyynxxx/.ssh/authorized_keys
+
+
+mkdir -p /tmp/kickstart
+cd /tmp/kickstart
+git clone https://github.com/lyynxxx/stakingnode.git
+
+## Fail2ban
+mv /tmp/kickstart/stakingnode/os/common/fail2ban/jail.local /etc/fail2ban/jail.local
+chown root:root /etc/fail2ban/jail.local
+chmod 644 /etc/fail2ban/jail.local
+systemctl enable fail2ban
+
+## nftables config (#ARCHSPEC)
+mv /tmp/kickstart/stakingnode/os/common/nftables/nftables.conf /etc/nftables.conf
+chown root:root /etc/nftables.conf
+chmod 600 /etc/nftables.conf
+sed -i 's/eth1/${NIC}/g' /etc/nftables.conf
+mv /tmp/kickstart/stakingnode/os/Arch/etc/systemd/system/nftables.service /etc/systemd/system/
+systemctl enable nftables
+
+## Sysctl tuning
+cat /tmp/kickstart/stakingnode/os/common/sysctl.d/99-sysctl.conf > /etc/sysctl.d/99-sysctl.conf
+
+## SSH
+cat /tmp/kickstart/stakingnode/os/common/ssh/sshd_config > /etc/ssh/sshd_config
+chown root:root /etc/ssh/sshd_config
+chmod 640 /etc/ssh/sshd_config
+systemctl enable sshd
+
+## temp folder/for backups
+mkdir /opt/tmp
+chown lyynxxx /opt/tmp

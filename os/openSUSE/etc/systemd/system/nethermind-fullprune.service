@@ -1,3 +1,4 @@
+## Ref to StatDBSize:  https://docs.nethermind.io/fundamentals/database/
 [Unit]
 Description=Nethermind Execution Layer Client service
 Wants=network-online.target
@@ -9,12 +10,12 @@ User=nethermind
 Group=nethermind
 Restart=on-failure
 RestartSec=3
-Environment="DOTNET_BUNDLE_EXTRACT_BASE_DIR=/opt/staking/clients/nethermind/app/tmp"
+Environment="DOTNET_BUNDLE_EXTRACT_BASE_DIR=/opt/nethermind/tmp"
 LimitNOFILE=12000
 LimitNPROC=12000
-WorkingDirectory=/opt/staking/clients/nethermind/app
-ExecStart=/opt/staking/clients/nethermind/app/Nethermind.Runner \
-  --baseDbPath /opt/staking/datadir/nethermind \
+WorkingDirectory=/opt/nethermind/app
+ExecStart=/opt/nethermind/app/Nethermind.Runner \
+  --baseDbPath /opt/nethermind/data \
   --Metrics.Enabled true \
   --Metrics.ExposePort 6060 \
   --Metrics.IntervalSeconds 10000 \
@@ -22,7 +23,7 @@ ExecStart=/opt/staking/clients/nethermind/app/Nethermind.Runner \
   --Sync.SnapSync true \
   --Sync.AncientBodiesBarrier 11052984 \
   --Sync.AncientReceiptsBarrier 11052984 \
-  --JsonRpc.JwtSecretFile /opt/staking/secret/jwtsecret \
+  --JsonRpc.JwtSecretFile /opt/nethermind/jwtsecret \
   --Pruning.Mode Full \
   --Pruning.AvailableSpaceCheckEnabled true \
   --Pruning.FullPruningCompletionBehavior None \
