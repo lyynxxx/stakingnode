@@ -33,12 +33,12 @@ chown root:root /etc/systemd/system/nethermind.service
 chmod 644 /etc/systemd/system/nethermind.service
 
 ## Limits:
-## ARCH -> mkdir -p /etc/security/limits.d/
+mkdir -p /etc/security/limits.d
 echo "nethermind soft nofile 12000" > /etc/security/limits.d/nethermind.conf
 echo "nethermind hard nofile 12000" >> /etc/security/limits.d/nethermind.conf
 
 ## FW open
 nft add rule inet my_table tcp_chain tcp dport 30303 counter accept
 nft add rule inet my_table udp_chain udp dport 30303 counter accept
-nft list ruleset > /etc/sysconfig/nftables.conf
+nft list ruleset > /etc/nftables.conf
 

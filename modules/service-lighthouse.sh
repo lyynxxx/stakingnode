@@ -89,9 +89,17 @@ $/opt/validator-lh/bin/lighthouse --network mainnet account validator import --k
 
 comment
 
+## From Lighthouse to Teku
+/opt/validator-lh/bin/lighthouse account validator slashing-protection export /tmp/slashing-interchange-format-minimal-from-lh.json --datadir /opt/validator-lh/data
 
-/opt/teku/bin/teku slashing-protection export --data-path=/opt/teku/data --to=/opt/tmp/slashing-interchange-format-minimal.json
-/opt/validator-lh/bin/lighthouse account validator slashing-protection import /opt/tmp/slashing-interchange-format-minimal.json --datadir /opt/validator-lh/data
+
+/opt/staking/clients/lighthouse/bin/lighthouse account validator slashing-protection export /tmp/slashing-interchange-format-minimal-from-lh.json --datadir /opt/staking/datadir/lighthouse/validator
+/opt/staking/clients/teku/bin/teku slashing-protection import --data-path /opt/staking/datadir/teku --from=/tmp/slashing-interchange-format-minimal-from-lh.json
+
+
+## From Teku to Lighihouse
+/opt/staking/clients/teku/bin/teku slashing-protection export --data-path=/opt/staking/datadir/teku --to=/opt/tmp/slashing-interchange-format-minimal-from-teku.json
+/opt/staking/clients/lighthouse/bin/lighthouse account validator slashing-protection import /opt/tmp/slashing-interchange-format-minimal.json --datadir /opt/validator-lh/data
 
 {
   "metadata" : {
