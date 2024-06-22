@@ -55,10 +55,9 @@ nft list ruleset > /etc/nftables.conf ## <-- Arch
 
 ## Exit:
 ## https://docs.teku.consensys.net/HowTo/Voluntary-Exit/
+## !!! /tmp noexec fluffs this
 ## su - teku -s /bin/bash
-## export JAVA_HOME=/opt/jdk/jdk-18.0.1.1
-## export PATH=$JAVA_HOME/bin:$PATH
-## /opt/teku/bin/teku voluntary-exit --beacon-node-api-endpoint=http://127.0.0.1:5051 --validator-keys=/opt/teku/validators/keys/keystore-m_12381_3600_1_0_0-1649489984.json:/opt/teku/validators/pwds/keystore-m_12381_3600_1_0_0-1649489984.txt
+## /opt/staking/clients/teku/bin/teku voluntary-exit --logging=DEBUG --data-base-path=/opt/staking/datadir/teku --beacon-node-api-endpoint=http://127.0.0.1:5052 --validator-keys=/opt/staking/clients/teku/validators/keys/keystore-m_12381_3600_0_0_0-1709842902.json:/opt/staking/clients/teku/validators/pwds/keystore-m_12381_3600_0_0_0-1709842902.txt
 
 ## Move validator to backup node...
 ## Move validator - create package

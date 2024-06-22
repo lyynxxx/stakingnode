@@ -15,8 +15,10 @@ LimitNPROC=12000
 WorkingDirectory=/opt/staking/clients/nethermind/app
 ExecStart=/opt/staking/clients/nethermind/app/Nethermind.Runner \
   --baseDbPath /opt/staking/datadir/nethermind \
+  --Network.P2PPort 30303 \
+  --Network.DiscoveryPort 30303 \
   --Metrics.Enabled true \
-  --Metrics.ExposePort 6060 \
+  --Metrics.ExposePort 55001 \
   --Metrics.IntervalSeconds 10000 \
   --HealthChecks.Enabled true \
   --Sync.SnapSync true \

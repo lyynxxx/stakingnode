@@ -4,20 +4,24 @@
 mkdir -p /opt/tmp
 cd /opt/tmp
 LATEST=$(curl --silent "https://api.github.com/repos/sigp/lighthouse/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
+##Portable, for older cpus
 curl -L https://github.com/sigp/lighthouse/releases/download/$LATEST/lighthouse-$LATEST-x86_64-unknown-linux-gnu-portable.tar.gz -o lighthouse-$LATEST-x86_64-unknown-linux-gnu-portable.tar.gz
 tar -xf lighthouse-$LATEST-x86_64-unknown-linux-gnu-portable.tar.gz
 
+##Default, for newer cpus
+curl -L https://github.com/sigp/lighthouse/releases/download/$LATEST/lighthouse-$LATEST-x86_64-unknown-linux-gnu.tar.gz -o lighthouse-$LATEST-x86_64-unknown-linux-gnu.tar.gz
+tar -xf lighthouse-$LATEST-x86_64-unknown-linux-gnu.tar.gz
 
 ## Add service users - Lighthouse Beacon Chain
-groupadd beacon
-useradd --system -g beacon --no-create-home --shell /bin/false beacon
+groupadd lighthouse
+useradd --system -g lighthouse --no-create-home --shell /bin/false lighthouse
 mkdir -p /opt/staking/datadir/lighthouse/beacon
 mkdir -p /opt/staking/clients/lighthouse/bin
 
 cp /opt/tmp/lighthouse /opt/staking/clients/lighthouse/bin/
 chmod 755 /opt/staking/clients/lighthouse/bin/lighthouse
-chown -R beacon:beacon /opt/staking/clients/lighthouse
-chown -R beacon:beacon /opt/staking/datadir/lighthouse/beacon
+chown -R lighthouse:lighthouse /opt/staking/clients/lighthouse
+chown -R lighthouse:lighthouse /opt/staking/datadir/lighthouse
 
 ## Add service users - Lighthouse validator client (will use the same binary)
 groupadd validator
@@ -27,10 +31,10 @@ chown -R validator:validator /opt/staking/datadir/lighthouse/validator
 
 
 ## Copy service files
-cp /tmp/kickstart/stakingnode/common/etc/systemd/system/beacon-lh.service /etc/systemd/system/beacon.service
+cp /tmp/kickstart/stakingnode/common/etc/systemd/system/beacon-lh.service /etc/systemd/system/lighthouse-bn.service
 cp /tmp/kickstart/stakingnode/common/etc/systemd/system/validator-lh.service /etc/systemd/system/validator.service
-chown root:root /etc/systemd/system/beacon.service
-chmod 644 /etc/systemd/system/beacon.service
+chown root:root /etc/systemd/system/lighthouse-bn.service
+chmod 644 /etc/systemd/system/lighthouse-bn.service
 chown root:root /etc/systemd/system/validator.service
 chmod 644 /etc/systemd/system/validator.service
 
@@ -38,8 +42,8 @@ chmod 644 /etc/systemd/system/validator.service
 
 ## Limits:
 
-echo "beacon soft nofile 8192" > /etc/security/limits.d/beacon.conf
-echo "beacon hard nofile 8192" >> /etc/security/limits.d/beacon.conf
+echo "lighthouse soft nofile 8192" > /etc/security/limits.d/beacon.conf
+echo "lighthouse hard nofile 8192" >> /etc/security/limits.d/beacon.conf
 
 ## FW open
 nft add rule inet my_table tcp_chain tcp dport 9000 counter accept

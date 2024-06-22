@@ -61,7 +61,7 @@ mount --mkdir /dev/sys/var /mnt/var
 mount --mkdir /dev/sys/tmp /mnt/tmp
 swapon /dev/sys/swap
 
-pacstrap -K /mnt base linux linux-firmware grub efibootmgr mc jq git nftables lvm2 chrony openssh xfsprogs fail2ban p7zip htop
+pacstrap -K /mnt base linux linux-firmware grub efibootmgr mc jq git nftables lvm2 chrony openssh xfsprogs fail2ban p7zip htop dmidecode screen
 genfstab -U /mnt >> /mnt/etc/fstab
 
 

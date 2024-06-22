@@ -1,0 +1,2 @@
+# green (hyve00) prefix, so I know it's a VM on my server
+PS1='\e[0;32m(hyve00)\e[0m [\u@\h \W]\$ '

@@ -1,0 +1,4 @@
+#Check Nethermind sync status
+alias nsync='curl -s http://localhost:8545/health | jq'
+alias get_statedbsize='statedbsize=$(curl -sL localhost:55001 | grep nethermind_state_db_size | tail -1| cut -d " " -f3) && expr $statedbsize / 1024 / 1024 / 1024'
+

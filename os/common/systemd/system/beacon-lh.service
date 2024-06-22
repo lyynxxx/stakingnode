@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=beacon
+User=lighthouse
 Restart=always
 RestartSec=5
 LimitNOFILE=5120
@@ -14,7 +14,7 @@ ExecStart=/opt/staking/clients/lighthouse/bin/lighthouse beacon --network mainne
                                                --execution-endpoints http://127.0.0.1:8551 --execution-jwt /opt/staking/secret/jwtsecret \
                                                --staking --eth1-blocks-per-log-query 500 --disable-upnp --validator-monitor-auto \
                                                --debug-level ward \
-                                               --metrics --metrics-address 127.0.0.1 --metrics-port 55001
+                                               --metrics --metrics-address 127.0.0.1 --metrics-port 55002
 InaccessibleDirectories=/home
 ReadOnlyDirectories=/etc /usr /var
 DevicePolicy=closed
