@@ -6,3 +6,44 @@ cat seed.txt.enc | openssl enc -d -aes-256-cbc -a -md sha512 -pass pass:Jelszo12
 
 # generate QR code from encrypted seed
 cat seed.txt.enc | qrencode -s 3 -l M -o seed.txt.enc.qr.png
+
+
+
+------------------------
+Honestly, it wouldn't be my first choice, but the goal is to make the process as simple as possible. General experience shows that most people like to use the Ubuntu Linux for everything, as it is easy enough even for beginners.
+
+Download the Ubuntu Desktop live ISO, burn it to a pendrive or DVD, then run it. You don't need to install it, just start it in trial mode, all the necessary tools will be available to you. This YT video could help a lot if you have no idea how to start this: https://www.youtube.com/watch?v=X_fDdUgqIUQ
+
+At the moment 24.04LTS is the available version on the Ubuntu download page: https://ubuntu.com/download/desktop
+
+Let's boot up!
+
+Choose the first menu item. We will not install it, but a graphical environment will start where you can try out the system.
+
+It will ask if we just want to try it or install it. Choose to just try it out. Then it loads the pre-installed apps.
+
+ - open text editor
+ - ír bele amit akarsz
+ - mentsd el
+ - nézd meg mekkora...
+ - ha akarsz még beleírni, írj, nézd meg mennyit foglal, iteráld...
+ - nyissuk meg a terminált..
+ - rakjuk ki fullscreenbe
+
+cat data.txt | openssl enc -aes-256-cbc -a -md sha512 -pass pass:SecurePAssword123 -pbkdf2 > data.txt.enc
+
+ - irassuk ki, hogy titkosítás után milyen a file
+ - akár ezt is el lehet rakni akárhova, de sokkal menőbb, hogy ezt ki lehet írni a telefonnal
+ - nem árt ha van net, mert akkor lehet QR kódot generálni
+ - apt install qrencode -y
+
+cat seed.txt.enc | qrencode -s 3 -l M -o seed.txt.enc.qr.png
+
+ - akkor ezt ki lehet nyomtatni, vagy el lehet rakni, telefonnal lefényképezni... a titkosíŧott szöveg bármikor visszanyerhető belőle. Mivel nincs rá utaló semmi nyom, hogy miez, bárki olvassa be, nem érti majd miez.
+ - titkosítani és kimenteni az egyszerűbb, mert le tudjuk fényképezni és elrakni, de a visszafejtéshez a titkosított szöveget vissza kell juttatni a gépre
+ - a hangsúly azon van, hogy minél biztonságosabban hozzuk ki az adatot.
+ - visszafejtés:
+ - az első lehetőség, hogy nagyon vigyázva begépeljük, de ez nem túl szerencsés, mert egyetlen karakter elütés már nem visszakódolható
+ - a következő lehetőség, hogy a telefonunkkal beolvassuk a titkosított anyagot és azt a telefonon lementjük egy szöveges fileba, amit majd felmásolunk az Ubuntu Live cdre
+ - vagy a titkosított filet is, ha elraktuk, az visszamásolható
+ - ha visszamásoltuk, akkor 

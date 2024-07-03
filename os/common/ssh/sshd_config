@@ -28,7 +28,7 @@ Port 2992
 
 # Authentication:
 
-#LoginGraceTime 2m
+LoginGraceTime 0
 PermitRootLogin no
 StrictModes yes
 MaxAuthTries 3
