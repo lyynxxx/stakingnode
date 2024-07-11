@@ -33,6 +33,10 @@ PermitRootLogin no
 StrictModes yes
 MaxAuthTries 3
 #MaxSessions 10
+MaxStartups 10:30:60
+
+ClientAliveInterval 15
+ClientAliveCountMax 3
 
 PubkeyAuthentication yes
 
@@ -72,6 +76,11 @@ PasswordAuthentication no
 #GSSAPIStrictAcceptorCheck yes
 #GSSAPIKeyExchange no
 
+Ciphers -3des-cbc,aes128-cbc,aes192-cbc,aes256-cbc,chacha20-poly1305@openssh.com
+KexAlgorithms -diffie-hellman-group1-sha1,diffie-hellman-group14-sha1,diffie-hellman-group-exchange-sha1
+MACs -hmac-md5,hmac-md5-96,hmac-ripemd160,hmac-sha1-96,umac-64@openssh.com,hmac-md5-etm@openssh.com,hmac-md5-96-etm@openssh.com,hmac-ripemd160-etm@openssh.com,hmac-sha1-96-etm@openssh.com,umac-64-etm@openssh.com,umac-128-etm@openssh.com
+
+
 # Set this to 'yes' to enable PAM authentication, account processing,
 # and session processing. If this is enabled, PAM authentication will
 # be allowed through the ChallengeResponseAuthentication and
@@ -81,7 +90,7 @@ PasswordAuthentication no
 # If you just want the PAM account and session checks to run without
 # PAM authentication, then enable this but set PasswordAuthentication
 # and ChallengeResponseAuthentication to 'no'.
-UsePAM no
+UsePAM yes
 
 #AllowAgentForwarding yes
 #AllowTcpForwarding yes
@@ -93,7 +102,7 @@ UsePAM no
 #PrintMotd yes
 #PrintLastLog yes
 #TCPKeepAlive yes
-#PermitUserEnvironment no
+PermitUserEnvironment no
 #Compression delayed
 ClientAliveInterval 120
 #ClientAliveCountMax 3
