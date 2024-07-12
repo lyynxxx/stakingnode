@@ -1,0 +1,45 @@
+[Unit]
+Description=Teku ETH Client
+After=network.target
+
+[Service]
+Type=simple
+User=teku
+Restart=on-failure
+RestartSec=3
+LimitNOFILE=12000
+LimitNPROC=12000
+Environment="JAVA_OPTS=-Xmx6g -Djava.io.tmpdir=/opt/staking/clients/teku/tmp -Dio.netty.native.workdir=/opt/staking/clients/teku/tmp"
+Environment="TEKU_OPTS=-XX:-HeapDumpOnOutOfMemoryError"
+Environment="TMP=/opt/staking/clients/teku/tmp"
+Environment="TEMP=/opt/staking/clients/teku/tmp"
+Environment="TMPDIR=/opt/staking/clients/teku/tmp"
+ExecStart=/opt/staking/clients/teku/bin/teku --network=mainnet --data-base-path=/opt/staking/datadir/teku --data-storage-mode="prune"\
+		--ee-endpoint=http://127.0.0.1:8551 --ee-jwt-secret-file "/opt/staking/secret/jwtsecret"  \
+		--initial-state="https://beaconstate.info" --rest-api-enabled=true --rest-api-port=5052 \
+		--p2p-peer-upper-bound=100 --p2p-peer-lower-bound=60 \
+		--metrics-enabled --metrics-port=55002 --eth1-deposit-contract-max-request-size=1500
+
+##--validator-keys=/opt/staking/clients/teku/validators/keys:/opt/staking/clients/teku/validators/pwds --validators-graffiti="Mom's Old-Fashioned Robot Oil" --validators-proposer-default-fee-recipient 0x452D545Ea9Fcf6564370Ae418bcE49404994Bd3f
+
+InaccessibleDirectories=/home /root
+ReadOnlyDirectories=/etc /usr /var
+DevicePolicy=closed
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+ProtectProc=invisible
+RestrictSUIDSGID=true
+RestrictNamespaces=yes
+RestrictRealtime=yes
+#MemoryDenyWriteExecute=yes
+LockPersonality=yes
+#Drop all capabilites!!
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target

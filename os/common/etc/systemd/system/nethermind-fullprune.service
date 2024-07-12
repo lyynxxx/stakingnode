@@ -1,0 +1,53 @@
+[Unit]
+Description=Nethermind Execution Layer Client service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=nethermind
+Group=nethermind
+Restart=on-failure
+RestartSec=3
+Environment="DOTNET_BUNDLE_EXTRACT_BASE_DIR=/opt/staking/clients/nethermind/app/tmp"
+LimitNOFILE=12000
+LimitNPROC=12000
+WorkingDirectory=/opt/staking/clients/nethermind/app
+ExecStart=/opt/staking/clients/nethermind/app/Nethermind.Runner \
+  --baseDbPath /opt/staking/datadir/nethermind \
+  --Network.P2PPort 30303 \
+  --Network.DiscoveryPort 30303 \
+  --Metrics.Enabled true \
+  --Metrics.ExposePort 55001 \
+  --Metrics.IntervalSeconds 10000 \
+  --HealthChecks.Enabled true \
+  --Sync.SnapSync true \
+  --Sync.AncientBodiesBarrier 11052984 \
+  --Sync.AncientReceiptsBarrier 11052984 \
+  --JsonRpc.JwtSecretFile /opt/staking/secret/jwtsecret \
+  --Pruning.Mode Full \
+  --Pruning.AvailableSpaceCheckEnabled true \
+  --Pruning.FullPruningCompletionBehavior None \
+  --Pruning.FullPruningTrigger StateDbSize \
+  --Pruning.FullPruningThresholdMb 356000
+
+InaccessibleDirectories=/home /root
+ReadOnlyDirectories=/etc /usr /var
+DevicePolicy=closed
+PrivateTmp=yes
+NoNewPrivileges=yes
+PrivateDevices=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectSystem=full
+ProtectProc=invisible
+RestrictSUIDSGID=true
+RestrictNamespaces=yes
+RestrictRealtime=yes
+LockPersonality=yes
+#Drop all capabilites!!
+CapabilityBoundingSet=
+
+[Install]
+WantedBy=multi-user.target
