@@ -1,2 +1,0 @@
-## Watch any access/changes on validator key's password files
--w /opt/teku/validators/pwds/ -k vkeys
