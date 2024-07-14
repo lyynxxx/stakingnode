@@ -1,10 +1,14 @@
-# Rocky Linux 9 Kickstart Template
+# Rocky Linux 9 Kickstart Template - UEFI and GPT
+# inst.ks=http://192.168.10.125/vm/minimal.ks ip=ip::gateway:netmask:hostname:interface(enp0s3):none nameserver=x.x.x.x
+# Security profile: CIS2
 
 # System authorization information
 auth --enableshadow --passalgo=sha512
 
 # Network information
-network --bootproto=dhcp --device=eth0 --activate
+# network --bootproto=dhcp --device=eth0 --activate
+network  --bootproto=static --device=link --gateway=192.168.10.1 --ip=192.168.10.92 --nameserver=192.168.10.1 --netmask=255.255.255.0 --noipv6 --activate
+network  --hostname=mail.vm
 
 # Use graphical installation
 graphical
@@ -15,21 +19,52 @@ keyboard --vckeymap=us --xlayouts='us'
 # System language
 lang en_US.UTF-8
 
-# Installation source
+# Installation source (url: netinstall, network reuired; cdrom:iso file)
+# cdrom
 url --url="http://mirror.centos.org/rocky/9/BaseOS/x86_64/os/"
 
 # Minimal installation with additional packages
 %packages --nobase
 @^minimal-environment
-mc
-jq
+aide
+audit
+libselinux
+nftables
+rsyslog
+sudo
+-avahi
+-bind
+-cups
+-cyrus-imapd
+-dhcp-server
+-dnsmasq
+-dovecot
+-firewalld
+-ftp
+-gdm
+-httpd
+-mcstrans
+-net-snmp
+-nginx
+-openldap-clients
+-rsync-daemon
+-samba
+-setroubleshoot
+-squid
+-telnet
+-telnet-server
+-tftp
+-tftp-server
+-vsftpd
+-xorg-x11-server-common
+
 %end
 
 # System timezone
 timezone Europe/Budapest --isUtc --ntpservers=0.hu.pool.ntp.org,1.hu.pool.ntp.org,2.hu.pool.ntp.org
 
-# Root password
-rootpw --iscrypted $6$randomsalt$randomhashedpassword
+# Root password, changit!!!
+rootpw --plaintext JaffaKree123!%/
 
 # Bootloader configuration
 bootloader --location=mbr --boot-drive=sda
