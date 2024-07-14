@@ -175,14 +175,13 @@ cp /tmp/stakingnode/os/common/etc/modprobe.d/disable-network.conf /etc/modprobe.
 systemctl disable firewalld
 systemctl mask --now firewalld
 
-## update crypto policies
+## update crypto policies, disable weak system-wide poilicies
+## alternative: update-crypto-policies --set FUTURE
 cp /tmp/stakingnode/os/common/etc/crypto-policies/policies/modules/* /etc/crypto-policies/policies/modules/
 update-crypto-policies --set DEFAULT:NO-SHA1:NO-WEAKMAC:NO-SSHCBC:NO-SSHCHACHA20:NO-SSHETM
 
-
 ## hide some stuff
 echo "export HISTCONTROL=ignorespace" >> /root/.bash_profile
-
 
 ## Create default user with ssh key
 useradd -m -s /bin/bash -d /home/lyynxxx lyynxxx
