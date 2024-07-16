@@ -99,6 +99,9 @@ chown lyynxxx /opt/tmp
 # Hide processes from users. Users can see only their own process list
 #echo "proc                    /proc                   proc    defaults,hidepid=2    0 0" >> /etc/fstab
 
+## Change Zypp config, don't install all the recommended sht...
+sed -i 's/*.solver.onlyRequires/solver.onlyRequires=true/' /etc/zypp/zypp.conf
+
 # set /usr to read-only
 LINE=$(grep -n '/usr' /etc/fstab| cut -d ":" -f 1)
 if [ ! -z "$LINE" ]; then 
