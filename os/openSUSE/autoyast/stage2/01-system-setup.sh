@@ -31,26 +31,26 @@ cd /tmp/kickstart
 git clone https://github.com/lyynxxx/stakingnode.git
 
 ## Auditd
-mv /tmp/kickstart/stakingnode/os/openSUSE/etc/audit/rules.d/audit-hc.rules /etc/audit/rules.d/audit.rules
+mv /tmp/kickstart/stakingnode/os/common/etc/audit/rules.d/audit-hc.rules /etc/audit/rules.d/audit.rules
 chown root:root /etc/audit/rules.d/audit.rules
 chmod 600 /etc/audit/rules.d/audit.rules
 
 ## Fail2ban
-mv /tmp/kickstart/stakingnode/os/openSUSE/etc/fail2ban/jail.local /etc/fail2ban/jail.local
+mv /tmp/kickstart/stakingnode/os/common/etc/fail2ban/jail.local /etc/fail2ban/jail.local
 chown root:root /etc/fail2ban/jail.local
 chmod 644 /etc/fail2ban/jail.local
 
 ## nftables config
-mv /tmp/kickstart/stakingnode/os/openSUSE/etc/sysconfig/nftables.conf /etc/sysconfig/nftables.conf
+mv /tmp/kickstart/stakingnode/os/common/nftables/nftables.conf /etc/sysconfig/nftables.conf
 chown root:root /etc/sysconfig/nftables.conf
 chmod 600 /etc/sysconfig/nftables.conf
 
 ## Sysctl tuning
-cat /tmp/kickstart/stakingnode/os/openSUSE/etc/sysctl.d/99-sysctl.conf > /etc/sysctl.d/99-sysctl.conf
-mv /tmp/kickstart/stakingnode/os/openSUSE/etc/systemd/system/nftables.service /etc/systemd/system/
+cat /tmp/kickstart/stakingnode/os/common/etc/sysctl.d/99-sysctl.conf > /etc/sysctl.d/99-sysctl.conf
+mv /tmp/kickstart/stakingnode/os/common/etc/systemd/system/nftables.service /etc/systemd/system/
 
 ## SSH
-cat /tmp/kickstart/stakingnode/os/openSUSE/etc/ssh/sshd_config > /etc/ssh/sshd_config
+cat /tmp/kickstart/stakingnode/os/common/etc/ssh/sshd_config > /etc/ssh/sshd_config
 chown root:root /etc/ssh/sshd_config
 chmod 640 /etc/ssh/sshd_config
 
@@ -97,7 +97,7 @@ chown lyynxxx /opt/tmp
 
 ## fine tune fstab
 # Hide processes from users. Users can see only their own process list
-echo "proc                    /proc                   proc    defaults,hidepid=2    0 0" >> /etc/fstab
+#echo "proc                    /proc                   proc    defaults,hidepid=2    0 0" >> /etc/fstab
 
 # set /usr to read-only
 LINE=$(grep -n '/usr' /etc/fstab| cut -d ":" -f 1)
