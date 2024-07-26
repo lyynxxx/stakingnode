@@ -1,0 +1,22 @@
+The Importance of Keeping Valuable Data and Passwords Safe
+
+In today's digital age, the security of our most valuable data and passwords is paramount. Sensitive personal and/or financial information such as password, banking details, personal identification numbers, and confidential documents are frequently targeted by cybercriminals. If this information falls into the wrong hands, the consequences can be devastating, leading to identity theft, financial loss, and severe privacy breaches. Ensuring that our critical data is stored securely is essential to protect ourselves from these threats.
+
+One effective way to safeguard this information is by storing it in a physical form, such as written notes or encrypted digital backups on devices like NFC cards. By doing so, you create an additional layer of security. Even if your digital devices are compromised, your most sensitive information remains protected offline. Using encryption adds an extra level of security, making it extremely difficult for unauthorized individuals to access your data without the correct password. You can safely place a copy for safekeeping with anyone you trust, or you can just place it in a safe or in a lawyer's deposit.
+
+
+The Necessity of Backups
+
+Backups are a critical component of data security and management. They serve as a safety net against various forms of data loss, whether due to hardware failures, accidental deletions, malware attacks, or natural disasters. Without backups, losing access to your data can mean permanent loss, with potentially serious consequences, especially if the data includes important passwords or sensitive information.
+
+Regularly creating backups ensures that you have copies of your important data that can be restored in the event of an emergency. It is wise to maintain multiple backups in different forms and locations. For instance, having digital backups stored securely in a dedicated external storage offline or in the cloud, offers a robust solution. This redundancy helps ensure that even if one backup is compromised or lost, you still have access to your data through other means. There are data that we would not like to store online, using encrypted pendrives or NFC cards can help us sleep peacefully.
+
+
+Distributed Data and Accessibility in Emergencies
+
+It is increasingly difficult to keep all our digital data in one place due to the sheer volume and diversity of information we manage daily. Data is often spread across various devices, cloud services, and storage media. In the event of a sudden accident or emergency, family members may not know where to find crucial information or how to access it. This disorganization can lead to significant stress and complications during already challenging times. By creating secure backups and informing trusted family members or friends about their existence and access methods, you ensure that essential information can be readily retrieved when needed, providing peace of mind and smoother transitions in critical situations.
+
+
+Driven by a desire to securely save and back up my most important data (especially the access methods of my crypto wallet, which I did not want to store online), I developed this project to utilize tools available for free and NFC cards for encrypted data storage. Recognizing the potential benefits this solution offers, I am excited to share this project, allowing others to safeguard their valuable information in a similar manner. I hope to contribute to a broader community effort in enhancing personal data security and making robust backup solutions accessible to everyone.
+
+For those who aren't afraid to get their hands dirty, here's a simple but effective way to do it yourself. And for the rest of you, I'll share a mobile app that makes the whole process much easier. The application does not log, does not save anything, does not need internet or network. In fact! Feel free to disable all network access or monitor network traffic. Since it's made for myself, it's only available for Android right now.
