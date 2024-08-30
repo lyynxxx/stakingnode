@@ -1,7 +1,7 @@
 # Rocky Linux 9 Kickstart - UEFI | Following the CIS recommendations with with additional fine-tuning.
 # https://www.cisecurity.org/cis-benchmarks
 ###################################################################################################
-# inst.ks=http://192.168.10.125/vm/minimal.ks ip=ip::gateway:netmask:hostname:interface(enp0s3):none nameserver=x.x.x.x
+# inst.ks=http://192.168.10.125/vm/minimal.ks ip=ip::gateway:netmask:hostname:interface(enp0s3):off nameserver=x.x.x.x
 
 
 
