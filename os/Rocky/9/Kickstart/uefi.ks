@@ -99,9 +99,10 @@ logvol /var/log --fstype="xfs" --size=3072 --name=var_log --vgname=vg00 --fsopti
 echo "tmpfs /tmp tmpfs defaults,nodev,nosuid,noexec,mode=1777,size=1G 0 0" >> /etc/fstab
 echo "tmpfs /dev/shm tmpfs defaults,rw,nosuid,nodev,noexec,relatime 0 0" >> /etc/fstab
 
-## logins
+## logins, set your paranoid levels, but installer scripts that create/copy files may or may not work as they should with 077 umask...
 sed -i 's/^.*LOG_OK_LOGINS.*/LOG_OK_LOGINS yes/' /etc/login.defs
 sed -i 's/^UMASK.*/UMASK 077/' /etc/login.defs
+#sed -i 's/^UMASK.*/UMASK 027/' /etc/login.defs
 
 ## securing the console
 echo "console" > /etc/securetty
