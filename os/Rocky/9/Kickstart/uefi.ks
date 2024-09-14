@@ -194,8 +194,8 @@ chmod 400 /home/lyynxxx/.ssh/authorized_keys
 
 
 ## Set immutable options for password files, to prevent modification or accidental deletion (this will fluff you too! :D )
-chattr +i /etc/passwd
-chattr +i /etc/shadow
+#chattr +i /etc/passwd
+#chattr +i /etc/shadow
 
 
 # set /usr to read-only
