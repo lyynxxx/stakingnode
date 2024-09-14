@@ -1,27 +1,19 @@
 #       $OpenBSD: sshd_config,v 1.104 2021/07/02 05:11:21 dtucker Exp $
 
-# This is the sshd server system-wide configuration file.  See
-# sshd_config(5) for more information.
+## Hardened sshd config, based on a SLES15 install.
+## Last update: 2024.09.14
 
-# This sshd was compiled with PATH=/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+Protocol 2
 
-# The strategy used for options in the default sshd_config shipped with
-# OpenSSH is to specify options with their default value where
-# possible, but leave them commented.  Uncommented options override the
-# default value.
-
-# To modify the system-wide sshd configuration, create a  *.conf  file under
-#  /etc/ssh/sshd_config.d/  which will be automatically included below
-#Include /etc/ssh/sshd_config.d/*.conf
-
-# If you want to change the port on a SELinux system, you have to tell
-# SELinux about this change.
+# If you want to change the port on a SELinux system, you have to tell SELinux about this change.
 # semanage port -a -t ssh_port_t -p tcp #PORTNUMBER
-#
+
 Port 2992
-#AddressFamily any
+
+# only listen to IPv4
+AddressFamily inet
 #ListenAddress 0.0.0.0
-#ListenAddress ::
+
 
 #HostKey /etc/ssh/ssh_host_rsa_key
 #HostKey /etc/ssh/ssh_host_ecdsa_key
@@ -39,6 +31,7 @@ MACs -hmac-md5,hmac-md5-96,hmac-ripemd160,hmac-sha1-96,umac-64@openssh.com,hmac-
 #SyslogFacility AUTH
 LogLevel INFO
 
+
 # Authentication
 LoginGraceTime 0
 PermitRootLogin no
@@ -46,18 +39,14 @@ StrictModes yes
 MaxAuthTries 3
 #MaxSessions 10
 MaxStartups 10:30:60
-
 ClientAliveInterval 15
 ClientAliveCountMax 3
-
 PubkeyAuthentication yes
 
 # The default is to check both .ssh/authorized_keys and .ssh/authorized_keys2
 # but this is overridden so installations will only check .ssh/authorized_keys
 AuthorizedKeysFile      .ssh/authorized_keys
-
 #AuthorizedPrincipalsFile none
-
 #AuthorizedKeysCommand none
 #AuthorizedKeysCommandUser nobody
 
@@ -71,10 +60,10 @@ IgnoreRhosts yes
 
 # To disable tunneled clear text passwords, change to no here!
 PasswordAuthentication no
-#PermitEmptyPasswords no
+PermitEmptyPasswords no
 
 # Change to no to disable s/key passwords
-ChallengeResponseAuthentication no
+#ChallengeResponseAuthentication yes
 
 # Kerberos options
 KerberosAuthentication no
@@ -98,10 +87,11 @@ GSSAPIAuthentication no
 # If you just want the PAM account and session checks to run without
 # PAM authentication, then enable this but set PasswordAuthentication
 # and ChallengeResponseAuthentication to 'no'.
-UsePAM yes
+UsePAM no
 
-#AllowAgentForwarding yes
-#AllowTcpForwarding yes
+AllowAgentForwarding no
+AllowTcpForwarding no
+AllowStreamLocalForwarding no
 #GatewayPorts no
 X11Forwarding no
 #X11DisplayOffset 10
@@ -111,12 +101,12 @@ X11Forwarding no
 #PrintLastLog yes
 #TCPKeepAlive yes
 PermitUserEnvironment no
-#Compression delayed
+Compression no
 ClientAliveInterval 120
 #ClientAliveCountMax 3
 #UseDNS no
 #PidFile /run/sshd.pid
-#PermitTunnel no
+PermitTunnel no
 #ChrootDirectory none
 #VersionAddendum none
 AllowUsers=lyynxxx
@@ -124,7 +114,9 @@ AllowUsers=lyynxxx
 # no default banner path
 #Banner none
 
-# override default of no subsystems
+# path to the sftp-server binary depends on your distribution
+# Subsystem sftp /usr/libexec/openssh/sftp-server <--RHEL
+# Subsystem sftp /usr/lib/ssh/sftp-server  <--SUSE
 Subsystem       sftp    /usr/lib/ssh/sftp-server
 
 # This enables accepting locale enviroment variables LC_* LANG, see sshd_config(5).
