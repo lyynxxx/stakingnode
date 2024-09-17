@@ -2,12 +2,12 @@
 ## https://docs.teku.consensys.net/en/latest/HowTo/Get-Started/Run-Teku/
 ## You can run Teku as a beacon node and validator in a single process, or as separate processes.
 
-## Get JAVA, pref 17LTS Runtime Env only, no need for JDK...
+## Get JAVA/openjdk 21
 ## Arch
-## pacman -S extra/jre17-openjdk-headless
+## pacman -S extra/jre21-openjdk-headless 
 
 ## Suse
-## zypper in java-17-openjdk-headless
+## zypper in java-21-openjdk-headless
 
 ## Download Teku latest  --  assuming jq and curl are installed
 mkdir -p /opt/tmp

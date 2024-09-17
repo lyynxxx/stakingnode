@@ -13,12 +13,12 @@ LATEST=$(curl -sL https://api.github.com/repos/hyperledger/besu/releases/latest 
 curl -L https://github.com/hyperledger/besu/releases/download/$LATEST/besu-$LATEST.tar.gz --output besu-$LATEST.tar.gz
 tar -zxf besu-$LATEST.tar.gz -C /opt/tmp/
 
-## Get JAVA, pref 17LTS Runtime Env only, no need for JDK...
+## Get JAVA/openjdk 21
 ## Arch
-## pacman -S extra/jre17-openjdk-headless
+## pacman -S extra/jre21-openjdk-headless 
 
 ## Suse
-## zypper in java-17-openjdk-headless
+## zypper in java-21-openjdk-headless
 
 
 ## Add service users - besu
