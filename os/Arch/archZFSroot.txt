@@ -1,0 +1,185 @@
+# https://openzfs.github.io/openzfs-docs/Getting%20Started/Arch%20Linux/Root%20on%20ZFS.html
+
+sgdisk -Z /dev/vda
+sgdisk -Z /dev/vdb
+reboot
+-----------------------------------------------------
+sgdisk -n1:0:+500M -t1:ef00 /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF95020B0L960CGN
+sgdisk -n1:0:+500M -t1:ef00 /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF950402LP960CGN
+
+sgdisk -n2:0:+8G -t2:8200 /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF95020B0L960CGN
+sgdisk -n2:0:+8G -t2:8200 /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF950402LP960CGN
+
+sgdisk -n3:0:0 -t3:bf00 /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF95020B0L960CGN
+sgdisk -n3:0:0 -t3:bf00 /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF950402LP960CGN
+
+mkfs.vfat -F 32 -n EFI /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF95020B0L960CGN-part1
+mkfs.vfat -F 32 -n EFI /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF950402LP960CGN-part1
+
+mkswap /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF95020B0L960CGN-part2
+mkswap /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF950402LP960CGN-part2
+swapon /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF95020B0L960CGN-part2 /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF950402LP960CGN-part2
+
+echo 'pina12345678' > /etc/zfs/zroot.key
+chmod 000 /etc/zfs/zroot.key
+
+zpool create -f \
+    -o ashift=12 \
+    -o autotrim=on \
+    -O atime=off \
+    -O relatime=on \
+    -O encryption=aes-256-gcm -O keylocation=file:///etc/zfs/zroot.key -O keyformat=passphrase \
+    -O acltype=posixacl -O canmount=off -O compression=lz4 \
+    -O dnodesize=auto -O normalization=formD \
+    -O xattr=sa -O devices=off -O mountpoint=none -R /mnt zroot mirror /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF95020B0L960CGN-part3 /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF950402LP960CGN-part3
+
+
+zfs create -o mountpoint=none -o canmount=off zroot/ROOT
+zfs create -o mountpoint=none zroot/DATA
+zfs create -o mountpoint=/ -o canmount=noauto zroot/ROOT/arch
+zfs create -o mountpoint=/var zroot/ROOT/var
+zfs create -o mountpoint=/var/log zroot/ROOT/var/log
+zfs create -o mountpoint=/var/tmp zroot/ROOT/var/tmp
+zfs create -o mountpoint=/home zroot/DATA/home
+zfs create -o mountpoint=/opt zroot/DATA/opt
+zfs create -o mountpoint=/snapstore zroot/DATA/snapstore
+
+zpool set bootfs=zroot/ROOT/arch zroot
+zfs set primarycache=metadata zroot/ROOT
+zfs set secondarycache=none zroot/ROOT
+zfs set primarycache=metadata zroot/DATA
+zfs set secondarycache=none zroot/DATA
+
+zfs set exec=off zroot/DATA
+zfs set devices=off zroot/DATA
+zfs set setuid=off zroot/DATA
+zfs set exec=off zroot/ROOT/var/log
+zfs set devices=off zroot/ROOT/var/log
+zfs set setuid=off zroot/ROOT/var/log
+zfs set exec=off zroot/ROOT/var/tmp
+zfs set devices=off zroot/ROOT/var/tmp
+zfs set setuid=off zroot/ROOT/var/tmp
+
+zpool export zroot
+
+zpool import # get id: 7396796742574331042
+zpool import 7396796742574331042 -R /mnt zroot
+zfs load-key -L prompt zroot
+
+zfs mount zroot/ROOT/arch
+zfs mount -a
+
+mkdir -p /mnt/boot
+mount -t vfat -o fmask=0077,dmask=0077,iocharset=iso8859-1 /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF95020B0L960CGN-part1 /mnt/boot
+mkdir -p /mnt/etc/zfs
+
+pacstrap /mnt base git mc jq linux-lts linux-firmware linux-lts-headers efibootmgr os-prober rsync openssh refind dnsmasq nftables fail2ban
+genfstab -U -p /mnt >> /mnt/etc/fstab
+
+cp -ar custom_pkgs /mnt/root/
+arch-chroot /mnt
+
+!!!Remove all lines in /etc/fstab, leaving only the entries for swap and boot; for boot, change fmask and dmask to 0077.
+
+pacman -U root/custom_pkgs/*
+
+sed -i 's/^FILES=.*/FILES=(\/etc\/zfs\/zroot.key)/g' /etc/mkinitcpio.conf
+sed -i 's/^MODULES=.*/MODULES=(zfs)/g' /etc/mkinitcpio.conf
+sed -i 's/^HOOKS=.*/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block zfs filesystems)/g' /etc/mkinitcpio.conf
+
+echo 'pina12345678' > /etc/zfs/zroot.key
+chmod 000 /etc/zfs/zroot.key
+mkinitcpio -P
+
+ln -sf /usr/share/zoneinfo/Europe/Budapest /etc/localtime
+hwclock --systohc
+sed -i 's/#\(en_US\.UTF-8\)/\1/' /etc/locale.gen
+locale-gen
+echo "LANG=en_US.UTF-8" > /etc/locale.conf
+
+
+zpool set bootfs=zroot/ROOT/arch zroot
+zpool set cachefile=/etc/zfs/zpool.cache zroot
+
+systemctl enable zfs.target
+systemctl enable zfs-import-cache.service
+systemctl enable zfs-mount.service
+systemctl enable zfs-import.target
+
+echo "hostname" > /etc/hostname
+zgenhostid -f -o /etc/hostid
+passwd
+
+
+refind-install
+sed -i "s/^timeout.*/timeout 8/g" /boot/EFI/refind/refind.conf
+sed -i "s/^#textonly.*/textonly/g" /boot/EFI/refind/refind.conf
+tee /boot/refind_linux.conf <<EOF
+"Arch Linux VDA1" "root=ZFS=zroot/ROOT/arch rw zfs_import_dir=/dev/"
+EOF
+
+umount /boot
+mount /dev/disk/by-id/ata-INTEL_SSDSC2KB960G8_BTYF950402LP960CGN-part1 /boot
+refind-install
+sed -i "s/^timeout.*/timeout 8/g" /boot/EFI/refind/refind.conf
+sed -i "s/^#textonly.*/textonly/g" /boot/EFI/refind/refind.conf
+tee  /boot/refind_linux.conf <<EOF
+"Arch Linux VDA1" "root=ZFS=zroot/ROOT/arch rw zfs_import_dir=/dev/"
+EOF
+sed -i "s/VDA1/VDB1/g" /boot/refind_linux.conf
+
+
+#rsync -av --delete /boot/ /bckboot/
+#sed -i "s/VDA1/VDB1/g" /boot/refind_linux.conf
+
+
+umount /mnt/boot
+zfs snapshot -r zroot/ROOT@initial-installation  ## this creates a snapshot on all child datasets, but rollback applyed on each dataset
+zfs umount -a
+zpool export zroot
+
+
+####################################################
+
+systemctl enable systemd-networkd
+systemctl enable systemd-resolved
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+tee /etc/systemd/network/10-br0.netdev <<EOF
+[NetDev]
+Name=br0
+Kind=bridge
+MACAddress=1:06:87:00
+EOF
+
+
+tee /etc/systemd/network/20-br0.network <<EOF
+[Match]
+Name=br0
+
+[Link]
+RequiredForOnline=routable
+
+[Network]
+DNS=185.43.204.1
+Address=xxxx/24
+Gateway=xxxx
+EOF
+
+
+tee  /etc/systemd/network/30-bind-br0.network <<EOF
+[Match]
+Name=eno1
+
+[Network]
+Bridge=br0
+EOF
+
+
+tee /etc/systemd/resolved.conf <<EOF
+[Resolve]
+DNS=185.43.204.1
+MulticastDNS=no
+DNSStubListener=no
+
+EOF
