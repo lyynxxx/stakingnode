@@ -1,0 +1,5 @@
+mkdir -p /opt/archrepomirrors/{core,extra}/os/x86_64
+
+rsync -avzL --delete-after rsync://mirror.ubrco.de/archlinux/core/os/x86_64/ /opt/archrepomirrors/core
+rsync -avzL --delete-after rsync://mirror.ubrco.de/archlinux/extra/os/x86_64/ /opt/archrepomirrors/extra
+

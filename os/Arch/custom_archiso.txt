@@ -1,0 +1,51 @@
+## Custom archiso build with ZFS
+WORKINGDIR=/opt/archiso/
+PKGDIR=/opt/archiso/custom_pkgs
+
+
+git clone https://aur.archlinux.org/zfs-utils
+cd zfs-utils
+makepkg --skippgpcheck
+sudo pacman -U zfs-utils-2.2.7-1-x86_64.pkg.tar.zst
+
+git clone https://aur.archlinux.org/zfs-linux-lts.git
+cd zfs-linux-lts
+makepkg --skippgpcheck
+
+git clone https://aur.archlinux.org/zfs-dkms
+cd zfs-linux-lts
+makepkg --skippgpcheck
+
+
+cp -r /usr/share/archiso/configs/releng/ .
+mv releng zfsiso
+cd zfsiso
+mkdir zfsrepo
+cd zfsrepo
+cp /opt/archiso/custom_pkgs/zfs-dkms/*.zst .
+cp /opt/archiso/custom_pkgs/zfs-utils/*.zst .
+repo-add zfsrepo.db.tar.gz *.zst
+cd ..
+
+tee -a packages.x86_64 <<EOF
+## ZFS
+linux-headers
+zfs-dkms
+zfs-utils
+EOF
+
+
+tee -a pacman.conf <<EOF
+
+[zfsrepo]
+SigLevel = Optional TrustAll
+Server = file:///opt/archiso/zfsiso/zfsrepo
+
+EOF
+
+rm -rf WORK && rm -rf ISO
+mkdir WORK
+mkdir ISO
+
+su
+mkarchiso -v -w WORK -o ISO .
